@@ -1,0 +1,20 @@
+.pagecontainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: 100vh;
+    background-color: lightgray;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    justify-content: center;
+    width: 600px;
+    height: 500px;
+    border-radius: 10px;
+    background-color: black;
+    box-shadow: 10px 10px 5px lightslategrey;
+}
