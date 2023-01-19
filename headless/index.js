@@ -24,7 +24,7 @@ async function create_session() {
   }
   const res = await fetch(`https://surfly.online/v2/sessions/?api_key=${api_key}`, params);
   const data = await res.json();
-  console.log(data);
+  console.log(data, 'data');
   return data.headless_link;
 }
 
