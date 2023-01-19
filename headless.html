@@ -24,29 +24,26 @@
         </section>
 
         <div>
-          <form>
+                <form>
 
-            <label for="url">
-              URL to browse:
-              <input id="url" placeholder="url" name="url" type="text" value="https://en.wikipedia.org/wiki/Main_Page">
-            </label>
-            <br>
+                    <label for="url">
+                        URL to browse:
+                        <input id="url" placeholder="url" name="url" type="text"
+                            value="https://en.wikipedia.org/wiki/Main_Page">
+                    </label>
+                    <br>
 
-            <button onclick="create_session().then(url => show_session(url))" type="button" class="hide-after-start">Start</button>
-           
+                    <button onclick="create_session().then(url => show_session(url))" type="button"
+                        class="hide-after-start">Start</button>
+
+            </div>
+
+            <iframe class="show-after-start" hidden width="1024" height="768"
+                allow="autoplay *; camera *; microphone *; display-capture *; geolocation *">
+            </iframe>
+
+
         </div>
-        
-        <iframe
-                class="show-after-start" hidden
-    width="1024"
-    height="768"
-    src="https://app.surfly.com/embed/history/?agent_token=`d76f04f9ebc34ef7bfcc699bd5ed65c2`"
-    allow="autoplay *; camera *; microphone *; display-capture *; geolocation *;"
->
-</iframe>
-
-
-      </div>
     </div>
   </body>
 </html>
