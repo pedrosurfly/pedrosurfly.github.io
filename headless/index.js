@@ -18,7 +18,7 @@ async function create_session() {
     body: JSON.stringify({
       url,
       headless: true,
-      script_embedded: "https://headless-tiger.glitch.me/script_embedded.js", // point this URL to your own embedded script
+      script_embedded: "https://pedrosurfly.github.io/headless/script_embedded.js", // point this URL to your own embedded script
     }),
   };
 
