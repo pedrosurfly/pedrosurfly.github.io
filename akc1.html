@@ -13,7 +13,11 @@
         var nicChatPOC = '4af0d86f-ccb5-42a9-b742-a01c0dd513be';
         var clusterNiC = 'c36';
         var surflyWidgetKey = '2adb763e812b4818b962a3260bdf2ead';
-        var surflyModalBody = "By clicking Accept, an agent will automatically join you in a videochat session. You will be prompted to enable/disable your camera and mute/unmute your microphone. You can access your audio settings using the gear icon. You can end the videochat at any time, by clicking ✕ in the menu or by closing this tab in your browser.";
+        // var videoSignalerURL = "https://home-c58.nice-incontact.com/inContact/Manage/Scripts/Spawn.aspx?scriptName=Surfly_Signaler&bus_no=4604699&scriptId=149610338&skill_no=18593088&p1=&p2=&p3=&p4=&p5=&Guid=e015cc3e-9bb6-479c-8a28-e86d758c4845";
+        var chatSignalerURL = "https://home-c36.nice-incontact.com/inContact/Manage/Scripts/Spawn.aspx?scriptName=on_chat&bus_no=4600296&scriptId=149696167&skill_no=10577140&Guid=d99c3edd-0621-4c11-a2c0-71744c120862";
+        var surflyModalTitle = 'Start Videochat';
+        var surflyModalBody = 'By clicking Accept, an agent will automatically join you in a videochat session. You will be prompted to enable/disable your camera and mute/unmute your microphone. You can access your audio settings using the gear icon. You can end the videochat at any time, by clicking ✕ in the menu or by closing this tab in your browser.';
+
         let NicHomeURL = "https://home-" + clusterNiC + ".nice-incontact.com";
 
         var chatSrc = document.createElement("script");
@@ -29,7 +33,7 @@
             head.appendChild(scaledroneSrc);
 
             (function (s, u, r, f, l, y) {
-                s[f] = s[f] || { init: function () { s[f].q = arguments } };
+                s[f] = s[f] || { init: function () { s[f].q = arguments; } };
                 l = u.createElement(r); y = u.getElementsByTagName(r)[0]; l.async = 1;
                 l.src = 'https://surfly-us.com/surfly.js'; y.parentNode.insertBefore(l, y);
             })
@@ -37,8 +41,8 @@
 
             scaledroneSrc.onload = function () {
                 loadSurfly();
-            }
-        }
+            };
+        };
 
 
         function signalContact(contactId, followerLink, sessionPin, type) {
@@ -119,6 +123,7 @@
 
 
         function createSurflySession(contactId, inviteType) {
+            console.log('createSurflySession');
             var surflyMetadata = { "name": "Customer" };
             if (inviteType == 'cobrowse') {
                 var regularSession = Surfly.session({ block_until_agent_joins: false });
@@ -126,6 +131,7 @@
                     console.log('Waiting for confirmation');
                     session.startLeader(null, surflyMetadata);
                 }).on("session_started", function (session, event) {
+                    console.log('SurflySession: ' + session.pin + session.followerLink);
                     var surflySessionPin = session.pin;
                     var surflyFollowerLink = session.followerLink;
 
@@ -187,7 +193,7 @@
             Surfly.init(settings, function (initResult) {
                 if (initResult.success) {
                     if (!Surfly.isInsideSession) {
-                        //createVideochatButton();
+                        createVideochatButton();
 
                         const drone = new Scaledrone(scaleDroneChannelId);
 
@@ -209,8 +215,11 @@
                                     }
                                 }).on('message', message => {
                                     const { data, id, timestamp, clientId, member } = message;
-
+                                    console.log(data.type + " ElevateToCobrowse");
+                                    console.log(data.bu + " " + nicBusNumber);
+                                    console.log(data.uniquePageId + " " + localStorage.getItem(nicBusNumber + "-uniquePageId"));
                                     if (data.type == 'ElevateToCobrowse' && data.bu == nicBusNumber && data.uniquePageId == localStorage.getItem(nicBusNumber + "-uniquePageId")) {
+                                        console.log("I AM IN");
                                         createSurflySession(data.contactId, 'cobrowse');
 
                                         console.log('Co-browsing session requested');
@@ -292,7 +301,6 @@
 
             console.log('Initializing NiC');
         }
-
     </script>
 </body>
 
