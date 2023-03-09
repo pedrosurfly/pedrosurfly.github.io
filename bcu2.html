@@ -101,23 +101,8 @@
                 window.nicVideochatContactId = event.userData.contactId;
             }).on("session_ended", function (session, event) {
                 console.log("Videochat session ended");
-                createVideochatButton();
                 endWorkItem(window.nicVideochatContactId);
             }).create();
-        }
-
-
-        function createVideochatButton() {
-            Surfly.button({ position: 'bottomright' });
-            var surflyIframe = document.getElementById("surfly-api-frame");
-            var surflyButton = surflyIframe.contentWindow.document.getElementsByClassName("surfly-button-visible")[0];
-            surflyButton.innerHTML = '<span>Start Videochat</span>';
-            surflyButton.style.backgroundColor = 'rgb(0,0,0)';
-            var newSurflyButton = surflyButton.cloneNode(true);
-            surflyButton.parentNode.replaceChild(newSurflyButton, surflyButton);
-            newSurflyButton.addEventListener('click', function () {
-                createVideochatSession();
-            });
         }
 
 
@@ -143,7 +128,6 @@
                 }).on("session_ended", function (session, event) {
                     console.log("Regular session ended, updating Studio");
                     updateStudioScript(contactId, 'cobrowse');
-                    createVideochatButton();
                 }).create();
             } else if (inviteType == 'videochat') {
                 var regularSession = Surfly.session({
@@ -168,7 +152,6 @@
                 }).on("session_ended", function (session, event) {
                     console.log("Regular session ended, updating Studio");
                     updateStudioScript(contactId, 'videochat');
-                    createVideochatButton();
                 }).create();
             }
         }
@@ -192,7 +175,6 @@
             Surfly.init(settings, function (initResult) {
                 if (initResult.success) {
                     if (!Surfly.isInsideSession) {
-                        // createVideochatButton();
 
                         const drone = new Scaledrone(scaleDroneChannelId);
 
