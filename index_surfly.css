@@ -14,7 +14,7 @@
     align-items: center;
     justify-content: flex-start;
     width: 400px;
-    height: 470px;
+    height: 410px;
     border: 1px groove lightslategrey;
     border-radius: 10px;
     box-shadow: 10px 10px 5px lightslategrey;
@@ -37,6 +37,6 @@
 
 .img-logo {
     width: 400px;
-    height: 400px;
+    height: 300px;
     border-radius: 10px;
 }
