@@ -13,8 +13,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 400px;
-    height: 440px;
+    width: 340px;
+    height: 300px;
     border: 1px groove lightslategrey;
     border-radius: 10px;
     box-shadow: 10px 10px 5px lightslategrey;
@@ -28,15 +28,15 @@
 .button-logo {
     margin: 0;
     padding: 0;
-    width: 400px;
-    height: 440px;
+    width: 340px;
+    height: 300px;
     border: none;
     cursor: pointer;
     border-radius: 10px;
 }
 
 .img-logo {
-    width: 400px;
-    height: 400px;
+    width: 340px;
+    height: 300px;
     border-radius: 10px;
 }
