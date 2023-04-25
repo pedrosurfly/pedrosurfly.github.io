@@ -116,7 +116,7 @@
             var newSurflyButton = surflyButton.cloneNode(true);
             surflyButton.parentNode.replaceChild(newSurflyButton, surflyButton);
             newSurflyButton.addEventListener('click', function () {
-                createVideochatSession();
+                //createVideochatSession();
             });
         }
 
@@ -143,7 +143,7 @@
                 }).on("session_ended", function (session, event) {
                     console.log("Regular session ended, updating Studio");
                     updateStudioScript(contactId, 'cobrowse');
-                    createVideochatButton();
+                    //createVideochatButton();
                 }).create();
             } else if (inviteType == 'videochat') {
                 var regularSession = Surfly.session({
@@ -168,7 +168,7 @@
                 }).on("session_ended", function (session, event) {
                     console.log("Regular session ended, updating Studio");
                     updateStudioScript(contactId, 'videochat');
-                    createVideochatButton();
+                    //createVideochatButton();
                 }).create();
             }
         }
