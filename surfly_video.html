@@ -25,7 +25,9 @@
             var videoSignalerURL    = "https://home-b32.nice-incontact.com/inContact/Manage/Scripts/Spawn.aspx?scriptName=Surfly_Signaler&bus_no=4599130&scriptId=84719989&skill_no=4137136&Guid=602c459a-c935-4539-9fa0-0827ab102c74";
             var chatSignalerURL     = "https://home-b32.nice-incontact.com/inContact/Manage/Scripts/Spawn.aspx?scriptName=Surfly_Signaler&bus_no=4599130&scriptId=86019322&skill_no=11312999&Guid=602c459a-c935-4539-9fa0-0827ab102c74";
             var surflyModalTitle    = 'Start Videochat';
-            var surflyModalBody     = 'By clicking Accept, an agent will automatically join you in a videochat session. You will be prompted to enable/disable your camera and mute/unmute your microphone. You can access your audio settings using the gear icon. You can end the videochat at any time, by clicking ✕ in the menu or by closing this tab in your browser.';let NicHomeURL = "https://home-" + clusterNiC + ".nice-incontact.com";
+            var surflyModalBody     = 'Thank you for requesting support through our secure co-browsing platform. The EPB representative assisting you today will not be able to see any open tabs in your browser or sensitive information such as passwords. Would you like to proceed with this session and connect with a local EPB representative?';
+        
+        let NicHomeURL = "https://home-" + clusterNiC + ".nice-incontact.com";
 
         var chatSrc = document.createElement("script");
         chatSrc.src = NicHomeURL + "/inContact/ChatClient/js/embed.min.js";
