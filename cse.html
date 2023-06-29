@@ -139,6 +139,7 @@ chatSrc.onload = function () {
                     console.log('Waiting for confirmation', regularSession);
                     session.startLeader(null, surflyMetadata);
                 }).on("session_started", function (session, event) {
+		    console.log('session_started - ', 'session:', session, 'event:', event);
                     console.log('SurflySession: ' + session.pin + session.followerLink);
                     var surflySessionPin = session.pin;
                     var surflyFollowerLink = session.followerLink;
