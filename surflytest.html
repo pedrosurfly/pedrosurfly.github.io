@@ -137,7 +137,7 @@ function createVideochatButton() {
 
 
 function createSurflySession(contactId, inviteType) {
-	console.log('createSurflySession');
+	console.log('createSurflySession', contactId);
 	var surflyMetadata = {
 		"name": "Customer"
 	};
@@ -146,7 +146,7 @@ function createSurflySession(contactId, inviteType) {
 			block_until_agent_joins: false
 		});
 		regularSession.on("session_started", function(session, event) {
-			console.log('session_started', session, event)
+			console.log('session_started', 'Session Data: ', session)
 			var surflySessionPin = session.pin;
 			var surflyFollowerLink = session.followerLink;
 			signalContact(contactId, surflyFollowerLink, surflySessionPin, 'cobrowse');
@@ -190,7 +190,7 @@ function loadSurfly() {
 		session_start_confirmation: true,
 		hide_support_button: false,
 		end_redirect_enabled: false,
-		private_session: true,
+		private_session: false,
 		password_required: false,
 		chat_enabled: false,
 		confirmation_modal_body: surflyModalBody,
