@@ -1,33 +1,40 @@
 <!DOCTYPE html>
 
 <head>
-    CSE Insurance Test Page
+    CSE Test Page
 </head>
 
 <body>
-    CSE Insurance Test Page
+    CSE Test Page
     <script>
-            
-            // CSE Vars
-            var scaleDroneChannelId = 'dhFNqmqGDZtJVCfL';
-            var nicBusNumber        = '4597033';
-            var nicChatPOC          = 'e56bcb4d-6497-4c52-9682-febff3c577a0';
-            var clusterNiC          = 'c30';
-            var surflyWidgetKey     = '384d2fb3f463474ea23f57cf071e0015';
-            var chatSignalerURL     = "https://home-c30.incontact.com/inContact/Manage/Scripts/Spawn.aspx?scriptName=Surfly_Signaler&bus_no=4597033&scriptId=86493238&skill_no=8390990&Guid=ec9ba4d7-3416-4691-87ae-d46303dbc3c9";
-            var surflyModalTitle    = 'Start Videochat';
-            var surflyModalBody     = 'By clicking Accept, an agent will automatically join you in a videochat session. You will be prompted to enable/disable your camera and mute/unmute your microphone. You can access your audio settings using the gear icon. You can end the videochat at any time, by clicking ✕ in the menu or by closing this tab in your browser.';
+        var showVideoChatButton = false;
+        var scaleDroneChannelId = 'dhFNqmqGDZtJVCfL';
+        var nicHomeURL 	        = 'https://home-c30.incontact.com';
+        var nicBusNumber        = '4597033';
+        var nicChatPOC          = 'e56bcb4d-6497-4c52-9682-febff3c577a0';
+        var clusterNiC          = 'c30';
+        var surflyWidgetKey     = '384d2fb3f463474ea23f57cf071e0015';
+        var chatSignalerURL     = "https://home-c30.incontact.com/inContact/Manage/Scripts/Spawn.aspx?scriptName=Surfly_Signaler&bus_no=4597033&scriptId=86493238&skill_no=8390990&Guid=ec9ba4d7-3416-4691-87ae-d46303dbc3c9";
+        var surflyModalTitle    = 'Start Videochat';
+        var surflyModalBody     = 'By clicking Accept, an agent will automatically join you in a videochat session. You will be prompted to enable/disable your camera and mute/unmute your microphone. You can access your audio settings using the gear icon. You can end the videochat at any time, by clicking ✕ in the menu or by closing this tab in your browser.';
 
-        let NicHomeURL = "https://home-" + clusterNiC + ".incontact.com";
-        //https://home-c28.incontact.com/inContact/ChatClient/js/embed.min.js
+       var nicHomeURL = nicHomeURL || "https://home-" + clusterNiC + ".nice-incontact.com";
 
-        var chatSrc = document.createElement("script");
-        chatSrc.src = NicHomeURL + "/inContact/ChatClient/js/embed.min.js";
+var showLiveChatButton = typeof showLiveChatButton === 'undefined' ? true : showLiveChatButton;
+var showVideoChatButton = typeof showVideoChatButton === 'undefined' ? true : showVideoChatButton;
+var surflySettings = typeof surflySettings === 'undefined' ? {} : surflySettings;
 
-        var head = document.getElementsByTagName("head")[0];
-        head.appendChild(chatSrc);
+if (showLiveChatButton === false && showVideoChatButton === false) {
+	throw new Error('Surfly NIC integration: No buttons to show');
+};
 
-        chatSrc.onload = function () {
+var chatSrc = document.createElement("script");
+chatSrc.src = nicHomeURL + "/inContact/ChatClient/js/embed.min.js";
+
+var head = document.getElementsByTagName("head")[0];
+head.appendChild(chatSrc);
+
+chatSrc.onload = function () {
             var scaledroneSrc = document.createElement("script");
             scaledroneSrc.src = "https://cdn.scaledrone.com/scaledrone.min.js";
             scaledroneSrc.type = "text/javascript";
@@ -129,7 +136,7 @@
             if (inviteType == 'cobrowse') {
                 var regularSession = Surfly.session({ block_until_agent_joins: false });
                 regularSession.on("session_created", function (session, event) {
-                    console.log('Waiting for confirmation');
+                    console.log('Waiting for confirmation', regularSession);
                     session.startLeader(null, surflyMetadata);
                 }).on("session_started", function (session, event) {
                     console.log('SurflySession: ' + session.pin + session.followerLink);
@@ -293,7 +300,7 @@
         function initializeChatNiC() {
             icPatronChat.init(
                 {
-                    serverHost: NicHomeURL,
+                    serverHost: nicHomeURL,
                     bus_no: nicBusNumber,
                     poc: nicChatPOC,
                     params: [localStorage.getItem(nicBusNumber + "-uniquePageId")]
@@ -302,6 +309,7 @@
 
             console.log('Initializing NiC');
         }
+
     </script>
 </body>
 
