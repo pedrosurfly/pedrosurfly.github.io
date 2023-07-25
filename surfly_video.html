@@ -159,8 +159,8 @@
             } else if (inviteType == 'videochat') {
                 var regularSession = Surfly.session({
                     block_until_agent_joins: false,
-                    videochat_autostart: true,
-                    videochat_start_fullscreen: true
+                    //videochat_autostart: true,
+                    //videochat_start_fullscreen: true
                 });
                 regularSession.on("session_created", function (session, event) {
                     console.log('Waiting for confirmation');
