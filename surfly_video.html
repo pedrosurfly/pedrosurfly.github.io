@@ -94,7 +94,8 @@
             var videochatSession = Surfly.session({
                 block_until_agent_joins: false,
                 videochat_autostart: true,
-                videochat_start_fullscreen: true
+                videochat_start_fullscreen: true,
+                start_muted: true
             });
             var surflyMetadata = { "name": "Customer" };
 
@@ -160,7 +161,9 @@
                 var regularSession = Surfly.session({
                     block_until_agent_joins: false,
                     videochat_autostart: true,
-                    videochat_start_fullscreen: true
+                    videochat_start_fullscreen: true,
+                    videochat_prompt: false,
+                    start_muted: true
                 });
                 regularSession.on("session_created", function (session, event) {
                     console.log('Waiting for confirmation');
