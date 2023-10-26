@@ -223,6 +223,7 @@
                             console.log("random: " + uniquePageId);
 
                             localStorage.setItem(nicBusNumber + "-uniquePageId", uniquePageId);
+                            Surfly.session().startLeader(null, {name: document.getElementById("name").value, email_id: document.getElementById("email").value});
                         }
 
                     }
