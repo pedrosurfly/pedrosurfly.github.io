@@ -94,13 +94,13 @@
         function createVideochatSession() {
             var videochatSession = Surfly.session({
                 block_until_agent_joins: false,
-                hide_unitl_anget_joins: true,
+                hide_until_agent_joins: true,
                 videochat_autostart: true,
                 videochat_start_fullscreen: true,
                 videochat_prompt: false,
                 start_muted: true
             });
-            var surflyMetadata = { "name": "Customer" };
+            var surflyMetadata = { "name": name };
 
             videochatSession.on("session_created", function (session, event) {
                 console.log('Waiting for confirmation');
@@ -139,7 +139,7 @@
 
         // Create Surfly Session
         function createSurflySession(contactId, inviteType) {
-            var surflyMetadata = { "name": "Customer" };
+            var surflyMetadata = { "name": name };
             if (inviteType == 'cobrowse') {
                 var regularSession = Surfly.session({ block_until_agent_joins: false });
                 regularSession.on("session_created", function (session, event) {
@@ -207,8 +207,6 @@
             Surfly.init(settings, function (initResult) {
                 if (initResult.success) {
                     if (!Surfly.isInsideSession) {
-                        // createVideochatButton();
-
                         if (localStorage.getItem(nicBusNumber + "-uniquePageId")) {
                             console.log("random: " + localStorage.getItem(nicBusNumber + "-uniquePageId"));
                             Surfly.session().startLeader(null, {name: document.getElementById("name").value, email_id: document.getElementById("email").value});
