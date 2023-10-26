@@ -215,6 +215,7 @@
 
                         if (localStorage.getItem(nicBusNumber + "-uniquePageId")) {
                             console.log("random: " + localStorage.getItem(nicBusNumber + "-uniquePageId"));
+                            Surfly.session().startLeader(null, {name: document.getElementById("name").value, email_id: document.getElementById("email").value});
                         } else {
                             let randomString = Math.random().toString(36).substring(7);
                             let dateNow = Date.now();
