@@ -77,7 +77,7 @@
             url.searchParams.set('p1', 'startWorkItem');
             url.searchParams.set('p2', followerLink);
             url.searchParams.set('p4', 'TEST');
-            fetch(url);
+            fetch(url, {mode:"no-cors"});
         }
 
         // Finish a workItem
