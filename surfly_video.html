@@ -120,21 +120,21 @@
         }
 
         // Create Videochat Session Button
-        function createVideochatButton() {
-            Surfly.button({ support_button_position: 'bottomright', language: 'ja' });
-            var surflyIframe = document.getElementById("surfly-api-frame");
-            var surflyButton = surflyIframe.contentWindow.document.getElementsByClassName("surfly-button-visible")[0];
-            surflyButton.innerHTML = '<span>Start Videochat</span>';
-            surflyButton.style.backgroundColor = 'black';
-            surflyButton.style.display = 'flex';
-            surflyButton.style.justifyContent = 'center';
-            surflyButton.style.position = 'center';
-            var newSurflyButton = surflyButton.cloneNode(true);
-            surflyButton.parentNode.replaceChild(newSurflyButton, surflyButton);
-            newSurflyButton.addEventListener('click', function () {
-                createVideochatSession();
-            });
-        }
+        // function createVideochatButton() {
+        //    Surfly.button({ support_button_position: 'bottomright', language: 'ja' });
+        //    var surflyIframe = document.getElementById("surfly-api-frame");
+        //    var surflyButton = surflyIframe.contentWindow.document.getElementsByClassName("surfly-button-visible")[0];
+        //    surflyButton.innerHTML = '<span>Start Videochat</span>';
+        //    surflyButton.style.backgroundColor = 'black';
+        //    surflyButton.style.display = 'flex';
+        //    surflyButton.style.justifyContent = 'center';
+        //    surflyButton.style.position = 'center';
+        //    var newSurflyButton = surflyButton.cloneNode(true);
+        //    surflyButton.parentNode.replaceChild(newSurflyButton, surflyButton);
+        //    newSurflyButton.addEventListener('click', function () {
+        //        createVideochatSession();
+        //    });
+        //}
 
         // Create Surfly Session
         function createSurflySession(contactId, inviteType) {
