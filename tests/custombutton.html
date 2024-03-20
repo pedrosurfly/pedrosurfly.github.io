@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Live Help</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <script>
+
+        (function (s, u, r, f, l, y) {
+            s[f] = s[f] || { init: function () { s[f].q = arguments; } };
+            l = u.createElement(r); y = u.getElementsByTagName(r)[0]; l.async = 1;
+            l.src = 'https://surfly.com/surfly.js'; y.parentNode.insertBefore(l, y);
+        })
+            (window, document, 'script', 'Surfly');
+
+        var settings = {
+            // Surfly session options can be set here, or at the Company/Plan levels.
+            widget_key: 'fcaab5fc305e41b9a3ff42e526630d81',
+        };
+
+        Surfly.init(settings, function (initResult) {
+            if (initResult.success) {
+                // display the default Surfly button
+                if (!Surfly.isInsideSession) {
+
+                }
+            }
+            else {
+                console.log("Surfly was unable to initialize properly.");
+            }
+        });
+
+    </script>
+</head>
+
+<body>
+
+    <button onclick="Surfly.session().startLeader()">Start Cobrowsing</button>
+
+</body>
+
+</html>
