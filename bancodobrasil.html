@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banco do Brasil Demo</title>
+    <script>
+        var showVideoChatButton = true;
+        var nicBusNumber = "4606213";
+        var nicChatPOC = "dcff5278-b870-4308-ad34-7799be5418c0";
+        var clusterNiC = "b32";
+        var surflyWidgetKey = "7770e7d092434ab297abeb6224ffe070";
+        var videoSignalerURL ="https://home-b32.nice-incontact.com/inContact/Manage/Scripts/Spawn.aspx?scriptName=Surfly\IB_Video_WI&bus_no=4606213&scriptId=191499450&skill_no=23098050&p1=&p2=&p3=&p4=&p5=&Guid=fd79aa52-e1c3-48d5-b73a-11659f12cda0";
+        var surflyModalTitle    = 'Start Videochat';
+        var surflyModalBody     = 'Thank you for requesting support through our secure co-browsing platform. The EPB representative assisting you today will not be able to see any open tabs in your browser or sensitive information such as passwords. Would you like to proceed with this session and connect with a local EPB representative?';
+        
+        let NicHomeURL = "https://home-" + clusterNiC + ".nice-incontact.com";
+
+        var chatSrc = document.createElement("script");
+        chatSrc.src = NicHomeURL + "/inContact/ChatClient/js/embed.min.js";
+
+        var head = document.getElementsByTagName("head")[0];
+        head.appendChild(chatSrc);
+
+        chatSrc.onload = function () {
+            (function (s, u, r, f, l, y) {
+                s[f] = s[f] || { init: function () { s[f].q = arguments } };
+                l = u.createElement(r); y = u.getElementsByTagName(r)[0]; l.async = 1;
+                l.src = 'https://surfly-us.com/surfly.js'; y.parentNode.insertBefore(l, y);
+            })
+                (window, document, 'script', 'Surfly');
+                loadSurfly();
+        }
+
+
+        function signalContact(contactId, followerLink, sessionPin, type) {
+            var url = new URL(chatSignalerURL);
+            url.searchParams.set('p1', contactId);
+            url.searchParams.set('p2', followerLink);
+            url.searchParams.set('p3', sessionPin);
+            url.searchParams.set('p4', type);
+            fetch(url);
+        }
+
+        // 
+        function updateStudioScript(contactId, type) {
+            var url = new URL(chatSignalerURL);
+            url.searchParams.set('p1', contactId);
+            url.searchParams.set('p2', 'NA');
+            url.searchParams.set('p3', `sessionended-${type}`);
+            url.searchParams.set('p4', 'NA');
+            fetch(url);
+        }
+
+        //
+        function signalWorkItem(followerLink) {
+            var url = new URL(videoSignalerURL);
+            url.searchParams.set('p1', 'startWorkItem');
+            url.searchParams.set('p2', followerLink);
+            fetch(url, {mode:"no-cors"});
+        }
+
+        // Finish a workItem
+        function endWorkItem(contactId) {
+            var url = new URL(videoSignalerURL);
+            url.searchParams.set('p1', 'endWorkItem');
+            url.searchParams.set('p2', contactId);
+            fetch(url);
+        }
+
+        // Create Videochat Session
+        function createVideochatSession() {
+            var videochatSession = Surfly.session({
+                block_until_agent_joins: false,
+                hide_unitl_anget_joins: true,
+                videochat_autostart: true,
+                start_with_fullscreen_videochat: true,
+                videochat_prompt: true,
+                start_muted: false,
+            });
+            var surflyMetadata = { "name": "Pedro Pereira", "email": "pedro@surfly.com" };
+
+            videochatSession.on("session_created", function (session, event) {
+                console.log('Waiting for confirmation');
+                session.startLeader(null, surflyMetadata);
+            }).on("session_started", function (session, event) {
+                var surflySessionPin = session.pin;
+                var surflyFollowerLink = session.followerLink;
+                signalWorkItem(surflyFollowerLink);
+                console.log("Videochat session started");
+                console.log('Session Pin: ' + surflySessionPin);
+            }).on("viewer_joined", function (session, event) {
+                window.nicVideochatContactId = event.userData.contactId;
+            }).on("session_ended", function (session, event) {
+                console.log("Videochat session ended");
+                createVideochatButton();
+                endWorkItem(window.nicVideochatContactId);
+            }).create();
+        }
+
+        // Create Surfly Session
+        function createSurflySession(contactId, inviteType) {
+            var surflyMetadata = { "name": "Customer" };
+            if (inviteType == 'cobrowse') {
+                var regularSession = Surfly.session({ block_until_agent_joins: false });
+                regularSession.on("session_created", function (session, event) {
+                    console.log('Waiting for confirmation');
+                    session.startLeader(null, surflyMetadata);
+                }).on("session_started", function (session, event) {
+                    var surflySessionPin = session.pin;
+                    var surflyFollowerLink = session.followerLink;
+
+                    signalContact(contactId, surflyFollowerLink, surflySessionPin, 'cobrowse');
+
+                    var chatDiv = document.getElementById("chat-div-wrap");
+                    chatDiv.style.zIndex = "2147483549";
+                    console.log('Session Pin: ' + surflySessionPin);
+                    console.log('Contact ID: ' + contactId);
+                }).on("session_ended", function (session, event) {
+                    console.log("Regular session ended, updating Studio");
+                    updateStudioScript(contactId, 'cobrowse');
+                    createVideochatButton();
+                }).create();
+            } else if (inviteType == 'videochat') {
+                var regularSession = Surfly.session({
+                    block_until_agent_joins: false,
+                    videochat_autostart: true,
+                    start_with_fullscreen_videochat: true,
+                    videochat_prompt: false,
+                    start_muted: false
+                });
+                regularSession.on("session_created", function (session, event) {
+                    console.log('Waiting for confirmation');
+                    session.startLeader(null, surflyMetadata);
+                }).on("session_started", function (session, event) {
+                    var surflySessionPin = session.pin;
+                    var surflyFollowerLink = session.followerLink;
+
+                    signalContact(contactId, surflyFollowerLink, surflySessionPin, 'videochat');
+
+                    var chatDiv = document.getElementById("chat-div-wrap");
+
+                    chatDiv.style.zIndex = "2147483549";
+                    console.log('Session Pin: ' + surflySessionPin);
+                    console.log('Contact ID: ' + contactId);
+                }).on("session_ended", function (session, event) {
+                    console.log("Regular session ended, updating Studio");
+                    updateStudioScript(contactId, 'videochat');
+                    createVideochatButton();
+                }).create();
+            }
+        }
+
+        // 
+        function loadSurfly() {
+            // Setup settings from API
+            var settings = {
+                widget_key: surflyWidgetKey,
+                auto_restore: false,
+                session_start_confirmation: false,
+                hidden: false,
+                disable_end_redirect: true,
+                require_password: false,
+                agent_can_request_control: true,
+                automated_session_recording_enabled: true,
+                end_redirect_enabled: true,
+            };
+
+            Surfly.init(settings, function (initResult) {
+                if (initResult.success) {
+                    if (!Surfly.isInsideSession) {
+
+                        if (localStorage.getItem(nicBusNumber + "-uniquePageId")) {
+                            console.log("random: " + localStorage.getItem(nicBusNumber + "-uniquePageId"));
+                        } else {
+                            let randomString = Math.random().toString(36).substring(7);
+                            let dateNow = Date.now();
+                            let uniquePageId = randomString + "-" + dateNow;
+
+                            console.log("random: " + uniquePageId);
+
+                            localStorage.setItem(nicBusNumber + "-uniquePageId", uniquePageId);
+                        }
+
+                    }
+                }
+            });
+        }
+    </script>
+</head>
+
+<body class="pagecontainer">
+    <link rel="stylesheet" href="index_surfly.css">
+
+    <div class="container">
+
+        <button onclick={createVideochatSession()} class="button-logo">
+            <img src="./assets/videochat.png" alt="logo" class="img-logo">
+            <!-- <h1 class="title">LET'S CHAT</h1>
+          <p class="text">Tap the Icon above to speak with a First Service Assistance Manager.</p> -->
+        </button>
+    </div>
+
+    
+</body>
+
+</html>
