@@ -96,8 +96,8 @@
                 var spinner = document.querySelector("#spinner");
                 spinner.classList.remove("hidden");
                 // Remove the button
-                var button = document.querySelector("#start-button")
-                button.classList.add("hidden")
+                var button = document.querySelector("#start-button");
+                button.classList.add("hidden");
             }).on("viewer_joined", function (session, event) {
                 window.nicVideochatContactId = event.userData.contactId;
             }).on("session_ended", function (session, event) {
@@ -112,8 +112,8 @@
                 var spinner = document.querySelector("#spinner");
                 spinner.classList.add("hidden");
                 // Add the button
-                var button = document.querySelector("#start-button")
-                button.classList.remove("hidden")
+                var button = document.querySelector("#start-button");
+                button.classList.remove("hidden");
             }).create();
         };
 
@@ -236,6 +236,13 @@
     .text-queue {
         font-size: 20px;
         margin: 0;
+        padding: 20px;
+    }
+
+    #spinner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
     .hidden {
@@ -251,10 +258,15 @@
             </button>
         </div>
     </div>
-    <div id="spinner" class="hidden">
-        <div class="loader"></div>
-        <p class="text-queue">Wait! Someone you attend you soon!</p>
+    <div class="hidden">
+        <div id="spinner">
+            <div class="loader"></div>
+            <p class="text-queue">Wait! Someone you attend you soon!</p>
+            <p>In case you need to cancel, please click below</p>
+            <button onclick={endWorkItem()}>Cancel</button>
+        </div>
     </div>
+
 
 </body>
 
