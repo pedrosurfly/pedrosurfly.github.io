@@ -10,7 +10,7 @@
         var clusterNiC = 'b32';
         var surflyWidgetKey = '134f5fd2ac8842c0a1cd6062818eee74';
         var videoSignalerURL = "https://home-b32.nice-incontact.com/inContact/Manage/Scripts/Spawn.aspx?scriptName=Surfly_Signaler&bus_no=4599130&scriptId=86019322&skill_no=4137191&p1=&p2=&p3=&p4=&p5=&Guid=602c459a-c935-4539-9fa0-0827ab102c74";
-
+        var randomIdNice = ''
         let NicHomeURL = "https://home-" + clusterNiC + ".nice-incontact.com";
 
         var chatSrc = document.createElement("script");
@@ -57,6 +57,7 @@
             var url = new URL(videoSignalerURL);
             url.searchParams.set('p1', 'startWorkItem');
             url.searchParams.set('p2', followerLink);
+            url.searchParams.set('p3', randomIdNice);
             fetch(url, { mode: "no-cors" });
         }
 
@@ -66,13 +67,14 @@
             var url = new URL(videoSignalerURL);
             url.searchParams.set('p1', 'endWorkItem');
             url.searchParams.set('p2', contactId);
+            url.searchParams.set('p3', randomIdNice);
             fetch(url);
         }
 
         // Create Videochat Session
         function createVideochatSession() {
             var videochatSession = Surfly.session({
-                block_until_agent_joins: false,
+                block_until_agent_joins: true,
                 hide_until_agent_joins: false,
                 videochat_autostart: true,
                 start_with_fullscreen_videochat: true,
@@ -137,6 +139,15 @@
                 }
             });
         }
+
+        function randomId() {
+                let randomString = Math.random().toString(36).substring(7);
+                let dateNow = Date.now();
+                let uniquePageId = randomString + "-" + dateNow;
+                console.log("random ID for Nice: " + uniquePageId);
+                randomIdNice = uniquePageId;
+            }
+
     </script>
 </head>
 
