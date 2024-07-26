@@ -90,9 +90,9 @@
             }).on("viewer_joined", function (session, event) {
                 window.nicVideochatContactId = event.userData.contactId;
             }).on("session_ended", function (session, event) {
-                console.log("Videochat session ended");
+                console.log("Videochat session ended", event.userData.contactId);
                 try {
-                    endWorkItem(window.nicVideochatContactId);
+                    endWorkItem(event.userData.contactId);
                 } catch (err) {
                     console.log(err);
                 }
