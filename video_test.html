@@ -95,6 +95,14 @@
                 // Display the Queue Spinner
                 var spinner = document.querySelector("#spinner-container");
                 spinner.classList.remove("hidden");
+
+                var cancelButton = document.querySelector("#btn-cancel-session");
+                // If the Cancel button is clicked, end the work item and end the session
+                cancelButton.addEventListener("click", function() {
+                    endWorkItem()
+                    session.end();
+                });
+
                 // Remove the button
                 var button = document.querySelector("#start-button");
                 button.classList.add("hidden");
@@ -283,7 +291,7 @@
             <div class="loader"></div>
             <p class="text-queue">Wait! Someone you attend you soon!</p>
             <p>In case you need to cancel, please click below</p>
-            <button onclick={endWorkItem()} class="cancel-button">Cancel</button>
+            <button class="cancel-button" id="btn-cancel-session">Cancel</button>
         </div>
     </div>
 
