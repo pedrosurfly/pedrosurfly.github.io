@@ -95,6 +95,9 @@
                 // Display the Queue Spinner
                 var spinner = document.querySelector("#spinner");
                 spinner.classList.remove("hidden");
+                // Remove the button
+                var button = document.querySelector("#start-button")
+                button.classList.add("hidden")
             }).on("viewer_joined", function (session, event) {
                 window.nicVideochatContactId = event.userData.contactId;
             }).on("session_ended", function (session, event) {
@@ -236,7 +239,7 @@
 
 <body class="pagecontainer">
     <div class="container">
-        <div>
+        <div id="start-button">
             <button onclick={createVideochatSession()} class="button-logo">
                 <img src="./assets/videochat.png" alt="logo" class="img-logo">
             </button>
