@@ -59,6 +59,7 @@
 
         // Finish a workItem
         function endWorkItem(contactId) {
+            console.log('end work Item', contactId);
             var url = new URL(videoSignalerURL);
             url.searchParams.set('p1', 'endWorkItem');
             url.searchParams.set('p2', contactId);
@@ -90,7 +91,11 @@
                 window.nicVideochatContactId = event.userData.contactId;
             }).on("session_ended", function (session, event) {
                 console.log("Videochat session ended");
-                endWorkItem(window.nicVideochatContactId);
+                try {
+                    endWorkItem(window.nicVideochatContactId);
+                } catch (err) {
+                    console.log(err);
+                }
             }).create();
         }
 
