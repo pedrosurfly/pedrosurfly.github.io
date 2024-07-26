@@ -3,72 +3,6 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kiosk Demo</title>
-    <style>
-        .pagecontainer {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            min-height: 100vh;
-            background-color: white;
-    
-        }
-    
-        .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            align-items: center;
-            width: 300px;
-            height: 300px;
-            border: 1px groove lightslategrey;
-            border-radius: 10px;
-            box-shadow: 10px 10px 5px lightslategrey;
-        }
-    
-        .title {
-            font-size: 20px;
-            margin: 0;
-        }
-    
-        .button-logo {
-            margin: 0;
-            padding: 0;
-            width: 300px;
-            height: 300px;
-            border: none;
-            cursor: pointer;
-            border-radius: 10px;
-        }
-    
-        .img-logo {
-            width: 300px;
-            height: 300px;
-            border-radius: 10px;
-        }
-    
-        .loader {
-            border: 16px solid #f3f3f3;
-            /* Light grey */
-            border-top: 16px solid #3498db;
-            /* Blue */
-            border-radius: 50%;
-            width: 120px;
-            height: 120px;
-            animation: spin 2s linear infinite;
-        }
-    
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-    
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-    </style>
     <script>
         var showVideoChatButton = false;
         var nicBusNumber = '4599130';
@@ -207,15 +141,91 @@
         }
 
         function randomId() {
-                let randomString = Math.random().toString(36).substring(7);
-                let dateNow = Date.now();
-                let uniquePageId = randomString + "-" + dateNow;
-                console.log("random ID for Nice: " + uniquePageId);
-                randomIdNice = uniquePageId;
-            }
+            let randomString = Math.random().toString(36).substring(7);
+            let dateNow = Date.now();
+            let uniquePageId = randomString + "-" + dateNow;
+            console.log("random ID for Nice: " + uniquePageId);
+            randomIdNice = uniquePageId;
+        }
 
     </script>
 </head>
+<style>
+    .pagecontainer {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        min-height: 100vh;
+        background-color: white;
+
+    }
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        align-items: center;
+        width: 300px;
+        height: 300px;
+        border: 1px groove lightslategrey;
+        border-radius: 10px;
+        box-shadow: 10px 10px 5px lightslategrey;
+    }
+
+    .title {
+        font-size: 20px;
+        margin: 0;
+    }
+
+    .button-logo {
+        margin: 0;
+        padding: 0;
+        width: 300px;
+        height: 300px;
+        border: none;
+        cursor: pointer;
+        border-radius: 10px;
+    }
+
+    .img-logo {
+        width: 300px;
+        height: 300px;
+        border-radius: 10px;
+    }
+
+    .loader {
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid blue;
+        border-bottom: 16px solid blue;
+        width: 120px;
+        height: 120px;
+        -webkit-animation: spin 2s linear infinite;
+        animation: spin 2s linear infinite;
+    }
+
+    @-webkit-keyframes spin {
+        0% {
+            -webkit-transform: rotate(0deg);
+        }
+
+        100% {
+            -webkit-transform: rotate(360deg);
+        }
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+</style>
 
 <body class="pagecontainer">
     <div class="container">
@@ -225,6 +235,7 @@
         </button>
 
         <div class="loader"></div>
+        <p>Wait! Someone you attend you soon!</p>
     </div>
 
 
