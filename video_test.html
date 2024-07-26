@@ -31,6 +31,7 @@
 
 
         function signalContact(contactId, followerLink, sessionPin, type) {
+            console.log('signal contact');
             var url = new URL(chatSignalerURL);
             url.searchParams.set('p1', contactId);
             url.searchParams.set('p2', followerLink);
@@ -41,6 +42,7 @@
 
         // 
         function updateStudioScript(contactId, type) {
+            console.log('udpate Studio Script');
             var url = new URL(chatSignalerURL);
             url.searchParams.set('p1', contactId);
             url.searchParams.set('p2', 'NA');
@@ -51,6 +53,7 @@
 
         //
         function signalWorkItem(followerLink) {
+            console.log('signal Work Item');
             var url = new URL(videoSignalerURL);
             url.searchParams.set('p1', 'startWorkItem');
             url.searchParams.set('p2', followerLink);
@@ -59,7 +62,7 @@
 
         // Finish a workItem
         function endWorkItem(contactId) {
-            console.log('end work Item', contactId);
+            console.log('End Work Item', contactId);
             var url = new URL(videoSignalerURL);
             url.searchParams.set('p1', 'endWorkItem');
             url.searchParams.set('p2', contactId);
