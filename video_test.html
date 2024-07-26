@@ -238,20 +238,17 @@
 </style>
 
 <body class="pagecontainer">
-    <div class="container">
-        <div id="start-button">
+    <div class="container" id="start-button">
+        <div>
             <button onclick={createVideochatSession()} class="button-logo">
                 <img src="./assets/videochat.png" alt="logo" class="img-logo">
             </button>
         </div>
-        <div id="spinner" class="hidden">
-            <div class="loader"></div>
-            <p class="text-queue">Wait! Someone you attend you soon!</p>
-        </div>
-
-
     </div>
-
+    <div id="spinner" class="hidden">
+        <div class="loader"></div>
+        <p class="text-queue">Wait! Someone you attend you soon!</p>
+    </div>
 
 </body>
 
