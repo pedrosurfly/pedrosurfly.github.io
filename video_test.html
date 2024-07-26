@@ -93,7 +93,7 @@
             }).on("viewer_joined", function (session, event) {
                 window.nicVideochatContactId = event.userData.contactId;
             }).on("session_ended", function (session, event) {
-                console.log("Videochat session ended", event.userData.contactId);
+                console.log("Videochat session ended", event, session);
                 try {
                     'requesting end work item';
                     endWorkItem(window.nicVideochatContactId);
