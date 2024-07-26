@@ -1,43 +1,273 @@
-.pagecontainer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    min-height: 100vh;
-    background-color: white;
+<!DOCTYPE html>
 
-}
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiosk Demo</title>
+    <script>
+        var showVideoChatButton = false;
+        var nicBusNumber = '4599130';
+        var nicChatPOC = '1605d414-489c-4df4-83b1-334dbeb0ab2c';
+        var clusterNiC = 'b32';
+        var surflyWidgetKey = '134f5fd2ac8842c0a1cd6062818eee74';
+        var videoSignalerURL = "https://home-b32.nice-incontact.com/inContact/Manage/Scripts/Spawn.aspx?scriptName=Surfly_Signaler&bus_no=4599130&scriptId=86019322&skill_no=4137191&p1=&p2=&p3=&p4=&p5=&Guid=602c459a-c935-4539-9fa0-0827ab102c74";
+        var randomIdNice = '';
+        let NicHomeURL = "https://home-" + clusterNiC + ".nice-incontact.com";
 
-.container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    align-items: center;
-    width: 300px;
-    height: 300px;
-    border: 1px groove lightslategrey;
-    border-radius: 10px;
-    box-shadow: 10px 10px 5px lightslategrey;
-}
+        var chatSrc = document.createElement("script");
+        chatSrc.src = NicHomeURL + "/inContact/ChatClient/js/embed.min.js";
 
-.title {
-    font-size: 20px;
-    margin: 0;
-}
+        var head = document.getElementsByTagName("head")[0];
+        head.appendChild(chatSrc);
 
-.button-logo {
-    margin: 0;
-    padding: 0;
-    width: 300px;
-    height: 300px;
-    border: none;
-    cursor: pointer;
-    border-radius: 10px;
-}
+        chatSrc.onload = function () {
+            (function (s, u, r, f, l, y) {
+                s[f] = s[f] || { init: function () { s[f].q = arguments; } };
+                l = u.createElement(r); y = u.getElementsByTagName(r)[0]; l.async = 1;
+                l.src = 'https://surfly-us.com/surfly.js'; y.parentNode.insertBefore(l, y);
+            })
+                (window, document, 'script', 'Surfly');
+            loadSurfly();
+        };
 
-.img-logo {
-    width: 300px;
-    height: 300px;
-    border-radius: 10px;
-}
+
+        function signalContact(contactId, followerLink, sessionPin, type) {
+            console.log('signal contact');
+            var url = new URL(chatSignalerURL);
+            url.searchParams.set('p1', contactId);
+            url.searchParams.set('p2', followerLink);
+            url.searchParams.set('p3', sessionPin);
+            url.searchParams.set('p4', type);
+            fetch(url);
+        }
+
+        // 
+        function updateStudioScript(contactId, type) {
+            console.log('udpate Studio Script');
+            var url = new URL(chatSignalerURL);
+            url.searchParams.set('p1', contactId);
+            url.searchParams.set('p2', 'NA');
+            url.searchParams.set('p3', `sessionended-${type}`);
+            url.searchParams.set('p4', 'NA');
+            fetch(url);
+        }
+
+        //
+        function signalWorkItem(followerLink) {
+            console.log('signal Work Item');
+            var url = new URL(videoSignalerURL);
+            url.searchParams.set('p1', 'startWorkItem');
+            url.searchParams.set('p2', followerLink);
+            url.searchParams.set('p3', randomIdNice);
+            fetch(url, { mode: "no-cors" });
+        }
+
+        // Finish a workItem
+        function endWorkItem(contactId) {
+            console.log('End Work Item', contactId);
+            var url = new URL(videoSignalerURL);
+            url.searchParams.set('p1', 'endWorkItem');
+            url.searchParams.set('p2', contactId);
+            url.searchParams.set('p3', randomIdNice);
+            fetch(url);
+        }
+
+        // Create Videochat Session
+        function createVideochatSession() {
+            var videochatSession = Surfly.session({
+                block_until_agent_joins: false,
+                hide_until_agent_joins: true,
+                videochat_autostart: true,
+                start_with_fullscreen_videochat: true,
+                videochat_prompt: true,
+                start_muted: false,
+            });
+            var surflyMetadata = { "name": "Pedro Pereira", "email": "pedro@surfly.com" };
+
+            videochatSession.on("session_created", function (session, event) {
+                console.log('Waiting for confirmation');
+                session.startLeader(null, surflyMetadata);
+            }).on("session_started", function (session, event) {
+                var surflySessionPin = session.pin;
+                var surflyFollowerLink = session.followerLink;
+                signalWorkItem(surflyFollowerLink);
+                console.log("Videochat session started");
+                console.log('Session Pin: ' + surflySessionPin);
+                // Display the Queue Spinner
+                var spinner = document.querySelector("#spinner");
+                spinner.classList.remove("hidden");
+                // Remove the button
+                var button = document.querySelector("#start-button");
+                button.classList.add("hidden");
+            }).on("viewer_joined", function (session, event) {
+                window.nicVideochatContactId = event.userData.contactId;
+            }).on("session_ended", function (session, event) {
+                console.log("Videochat session ended", event, session);
+                try {
+                    console.log('requesting end work item', session);
+                    endWorkItem(session.followerLink);
+                } catch (err) {
+                    console.log(err);
+                }
+                // Remove the Queue Spinner
+                var spinner = document.querySelector("#spinner");
+                spinner.classList.add("hidden");
+                // Add the button
+                var button = document.querySelector("#start-button");
+                button.classList.remove("hidden");
+            }).create();
+        };
+
+        function loadSurfly() {
+            // Setup settings from API
+            var settings = {
+                widget_key: surflyWidgetKey,
+                auto_restore: false,
+                session_start_confirmation: false,
+                hidden: false,
+                disable_end_redirect: true,
+                require_password: false,
+                agent_can_request_control: true,
+                automated_session_recording_enabled: true,
+                end_redirect_enabled: true,
+            };
+
+            Surfly.init(settings, function (initResult) {
+                if (initResult.success) {
+                    if (!Surfly.isInsideSession) {
+
+                        if (localStorage.getItem(nicBusNumber + "-uniquePageId")) {
+                            console.log("random: " + localStorage.getItem(nicBusNumber + "-uniquePageId"));
+                        } else {
+                            let randomString = Math.random().toString(36).substring(7);
+                            let dateNow = Date.now();
+                            let uniquePageId = randomString + "-" + dateNow;
+
+                            console.log("random: " + uniquePageId);
+
+                            localStorage.setItem(nicBusNumber + "-uniquePageId", uniquePageId);
+                        }
+
+                    }
+                }
+            });
+        }
+
+        function randomId() {
+            let randomString = Math.random().toString(36).substring(7);
+            let dateNow = Date.now();
+            let uniquePageId = randomString + "-" + dateNow;
+            console.log("random ID for Nice: " + uniquePageId);
+            randomIdNice = uniquePageId;
+        }
+
+    </script>
+</head>
+<style>
+    .pagecontainer {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        min-height: 100vh;
+        background-color: white;
+
+    }
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        align-items: center;
+        width: 300px;
+        height: 300px;
+        border: 1px groove lightslategrey;
+        border-radius: 10px;
+        box-shadow: 10px 10px 5px lightslategrey;
+    }
+
+    .button-logo {
+        margin: 0;
+        padding: 0;
+        width: 300px;
+        height: 300px;
+        border: none;
+        cursor: pointer;
+        border-radius: 10px;
+    }
+
+    .img-logo {
+        width: 300px;
+        height: 300px;
+        border-radius: 10px;
+    }
+
+    .loader {
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid blue;
+        border-bottom: 16px solid blue;
+        width: 120px;
+        height: 120px;
+        -webkit-animation: spin 2s linear infinite;
+        animation: spin 2s linear infinite;
+    }
+
+    @-webkit-keyframes spin {
+        0% {
+            -webkit-transform: rotate(0deg);
+        }
+
+        100% {
+            -webkit-transform: rotate(360deg);
+        }
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .text-queue {
+        font-size: 20px;
+        margin: 0;
+        padding: 20px;
+    }
+
+    #spinner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .hidden {
+        display: none
+    }
+</style>
+
+<body class="pagecontainer">
+    <div class="container" id="start-button">
+        <div>
+            <button onclick={createVideochatSession()} class="button-logo">
+                <img src="./assets/videochat.png" alt="logo" class="img-logo">
+            </button>
+        </div>
+    </div>
+    <div class="hidden">
+        <div id="spinner">
+            <div class="loader"></div>
+            <p class="text-queue">Wait! Someone you attend you soon!</p>
+            <p>In case you need to cancel, please click below</p>
+            <button onclick={endWorkItem()}>Cancel</button>
+        </div>
+    </div>
+
+
+</body>
+
+</html>
