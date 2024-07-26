@@ -92,7 +92,7 @@
             }).on("session_ended", function (session, event) {
                 console.log("Videochat session ended", event.userData.contactId);
                 try {
-                    endWorkItem(event.userData.contactId);
+                    endWorkItem(window.nicVideochatContactId = event.userData.contactId);
                 } catch (err) {
                     console.log(err);
                 }
