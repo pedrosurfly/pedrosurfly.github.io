@@ -284,7 +284,7 @@
 
     .cancel-button {
         background-color: white;
-        color: black;
+        color: #e54747;
         border-radius: 8px;
         border: 2px solid #e54747;
         padding: 16px 32px;
@@ -305,7 +305,7 @@
 
 <body class="pagecontainer">
     <div class="container" id="start-button">
-        <h1 class="pageTitle">Click below to video chat with one of our Experts?</h1>
+        <h1 class="pageTitle">Click below to video chat with one of our Experts!</h1>
         <div>
             <button onclick={createVideochatSession()} class="start-button">
                 Start Video
@@ -315,7 +315,7 @@
     <div id="spinner-container" class="hidden">
         <div id="spinner">
             <div class="loader"></div>
-            <p class="text-queue">Wait! Someone you attend you soon!</p>
+            <p class="text-queue">Wait! Someone will attend you soon!</p>
             <p class="text-queue">In case you need to cancel, please click below</p>
             <button class="cancel-button" id="btn-cancel-session">Cancel</button>
         </div>
