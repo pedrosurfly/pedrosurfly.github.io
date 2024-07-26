@@ -2,7 +2,7 @@
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Test</title>
+    <title>Kiosk Demo</title>
     <script>
         var showVideoChatButton = false;
         var nicBusNumber = '4599130';
@@ -69,7 +69,7 @@
         function createVideochatSession() {
             var videochatSession = Surfly.session({
                 block_until_agent_joins: false,
-                hide_until_agent_joins: true,
+                hide_until_agent_joins: false,
                 videochat_autostart: true,
                 start_with_fullscreen_videochat: true,
                 videochat_prompt: true,
