@@ -64,7 +64,7 @@
 
         // Finish a workItem
         async function endWorkItem(followerLink) {
-            console.log('End Work Item', contactId);
+            console.log('End Work Item', randomIdNice);
             var url = new URL(videoSignalerURL);
             url.searchParams.set('p1', 'endWorkItem');
             url.searchParams.set('p2', followerLink);
