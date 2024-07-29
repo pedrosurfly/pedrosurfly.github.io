@@ -51,7 +51,7 @@
             fetch(url);
         }
 
-        //
+        // Start a Work Item
         function signalWorkItem(followerLink) {
             randomId();
             console.log('signal Work Item');
@@ -62,18 +62,14 @@
             fetch(url, { mode: "no-cors" });
         }
 
-        // Finish a workItem
+        // End a workItem
         function endWorkItem(followerLink) {
             console.log('End Work Item', randomIdNice);
-            try {
-                    var url = new URL(videoSignalerURL);
-                    url.searchParams.set('p1', 'endWorkItem');
-                    url.searchParams.set('p2', followerLink);
-                    url.searchParams.set('p3', randomIdNice);
-                    fetch(url);
-                } catch (err) {
-                    console.log(err);
-                }
+            var url = new URL(videoSignalerURL);
+            url.searchParams.set('p1', 'endWorkItem');
+            url.searchParams.set('p2', followerLink);
+            url.searchParams.set('p3', randomIdNice);
+            fetch(url);
         }
 
         // Create Videochat Session
@@ -86,7 +82,6 @@
                 videochat_prompt: true,
                 start_muted: false,
             });
-            var surflyMetadata = { "name": "Pedro Pereira", "email": "pedro@surfly.com" };
 
             videochatSession.on("session_created", function (session, event) {
                 console.log('Waiting for confirmation');
@@ -115,12 +110,10 @@
                 window.nicVideochatContactId = event.userData.contactId;
             }).on("session_ended", function (session, event) {
                 console.log("Videochat session ended", event, session);
-                try {
-                    console.log('requesting end work item', session);
-                    endWorkItem(session.followerLink);
-                } catch (err) {
-                    console.log(err);
-                }
+
+                console.log('requesting end work item', session);
+                endWorkItem(session.followerLink);
+
                 // Remove the Queue Spinner
                 var spinner = document.querySelector("#spinner-container");
                 spinner.classList.add("hidden");
@@ -166,7 +159,7 @@
         }
 
         function randomId() {
-            console.log('it got here')
+            console.log('it got here');
             let randomString = Math.random().toString(36).substring(7);
             let dateNow = Date.now();
             let uniquePageId = randomString + "-" + dateNow;
