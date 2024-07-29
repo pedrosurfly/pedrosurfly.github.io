@@ -161,6 +161,7 @@
         }
 
         function randomId() {
+            console.log('it got here')
             let randomString = Math.random().toString(36).substring(7);
             let dateNow = Date.now();
             let uniquePageId = randomString + "-" + dateNow;
