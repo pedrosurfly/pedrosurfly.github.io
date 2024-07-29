@@ -63,11 +63,11 @@
         }
 
         // Finish a workItem
-        function endWorkItem(contactId) {
+        async function endWorkItem(followerLink) {
             console.log('End Work Item', contactId);
             var url = new URL(videoSignalerURL);
             url.searchParams.set('p1', 'endWorkItem');
-            url.searchParams.set('p2', contactId);
+            url.searchParams.set('p2', followerLink);
             url.searchParams.set('p3', randomIdNice);
             fetch(url);
         }
