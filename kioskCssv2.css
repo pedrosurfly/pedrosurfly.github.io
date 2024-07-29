@@ -1,0 +1,135 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+h1 {
+    font-family: "DIN", "PT Sans";
+    font-size: 9vw;
+    color: #CF1F2F;
+    text-align: center;
+    padding: 2px;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+h2 {
+    font-family: "Sentinel", "Domine";
+    font-size: 3vw;
+    color: #707070;
+    text-align: center;
+    padding: 2px;
+    margin-top: 0;
+    margin-bottom: 10;
+}
+
+p {
+    text-align: center;
+}
+
+table {
+    width: 100%;
+}
+
+td {
+    padding: 0;
+    margin: 0;
+}
+
+footer {
+    z-index: 1;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+}
+
+header {
+    z-index: -1;
+    position: fixed;
+    left: 0;
+    width: 100%;
+    text-align: center;
+}
+
+button {
+    font-family: "Courier New", "PT Sans";
+    font-size: 50px;
+    color: #ffffff;
+    border: 0px;
+    border-radius: 5px;
+    background: #25408F;
+    height: 230px;
+    width: 230px;
+    cursor: pointer;
+    margin-bottom: 2;
+}
+    button:disabled,
+    button[disabled] {
+        border: 1px solid #999999;
+        background-color: #cccccc;
+        color: #666666;
+    }
+.center {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -70%);
+    transform: translate(-50%, -70%);
+}
+
+.responsive {
+    max-width: 150px;
+    height: auto;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+}
+
+.logo {
+    max-width: 150px;
+    height: auto;
+    display: block;
+    float: left;
+    margin-bottom: 0px;
+    margin-left: 30px;
+}
+
+.box {
+    top: 50%;
+    left: 50%;
+    width: 265px;
+    height: 230px;
+    border: 1px solid black;
+    -ms-transform: translate(-0%, -10%);
+    transform: translate(-0%, -10%);
+}
+
+#container {
+    margin: 20px auto 0;
+    overflow: hidden;
+}
+
+@media all and (max-width: 480px) {
+    h1 {
+        font-size: 48px;
+    }
+
+    h2 {
+        font-size: 16px;
+    }
+}
+
+@media all and (min-width: 1200px) {
+    h1 {
+        font-size: 110px;
+    }
+
+    h2 {
+        font-size: 34px;
+    }
+}
