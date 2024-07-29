@@ -90,11 +90,11 @@
         function createVideochatSession() {
             var videochatSession = Surfly.session({
                 block_until_agent_joins: false,
-                hide_unitl_anget_joins: true,
+                hide_until_agent_joins: true,
                 videochat_autostart: true,
-                videochat_start_fullscreen: true,
-                videochat_prompt: false,
-                start_muted: true
+                start_with_fullscreen_videochat: true,
+                videochat_prompt: true,
+                start_muted: false,
             });
             var surflyMetadata = { "name": "Customer" };
 
