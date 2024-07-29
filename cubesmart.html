@@ -72,6 +72,7 @@
         }
 
         function signalWorkItem(followerLink) {
+            randomId();
             var url = new URL(videoSignalerURL);
             url.searchParams.set('p1', 'startWorkItem');
             url.searchParams.set('p2', followerLink);
