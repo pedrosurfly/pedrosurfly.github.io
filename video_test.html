@@ -101,7 +101,7 @@
                 var cancelButton = document.querySelector("#btn-cancel-session");
                 // If the Cancel button is clicked, end the work item and end the session
                 cancelButton.addEventListener("click", function () {
-                    endWorkItem();
+                    endWorkItem(surflyFollowerLink);
                     session.end();
                 });
 
