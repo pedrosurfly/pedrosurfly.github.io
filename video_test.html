@@ -53,7 +53,7 @@
 
         // Start a Work Item
         async function signalWorkItem(followerLink) {
-            //await randomId();
+            await randomId();
             console.log('signal Work Item');
             var url = new URL(videoSignalerURL);
             url.searchParams.set('p1', 'startWorkItem');
