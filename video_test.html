@@ -63,13 +63,13 @@
         }
 
         // End a workItem
-        function endWorkItem(followerLink) {
+        async function endWorkItem(followerLink) {
             console.log('End Work Item', randomIdNice);
             var url = new URL(videoSignalerURL);
             url.searchParams.set('p1', 'endWorkItem');
             url.searchParams.set('p2', followerLink);
             url.searchParams.set('p3', randomIdNice);
-            fetch(url);
+            fetch(url, { mode: "no-cors" });
         }
 
         // Create Videochat Session
