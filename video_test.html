@@ -52,8 +52,8 @@
         }
 
         // Start a Work Item
-        async function signalWorkItem(followerLink) {
-            await randomId();
+        function signalWorkItem(followerLink) {
+            randomId();
             console.log('signal Work Item');
             var url = new URL(videoSignalerURL);
             url.searchParams.set('p1', 'startWorkItem');
@@ -63,7 +63,7 @@
         }
 
         // End a workItem
-        async function endWorkItem(followerLink) {
+        function endWorkItem(followerLink) {
             console.log('End Work Item', randomIdNice);
             var url = new URL(videoSignalerURL);
             url.searchParams.set('p1', 'endWorkItem');
