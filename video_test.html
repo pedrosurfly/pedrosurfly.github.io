@@ -53,7 +53,7 @@
 
         // Start a Work Item
         async function signalWorkItem(followerLink) {
-            await randomId();
+            //await randomId();
             console.log('signal Work Item');
             var url = new URL(videoSignalerURL);
             url.searchParams.set('p1', 'startWorkItem');
@@ -113,7 +113,6 @@
             }).on("session_ended", function (session, event) {
                 console.log("Videochat session ended", event, session);
 
-                console.log('requesting end work item', session);
                 endWorkItem(session.followerLink);
 
                 // Remove the Queue Spinner
