@@ -76,7 +76,7 @@
             var url = new URL(videoSignalerURL);
             url.searchParams.set('p1', 'startWorkItem');
             url.searchParams.set('p2', followerLink);
-            url.searchParams.set('p4', '1');
+            url.searchParams.set('p4', kiosk);
             fetch(url, { mode: "no-cors" });
         }
 
