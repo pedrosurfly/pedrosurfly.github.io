@@ -167,6 +167,12 @@
             randomIdNice = uniquePageId;
         }
 
+        window.addEventListener("unload", function () {
+            endWorkItem(session.followerLink);
+            }
+        )
+
+
     </script>
 </head>
 <style>
