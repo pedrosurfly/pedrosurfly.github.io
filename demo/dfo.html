@@ -17,16 +17,21 @@
         
     </script>
     <script>
-        var startSession = document.querySelector("#start-session");
+        window.addEventListener("DOMContentLoaded", (event) => {
+            var startSession = document.querySelector("#start-session");
                 // If the Cancel button is clicked, end the work item and end the session
                 let customerWidgetKey = "61c30ab2090a46d488cc5f41cc624fb4"
-                startSession.addEventListener("click", function () {
+                if (startSession) {
+                    startSession.addEventListener("click", function () {
                     window.parent.Surfly.settings.widget_key = customerWidgetKey
                     if (window.parent.Surfly.settings.widget_key === customerWidgetKey){
                         console.log('widget key change correctly', customerWidgetKey)
                         Surfly.session().startLeader()
                     }
                 });
+                }
+        }
+                
     </script>
     
 </head>
