@@ -17,20 +17,29 @@
 
     </script>
     <script>
-        window.addEventListener("DOMContentLoaded", (event) => {
-            var startSession = document.querySelector("#start-session");
-            // If the Cancel button is clicked, end the work item and end the session
-            let customerWidgetKey = "61c30ab2090a46d488cc5f41cc624fb4"
-            if (startSession) {
-                startSession.addEventListener("click", function () {
-                    window.parent.Surfly.settings.widget_key = customerWidgetKey
-                    if (window.parent.Surfly.settings.widget_key === customerWidgetKey) {
-                        console.log('widget key change correctly', customerWidgetKey)
-                        Surfly.session().startLeader()
-                    }
-                });
+        // window.addEventListener("DOMContentLoaded", (event) => {
+        //     var startSession = document.querySelector("#start-session");
+        //     // If the Cancel button is clicked, end the work item and end the session
+        //     let customerWidgetKey = "61c30ab2090a46d488cc5f41cc624fb4"
+        //     if (startSession) {
+        //         startSession.addEventListener("click", function () {
+        //             window.parent.Surfly.settings.widget_key = customerWidgetKey
+        //             if (window.parent.Surfly.settings.widget_key === customerWidgetKey) {
+        //                 console.log('widget key change correctly', customerWidgetKey)
+        //                 Surfly.session().startLeader()
+        //             }
+        //         });
+        //     }
+        // })
+
+        function startSession() {
+            let customerWidgetKey = "61c30ab2090a46d488cc5f41cc624fb4" //set customer widget key to variable
+            window.parent.Surfly.settings.widget_key = customerWidgetKey //set customer widget key to widget_key high level
+            if (window.parent.Surfly.settings.widget_key === customerWidgetKey) { // check if it worked to avoid null
+                console.log('widget key change correctly', customerWidgetKey)
+                Surfly.session().startLeader() // starts the session with the new widget key
             }
-        })
+        };
 
     </script>
 
@@ -123,7 +132,7 @@
                 <div class="hidden sm:mb-8 sm:flex sm:justify-center">
                     <div
                         class="relative rounded-full px-3 py-1 text-sm leading-6 text-gray-600 ring-1 ring-gray-900/10 hover:ring-gray-900/20">
-                        Would you like to connect virtually with us?. <p id="start-session"
+                        Would you like to connect virtually with us?. <p id="start-session" onclick="startSession()" type="button"
                             class="font-semibold text-indigo-600"><span class="absolute inset-0"
                                 aria-hidden="true"></span>Cobrowse Session<span aria-hidden="true">&rarr;</span></p>
                     </div>
@@ -139,7 +148,8 @@
                             class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Get
                             started</a>
                         <button href="#" class="text-sm font-semibold leading-6 text-gray-900"
-                            onclick="Surfly.session().startLeader()">Learn more <span aria-hidden="true">→</span></button>
+                            onclick="startSession()">Learn more <span
+                                aria-hidden="true">→</span></button>
                     </div>
                 </div>
             </div>
