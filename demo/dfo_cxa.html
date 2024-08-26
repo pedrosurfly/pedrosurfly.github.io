@@ -22,7 +22,7 @@
             if (window.parent.Surfly.settings.widget_key === customerWidgetKey) { // check if it worked to avoid null
                 console.log('widget key change correctly', customerWidgetKey)
                 try {
-                    Surfly.session().on('session_started', function (session, event) {
+                    Surfly.session().on('session_created', function (session, event) {
                         console.log('session started', session)
                         var surflySessionPin = session.pin
                         console.log('Session Pin: ' + surflySessionPin)
@@ -38,6 +38,9 @@
                         });
                         element.dispatchEvent(evt)
                     }).startLeader()
+                    // .on('session_started', function (session, event) {
+
+                    // })
                 } catch (error) {
                     console.log(error)
                 }
