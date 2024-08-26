@@ -28,8 +28,10 @@
                         console.log('session created', session)
                         var surflySessionPin = session.pin
                         console.log('Session Pin: ' + surflySessionPin)
-                        document.querySelector('[title="Customer Chat"]').contentWindow.document.getElementsByName('reply-box')[0].value = surflySessionPin
+                        var inputField = document.querySelector('[title="Customer Chat"]').contentWindow.document.getElementsByName('reply-box')[0].value
 
+                        inputField = surflySessionPin
+                        
                         var enterEvent = new KeyboardEvent('keydown', {
                             key: 'Enter',
                             code: 'Enter',
@@ -37,7 +39,6 @@
                             keyCode: 13,
                         });
 
-                        document.querySelector('[title="Customer Chat"]').contentWindow.document.getElementsByName('reply-box')[0].dispatchEvent(enterEvent)
                     }).on('session_started', function (session, event) {
                         console.log('session started')
                         var chat_frame = window.parent.document.getElementById("be-chat-container");
