@@ -31,6 +31,12 @@
                         var chat_frame_zIndex = parseInt(getComputedStyle(chat_frame).zIndex);
                         var surfly_frame = window.parent.document.getElementById("surfly-iframe");
                         surfly_frame.style.setProperty("z-index", chat_frame_zIndex - 1, "important");
+                        var sendPin = window.parent.document.getElementByName("reply-box")
+                        sendPin.value = surflySessionPin
+                        var evt = new KeyboardEvent("keydown", {
+                            bubbles: true, cancelable: true, keyCode: 13
+                        });
+                        element.dispatchEvent(evt)
                     }).startLeader()
                 } catch (error) {
                     console.log(error)
