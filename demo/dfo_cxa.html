@@ -21,26 +21,24 @@
             window.parent.Surfly.settings.widget_key = customerWidgetKey //set customer widget key to widget_key high level
             if (window.parent.Surfly.settings.widget_key === customerWidgetKey) { // check if it worked to avoid null
                 console.log('widget key change correctly', customerWidgetKey)
+                var surfly_api_frame = window.parent.document.getElementById("surfly-api-frame");
+                surfly_api_frame.style.setProperty("z-index", "2147483647", "important");
                 try {
                     Surfly.session().on('session_created', function (session, event) {
                         console.log('session started', session)
                         var surflySessionPin = session.pin
                         console.log('Session Pin: ' + surflySessionPin)
 
+
+                        var addPinToChat = document.querySelector('[title="Customer Chat"]').contentWindow.document.getElementsByName('reply-box')[0].value
+                        addPinToChat.value = surflySessionPin
+                    }).on('session_started', function (session, event) {
+                        console.log('session started')
                         var chat_frame = window.parent.document.getElementById("be-chat-container");
                         var chat_frame_zIndex = parseInt(getComputedStyle(chat_frame).zIndex);
                         var surfly_frame = window.parent.document.getElementById("surfly-iframe");
                         surfly_frame.style.setProperty("z-index", chat_frame_zIndex - 1, "important");
-                        var sendPin = document.querySelector('[title="Customer Chat"]').contentWindow.document.getElementsByName('reply-box')[0].value 
-                        sendPin.value = surflySessionPin
-                        var evt = new KeyboardEvent("keydown", {
-                            bubbles: true, cancelable: true, keyCode: 13
-                        });
-                        element.dispatchEvent(evt)
                     }).startLeader()
-                    // .on('session_started', function (session, event) {
-
-                    // })
                 } catch (error) {
                     console.log(error)
                 }
