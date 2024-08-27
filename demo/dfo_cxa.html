@@ -16,7 +16,7 @@
         brandembassy('init', 1022, 'chat_4bc8d701-a316-4b5f-bc12-9c45f766dbd0');
         window.parent.addEventListener("message", (message) => {
             if (message.origin === window.top.location.origin) {
-                console.log(message);
+                console.log(message.data);
             }
         });
     </script>
