@@ -14,6 +14,11 @@
         })('brandembassy', 'https://livechat-static-de-na1.niceincontact.com/4/chat.js');
 
         brandembassy('init', 1022, 'chat_4bc8d701-a316-4b5f-bc12-9c45f766dbd0');
+        window.parent.addEventListener("message", (message) => {
+            if (message.origin === window.top.location.origin) {
+                console.log(message);
+            }
+        });
     </script>
     <script>
         async function startSession() {
@@ -29,11 +34,7 @@
                         var surflySessionPin = session.pin
                         console.log('Session Pin: ' + surflySessionPin)
                         document.querySelector('[title="Customer Chat"]').contentWindow.document.getElementsByName('reply-box')[0].value = surflySessionPin
-                        window.parent.addEventListener("message", (message) => {
-                            if (message.origin === window.top.location.origin) {
-                                console.log(message);
-                            }
-                        });
+
                     }).on('session_started', function (session, event) {
                         console.log('session started')
                         var chat_frame = window.parent.document.getElementById("be-chat-container");
