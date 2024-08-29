@@ -14,23 +14,19 @@
         })('brandembassy', 'https://livechat-static-de-na1.niceincontact.com/4/chat.js');
 
         brandembassy('init', 1022, 'chat_4bc8d701-a316-4b5f-bc12-9c45f766dbd0');
-        {
-            window.addEventListener('message', (event) => {
-                // Check origin of the message if necessary
-                if (event.origin !== window.top.location.origin) return;
 
-                const message = event.data;
-                document.getElementsByName('reply-box')[0].value = 'Received: ' + message;
-            });
-
-            // var chat_frame = window.parent.document.getElementById("be-chat-container");
-            // var chat_frame_zIndex = parseInt(getComputedStyle(chat_frame).zIndex);
-            // var surfly_frame = window.parent.document.getElementById("surfly-iframe");
-            // surfly_frame.style.setProperty("z-index", chat_frame_zIndex - 1, "important");
-        }
 
     </script>
     <script>
+
+        window.addEventListener('message', (event) => {
+            // Check origin of the message if necessary
+            if (event.origin !== window.top.location.origin) return;
+            console.log(message, event, 'iframe')
+
+            const message = event.data;
+            document.getElementsByName('reply-box')[0].value = 'Received: ' + message;
+        });
         window.parent.addEventListener("message", (message) => {
             if (message.origin === window.top.location.origin) {
                 console.log(message.data);
@@ -38,12 +34,6 @@
             }
         });
 
-        function chatMessages(message) {
-            if (message.data.actionType !== "MESSAGE_RECEIVED") {
-                return;
-            }
-            var payload = message.data.action?.payload;
-        }
 
         async function startSession() {
             let customerWidgetKey = "134f5fd2ac8842c0a1cd6062818eee74" //set customer widget key to variable
