@@ -14,13 +14,15 @@
         })('brandembassy', 'https://livechat-static-de-na1.niceincontact.com/4/chat.js');
 
         brandembassy('init', 1022, 'chat_4bc8d701-a316-4b5f-bc12-9c45f766dbd0');
-        window.addEventListener('message', (event) => {
-            // Check origin of the message if necessary
-            if (event.origin !== window.top.location.origin) return;
+        {
+            window.addEventListener('message', (event) => {
+                // Check origin of the message if necessary
+                if (event.origin !== window.top.location.origin) return;
 
-            const message = event.data;
-            document.getElementsByName('reply-box')[0].value = 'Received: ' + message;
-        });
+                const message = event.data;
+                document.getElementsByName('reply-box')[0].value = 'Received: ' + message;
+            });
+        }
 
     </script>
     <script>
