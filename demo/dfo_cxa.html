@@ -17,7 +17,11 @@
 
     </script>
     <script>
-
+        window.parent.addEventListener("message", (message) => {
+            if (message.origin === window.top.location.origin) {
+                console.log(message.data);
+            }
+        });
         async function startSession() {
             let customerWidgetKey = "134f5fd2ac8842c0a1cd6062818eee74" //set customer widget key to variable
             window.parent.Surfly.settings.widget_key = customerWidgetKey //set customer widget key to widget_key high level
@@ -34,12 +38,7 @@
                         var surflySessionPin = session.pin
                         console.log('Session Pin: ' + surflySessionPin)
                         document.querySelector('[title="Customer Chat"]').contentWindow.document.getElementsByName('reply-box')[0].value = surflySessionPin
-                        window.parent.addEventListener("message", (message) => {
-                            if (message.origin === window.top.location.origin) {
-                                console.log(message.data);
-                                startSession(message)
-                            }
-                        });
+
                         if (message.data.actionType !== "MESSAGE_RECEIVED") {
                             return;
                         }
