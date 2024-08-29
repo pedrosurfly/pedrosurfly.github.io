@@ -22,7 +22,7 @@
         window.addEventListener('message', (event) => {
             // Check origin of the message if necessary
             if (event.origin !== window.top.location.origin) return;
-            console.log(message, event, 'iframe')
+            console.log(event, 'iframe')
 
             const message = event.data;
             document.getElementsByName('reply-box')[0].value = 'Received: ' + message;
