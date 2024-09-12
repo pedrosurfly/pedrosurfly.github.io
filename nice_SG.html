@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        (function (s, u, r, f, l, y) {
+            s[f] = s[f] || { init: function () { s[f].q = arguments; } };
+            l = u.createElement(r); y = u.getElementsByTagName(r)[0]; l.async = 1;
+            l.src = 'https://surfly.com/surfly.js'; y.parentNode.insertBefore(l, y);
+        })
+            (window, document, 'script', 'Surfly');
+
+        function createVideochatSession() {
+            var videochatSession = Surfly.session({
+                widget_key: "f91c918a872c4ec3bf4ccc7bc6388fec",
+                block_until_agent_joins: false,
+                hide_until_agent_joins: true,
+                videochat_autostart: true,
+                start_with_fullscreen_videochat: true,
+                videochat_prompt: true,
+                start_muted: false,
+            });
+
+            videochatSession.on("session_created", function (session, event) {
+                console.log('Waiting for confirmation');
+                session.startLeader(null, null);
+            }).on("session_started", function (session, event) {
+                var surflySessionPin = session.pin;
+                console.log("Videochat session started");
+            }).create();
+        };
+
+    </script>
+
+<body>
+    <button onclick={createVideochatSession()} class="start-button">
+        Start Video
+    </button>
+</body>
+</head>
