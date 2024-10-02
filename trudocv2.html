@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connecting Screen</title>
+    <style>
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            overflow: hidden;
+        }
+ 
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            padding: 0 20px;
+        }
+ 
+        .logo {
+            width: 80%;
+            max-width: 300px;
+            height: auto;
+            margin: 20px 0;
+        }
+ 
+        .status-message {
+            color: #009688;
+            font-size: 24px;
+            margin: 65px 0px 0px 0px;
+            text-align: center;
+        }
+ 
+        .doctor-info {
+ 
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+ 
+        .cancel-button {
+            color: #960505;
+            padding: 12px 24px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+ 
+        .cancel-button:hover {
+            background-color: #f4f2f2
+        }
+ 
+        .cancel-button:active {
+            background-color: #f4f2f2;
+            box-shadow: 0 2px #666;
+            transform: translateY(2px);
+        }
+    </style>
+    <script>
+        let countdownTimer;
+        let sessionDetails = {};
+        function startCountdown(duration, display) {
+            let timer = duration;
+            countdownTimer = setInterval(function () {
+                seconds = parseInt(timer, 10);
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+                display.textContent = seconds;
+                if (timer === 0) {
+                    clearInterval(countdownTimer); // Stop the countdown
+                    display.textContent = "Time's up!";
+                    cancelCall('timesup');
+                    console.log("Doctor has not joined within the allowed time.");
+                }
+ 
+                timer--;
+            }, 1000);
+        }
+ 
+        function initializeFollowerSession(sessionDetails) {
+            // Dynamically load Surfly script
+            (function (s, u, r, f, l, y) {
+                s[f] = s[f] || { init: function () { s[f].q = arguments } };
+                l = u.createElement(r); y = u.getElementsByTagName(r)[0]; l.async = 1;
+                l.src = 'https://surfly.com/surfly.js'; y.parentNode.insertBefore(l, y);
+            })(window, document, 'script', 'Surfly');
+ 
+            var settings = {
+                widget_key: '8adc03a0ff1049c18343b54bc7e1f24a',
+                hide_until_agent_joins: true
+            };
+ 
+            Surfly.init(settings, function (initResult) {
+                if (initResult.success) {
+                    console.log("Follower session initialized successfully.");
+                    const surflySession = Surfly.session(settings, sessionDetails.followerLink)
+                        .on('participant_joined', function (session) {
+                            console.log('The leader join the session');
+                            redirectToSurfly(sessionDetails.followerLink); // Redirect when a user joins
+                        })
+                        .on("error", function (error) {
+                            console.error("Error with Surfly follower session:", error);
+                        });
+                } else {
+                    console.log("Follower session initialization failed.");
+                }
+            });
+        }
+ 
+        function redirectToSurfly(callUrl) {
+            console.log('redirectToSurfly');
+            console.log(callUrl);
+            clearInterval(countdownTimer);
+            // window.location.href = callUrl;
+        }
+ 
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            const token = params.get('token');
+            const patient_name = params.get('patient_name') || 'Patient';
+            const follower_link = params.get('follower_link') || sessionDetails?.followerLink;
+            const leader_link = params.get('leader_link') || sessionDetails?.leader_link;
+            const cancel_redirect_url = params.get('cancel_redirect_url') || sessionDetails?.cancel_redirect_url;
+            return { patient_name, follower_link, token, leader_link, cancel_redirect_url };
+        }
+ 
+        function cancelCall(status) {
+            const { token, cancel_redirect_url, leader_link } = getQueryParams();
+            const baseUrl = window.location.origin;
+            const apiUrl = `${baseUrl}/api/v4/video/cancel`;
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    status: status,
+                    leader_link: leader_link
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    window.location.href = cancel_redirect_url;
+                })
+                .catch(error => {
+                    console.error('Error during API call:', error);
+                });
+        }
+ 
+        window.onload = function () {
+            const { patient_name, follower_link, leader_link, cancel_redirect_url } = getQueryParams();
+            if (sessionDetails) {
+                sessionDetails.followerLink = follower_link;  // Assign query param follower_link to sessionDetails
+            }
+            document.querySelector('.doctor-info').innerHTML = `
+        <span style="color:#009688;">${patient_name}<br></span>
+        <span style="color: #666666;">Just wait for a moment until we connect you with one of our Doctors... <span id="countdown">100</span> Sec.</span>
+    `;
+            // Countdown display element
+            let display = document.querySelector('#countdown');
+            // Start the countdown as soon as the page loads
+            startCountdown(90, display);  // Countdown for 90 seconds
+            // Initialize the follower session, but keep it visually blocked
+            initializeFollowerSession(sessionDetails);
+        };
+        window.addEventListener('load', function () {
+            document.querySelector('.cancel-button').addEventListener('click', function () {
+                cancelCall('cancel');
+            });
+        });
+    </script>
+</head>
+ 
+<body>
+    <div class="col-12" style="text-align: center;margin-top: 20px;">
+        <img src="logo.jpg" alt="TruDoc Logo" class="logo">
+    </div>
+ 
+    <div class="col-12 status-message">
+        Connecting...
+    </div>
+    <div class="container">
+        <div class="doctor-info">
+            <span style="color:#009688;">Ahmed Emam<br></span>
+            <span style="color: #666666;">Just wait for a moment until we connect you with one of our Doctors... <span
+                    id="countdown">100</span> Sec.</span>
+        </div>
+        <span class="cancel-button">Cancel Call</span>
+    </div>
+</body>
+ 
+</html>
