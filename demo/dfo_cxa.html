@@ -34,11 +34,8 @@
                 console.log("Cobrowse message received:", event.data);
 
                 // Check if Surfly is defined before calling session()
-                if (typeof Surfly !== 'undefined' && Surfly.session) {
                     Surfly.session().startLeader();
-                } else {
-                    console.error("Surfly is not defined or session is unavailable.");
-                }
+
             }
         }
     });
