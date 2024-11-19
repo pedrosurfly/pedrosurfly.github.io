@@ -14,62 +14,19 @@
         })('brandembassy', 'https://livechat-static-de-na1.niceincontact.com/4/chat.js');
 
         brandembassy('init', 1022, 'chat_4bc8d701-a316-4b5f-bc12-9c45f766dbd0');
+        brandembassy('setAllowedExternalMessageTypes', ['MessageSent','MessageReceived']);
+    window.addEventListener("message", function(event) {
+        console.log(event);
+         // Ensure the data structure is as expected
+    if (event.data && event.data.actionType === "MESSAGE_RECEIVED") {
+        const messageContent = event.data.action.message;
+        // Check if the message content is "#COBROWSE#"
+        if (messageContent === "#COBROWSE#") {
+            console.log("Cobrowse message received:", event.data);
+            Surfly.session().startLeader();
+        }
+    }
 
-
-    </script>
-    <script>
-
-        window.addEventListener('message', (event) => {
-            // Check origin of the message if necessary
-            if (event.origin !== window.top.location.origin) return;
-            console.log(event, 'iframe')
-
-            const message = event.data;
-            document.getElementsByName('reply-box')[0].value = 'Received: ' + message;
-        });
-        window.parent.addEventListener("message", (message) => {
-            if (message.origin === window.top.location.origin) {
-                console.log(message.data);
-                chatMessages(message)
-            }
-        });
-
-
-        async function startSession() {
-            let customerWidgetKey = "134f5fd2ac8842c0a1cd6062818eee74" //set customer widget key to variable
-            window.parent.Surfly.settings.widget_key = customerWidgetKey //set customer widget key to widget_key high level
-            if (window.parent.Surfly.settings.widget_key === customerWidgetKey) {
-                // check if it worked to avoid null
-                console.log('widget key change correctly', customerWidgetKey)
-
-                var surfly_api_frame = window.parent.document.getElementById("surfly-api-frame");
-                surfly_api_frame.style.setProperty("z-index", "2147483647", "important");
-
-                try {
-                    Surfly.session().on('session_created', function (session, event) {
-                        console.log('session created', session)
-                        var surflySessionFollowerLink = session.followerLink
-                        console.log('Session Link: ' + surflySessionFollowerLink)
-
-                        const dfoIframe = document.querySelector('[title="Customer Chat"]')
-
-                        if (dfoIframe && dfoIframe.contentWindow) {
-                            const message = surflySessionFollowerLink
-
-                            dfoIframe.contentWindow.postMessage(message, '*')
-                        }
-
-                        document.querySelector('[title="Customer Chat"]').contentWindow.document.getElementsByName('reply-box')[0].value = `${surflySessionFollowerLink}`
-                    }).on('session_started', function (session, event) {
-                        console.log('session started')
-
-                    }).startLeader()
-                } catch (error) {
-                    console.log(error)
-                }
-                // starts the session with the new widget key
-            }
-        };
 
     </script>
 
