@@ -163,9 +163,10 @@
     brandembassy('init', 1022, 'chat_4bc8d701-a316-4b5f-bc12-9c45f766dbd0');
     brandembassy('setAllowedExternalMessageTypes', ['MessageSent', 'MessageReceived']);
     window.addEventListener("message", function (event) {
-      console.log(event);
+      console.log(event, 'listener event');
       // Ensure the data structure is as expected
       if (event.data && event.data.actionType === "MESSAGE_RECEIVED") {
+        console.log(event.data.actionType, 'ACTION TYPE');
         const messageContent = event.data.action.message;
 
         // Check if the message content is "#COBROWSE#"
