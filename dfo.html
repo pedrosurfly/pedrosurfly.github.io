@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -117,6 +118,7 @@
     }
   </style>
 </head>
+
 <body>
   <header>
     <div class="logo">Surfly Test</div>
@@ -145,10 +147,43 @@
   </footer>
 
   <script>
-    document.getElementById('load-content').addEventListener('click', function() {
+    document.getElementById('load-content').addEventListener('click', function () {
       const dynamicContent = document.getElementById('dynamic-content');
       dynamicContent.classList.toggle('hidden');
     });
   </script>
+  <script>
+    (function (n, u) {
+      window.BrandEmbassy = n,
+        window[n] = window[n] || function () { (window[n].q = window[n].q || []).push(arguments); }, window[n].u = u,
+        e = document.createElement("script"), e.async = 1, e.src = u + "?" + Math.round(Date.now() / 1e3 / 3600),
+        document.head.appendChild(e);
+    })('brandembassy', 'https://livechat-static-de-na1.niceincontact.com/4/chat.js');
+
+    brandembassy('init', 1022, 'chat_4bc8d701-a316-4b5f-bc12-9c45f766dbd0');
+    brandembassy('setAllowedExternalMessageTypes', ['MessageSent', 'MessageReceived']);
+    window.addEventListener("message", function (event) {
+      console.log(event);
+      // Ensure the data structure is as expected
+      if (event.data && event.data.actionType === "MESSAGE_RECEIVED") {
+        const messageContent = event.data.action.message;
+
+        // Check if the message content is "#COBROWSE#"
+        if (messageContent === "#COBROWSE#") {
+          console.log("Cobrowse message received:", event.data);
+          startCobrowse();
+        }
+      }
+    });
+
+    function startCobrowse() {
+      Surfly.session().on('session_started', function (session, event) {
+        console.log("Session started", session, event);
+        var surflySessionPin = session.pin;
+        console.log("Surfly session pin", surflySessionPin);
+      }).startLeader();
+    }
+  </script>
 </body>
+
 </html>
