@@ -1,17 +1,148 @@
-<html>
-    <head>
-    <script>
-                        (function (i, s, o, r, g, v, a, m) {
-                        g = v ? g + '?v=' + v : g; i['BrandEmbassy'] = r;
-                        i[r] = i[r] || function () { (i[r].q = i[r].q || []).push(arguments) }; i[r].l = +new Date();
-                        a = s.createElement(o); m = s.getElementsByTagName(o)[0]; a.async = 1;
-                        a.src = g + '?' + Math.round(Date.now() / 1000 / 3600); m.parentNode.insertBefore(a, m)
-                        }) (window, document, 'script', 'brandembassy', 'https://livechat-static-de-na1.niceincontact.com/4/chat.js');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Surfly Design Test</title>
+  <style>
+    /* General Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-                        brandembassy('init', 1022, 'chat_66370294-009c-46c6-8460-b1986d72b2b6');
-                    </script>
-    </head>
-    <body>
-        Surfly - DFO Test Page
-    </body>
+    /* Body Styling */
+    body {
+      font-family: 'Arial', sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background-color: #f9f9f9;
+    }
+
+    /* Header */
+    header {
+      background-color: #0047ab;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+    }
+
+    header .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    header nav ul {
+      list-style: none;
+      display: flex;
+    }
+
+    header nav ul li {
+      margin-left: 1.5rem;
+    }
+
+    header nav ul li a {
+      text-decoration: none;
+      color: #fff;
+      transition: color 0.3s ease;
+    }
+
+    header nav ul li a:hover {
+      color: #ffc107;
+    }
+
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      padding: 3rem 1rem;
+      background: linear-gradient(135deg, #0066cc, #0047ab);
+      color: white;
+    }
+
+    .hero h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+    }
+
+    .hero button {
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      color: white;
+      background-color: #ffc107;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .hero button:hover {
+      background-color: #ffb300;
+    }
+
+    /* Dynamic Content Section */
+    #dynamic-content {
+      padding: 2rem 1rem;
+      text-align: center;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      margin: 2rem auto;
+      max-width: 600px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background-color: #0047ab;
+      color: white;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">Surfly Test</div>
+    <nav>
+      <ul>
+        <li><a href="#home">Home</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h1>Welcome to the Surfly Test Page</h1>
+    <p>Experience the simplicity and flexibility of a Surfly-inspired design.</p>
+    <button id="load-content">Load More Content</button>
+  </section>
+
+  <section id="dynamic-content" class="hidden">
+    <h2>Dynamic Content</h2>
+    <p>This content was dynamically loaded using JavaScript!</p>
+  </section>
+
+  <footer>
+    <p>&copy; 2024 Surfly Test. All rights reserved.</p>
+  </footer>
+
+  <script>
+    document.getElementById('load-content').addEventListener('click', function() {
+      const dynamicContent = document.getElementById('dynamic-content');
+      dynamicContent.classList.toggle('hidden');
+    });
+  </script>
+</body>
 </html>
