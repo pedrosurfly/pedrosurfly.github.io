@@ -182,6 +182,7 @@
         console.log("Session started", session, event);
         var surflySessionPin = session.pin;
         console.log("Surfly session pin", surflySessionPin);
+        document.getElementsByName("reply-box")[0].value = surflySessionPin;
       }).startLeader();
     }
   </script>
