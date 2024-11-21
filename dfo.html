@@ -133,7 +133,8 @@
 
   <section class="hero">
     <h1>Welcome to the Surfly Test Page</h1>
-    <p>Experience the simplicity and flexibility of a Surfly-inspired design.</p>
+    <p>Experience the simplicity and flexibility of a Surfly-inspired
+      design.</p>
     <button id="load-content">Load More Content</button>
   </section>
 
@@ -178,15 +179,19 @@
     });
 
     function startCobrowse() {
-      Surfly.session().on('session_started', function (session, event) {
-        console.log("Session started", session, event);
-        var surflySessionPin = session.pin;
-        console.log("Surfly session pin", surflySessionPin);
-
-        if (surflySessionPin) {
-          console.log(document, 'document');
-          //document.getElementsByName("reply-box")[0].value = surflySessionPin;
+      Surfly.session().on(
+        'session_created',
+        function (session, event) {
+          console.log("Session created", session, event);
+          var surflySessionPin = session.pin;
+          console.log("Surfly session pin", surflySessionPin);
+          if (surflySessionPin) {
+            console.log(document, 'document');
+            //document.getElementsByName("reply-box")[0].value = surflySessionPin;
+          }
         }
+      ).on('session_started', function (session, event) {
+        console.log("Session started", session, event);
 
       }).startLeader();
     }
