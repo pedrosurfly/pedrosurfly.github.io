@@ -85,6 +85,11 @@
 
         // Create Videochat Session
         function createVideochatSession() {
+            const selectedService = document.getElementById('service').value;
+            console.log('Selected Service:', selectedService);
+            console.log('Skill Number:', skillNumbers[selectedService]);
+            console.log('Video Signaler URL:', videoSignalerURL);
+
             var videochatSession = Surfly.session({
                 block_until_agent_joins: false,
                 hide_until_agent_joins: true,
