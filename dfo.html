@@ -161,7 +161,7 @@
     })('brandembassy', 'https://livechat-static-de-na1.niceincontact.com/4/chat.js');
 
     brandembassy('init', 1022, 'chat_4bc8d701-a316-4b5f-bc12-9c45f766dbd0');
-    brandembassy('setAllowedExternalMessageTypes', ['MessageSent', 'MessageReceived']);
+    brandembassy('setAllowedExternalMessageTypes', ['MESSAGE_SENT', 'MESSAGE_RECEIVED']);
     window.addEventListener("message", function (event) {
       console.log(event, 'listener event');
       // Ensure the data structure is as expected
