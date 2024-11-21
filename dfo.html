@@ -179,21 +179,28 @@
     });
 
     function startCobrowse() {
-      Surfly.session().on(
-        'session_created',
-        function (session, event) {
-          console.log("Session created", session, event);
-          var surflySessionPin = session.pin;
-          console.log("Surfly session pin", surflySessionPin);
-          if (surflySessionPin) {
-            console.log(document, 'document');
-            //document.getElementsByName("reply-box")[0].value = surflySessionPin;
+      let customerWidgetKey = "134f5fd2ac8842c0a1cd6062818eee74"; //set customer widget key to variable
+      window.parent.Surfly.settings.widget_key = customerWidgetKey; //set customer widget key to widget_key high level
+      if (window.parent.Surfly.settings.widget_key === customerWidgetKey) {
+        // check if it worked to avoid null
+        console.log('widget key change correctly', customerWidgetKey);
+        Surfly.session().on(
+          'session_created',
+          function (session, event) {
+            console.log("Session created", session, event);
+            var surflySessionPin = session.pin;
+            console.log("Surfly session pin", surflySessionPin);
+            if (surflySessionPin) {
+              console.log(document, 'document');
+              //document.getElementsByName("reply-box")[0].value = surflySessionPin;
+            }
           }
-        }
-      ).on('session_started', function (session, event) {
-        console.log("Session started", session, event);
+        ).on('session_started', function (session, event) {
+          console.log("Session started", session, event);
 
-      }).startLeader();
+        }).startLeader();
+      }
+
     }
   </script>
 </body>
