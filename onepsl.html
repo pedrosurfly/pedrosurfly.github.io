@@ -9,9 +9,20 @@
         var nicChatPOC = 'f02b34b5-b92f-49ca-be9f-df216ecfa1d7';
         var clusterNiC = 'c12';
         var surflyWidgetKey = '1bfa2f47bb0446ad956e57f75ff6fd4c';
-        var videoSignalerURL = "https://home-c12.incontact.com/inContact/Manage/Scripts/Spawn.aspx?scriptName=Surfly_Signaler&bus_no=4599052&scriptId=108529972&skill_no=11321174&p1=&p2=&p3=&p4=&p5=&Guid=9b38f4e3-2cc5-45b4-b722-1dce3f888479";
-        var randomIdNice = '';
-        let NicHomeURL = "https://home-" + clusterNiC + ".incontact.com";
+        let baseSignalerURL = "https://home-c12.incontact.com/inContact/Manage/Scripts/Spawn.aspx?scriptName=Surfly_Signaler&bus_no=4599052&scriptId=108529972";
+        let videoSignalerURL = "";
+
+        const skillNumbers = {
+            'Mechanical': '11321173',
+            'Electrical': '11321174',
+            'Utility': '11321175'
+        };
+
+        function updateSignalerURL(service) {
+            if (service in skillNumbers) {
+                videoSignalerURL = `${baseSignalerURL}&skill_no=${skillNumbers[service]}&p1=&p2=&p3=&p4=&p5=&Guid=9b38f4e3-2cc5-45b4-b722-1dce3f888479`;
+            }
+        }
 
         var chatSrc = document.createElement("script");
         chatSrc.src = NicHomeURL + "/inContact/ChatClient/js/embed.min.js";
@@ -299,13 +310,86 @@
         background-color: #e54747;
         color: white;
     }
+
+    .form-container {
+        margin: 20px 0;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    input,
+    select {
+        width: 300px;
+        padding: 10px;
+        border: 2px solid #e54747;
+        border-radius: 8px;
+        font-size: 16px;
+        outline: none;
+        box-sizing: border-box;
+        height: 42px;
+    }
+
+    input:focus,
+    select:focus {
+        border-color: #c13030;
+    }
+
+    select {
+        background-color: white;
+        cursor: pointer;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        padding-right: 30px;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e54747' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 16px;
+    }
+
+    /* Style for the placeholder color */
+    ::placeholder {
+        color: #999;
+    }
+
+    .start-button:disabled {
+        background-color: #cccccc;
+        border-color: #cccccc;
+        color: #666666;
+        cursor: not-allowed;
+    }
+
+    .start-button:disabled:hover {
+        background-color: #cccccc;
+        color: #666666;
+    }
 </style>
 
 <body class="pagecontainer">
     <div class="container" id="start-button">
         <h1 class="pageTitle">Click below to video chat with one of our Experts!</h1>
+        <div class="form-container">
+            <form id="contactForm" onsubmit="event.preventDefault();">
+                <div class="form-group">
+                    <input type="text" id="name" name="name" placeholder="Your Name" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" id="email" name="email" placeholder="Your Email" required>
+                </div>
+                <div class="form-group">
+                    <select id="service" name="service" required>
+                        <option value="" disabled selected>Choose Service</option>
+                        <option value="Electrical">Electrical</option>
+                        <option value="Mechanical">Mechanical</option>
+                        <option value="Utility">Utility</option>
+                    </select>
+                </div>
+            </form>
+        </div>
         <div>
-            <button onclick={createVideochatSession()} class="start-button">
+            <button onclick={createVideochatSession()} class="start-button" id="startVideoBtn" disabled>
                 Start Video
             </button>
         </div>
@@ -318,8 +402,39 @@
             <button class="cancel-button" id="btn-cancel-session">Cancel</button>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get form elements
+            const form = document.getElementById('contactForm');
+            const nameInput = document.getElementById('name');
+            const emailInput = document.getElementById('email');
+            const serviceSelect = document.getElementById('service');
+            const startVideoBtn = document.getElementById('startVideoBtn');
 
+            // Function to validate email format
+            function isValidEmail(email) {
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            }
 
+            // Function to check if all fields are valid
+            function validateForm() {
+                const isNameFilled = nameInput.value.trim() !== '';
+                const isEmailValid = isValidEmail(emailInput.value.trim());
+                const isServiceSelected = serviceSelect.value !== '';
+
+                if (isServiceSelected) {
+                    updateSignalerURL(serviceSelect.value);
+                }
+
+                startVideoBtn.disabled = !(isNameFilled && isEmailValid && isServiceSelected);
+            }
+
+            // Add event listeners to all form fields
+            nameInput.addEventListener('input', validateForm);
+            emailInput.addEventListener('input', validateForm);
+            serviceSelect.addEventListener('change', validateForm);
+        });
+    </script>
 </body>
 
 </html>
