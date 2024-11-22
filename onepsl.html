@@ -19,16 +19,16 @@
             'Utility': '11321175'
         };
 
-        const pocNumbers = {
-            'Mechanical': '3521e8d0-8dd4-4d49-8126-f6efc979c48f',
-            'Electrical': 'f02b34b5-b92f-49ca-be9f-df216ecfa1d7',
-            'Utility': '019d7e89-e4da-413a-ae50-9a3419ae7269'
-        };
+        // const pocNumbers = {
+        //     'Mechanical': '3521e8d0-8dd4-4d49-8126-f6efc979c48f',
+        //     'Electrical': 'f02b34b5-b92f-49ca-be9f-df216ecfa1d7',
+        //     'Utility': '019d7e89-e4da-413a-ae50-9a3419ae7269'
+        // };
 
         function updateSignalerURL(service) {
             if (service in skillNumbers) {
                 videoSignalerURL = `${baseSignalerURL}&skill_no=${skillNumbers[service]}&p1=&p2=&p3=&p4=&p5=&Guid=9b38f4e3-2cc5-45b4-b722-1dce3f888479`;
-                nicChatPOC = pocNumbers[service];
+                // nicChatPOC = pocNumbers[service];
             }
         }
 
