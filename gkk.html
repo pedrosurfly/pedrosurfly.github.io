@@ -154,6 +154,29 @@
     });
   </script>
   <script>
+    (function(s,u,r,f,l,y){s[f]=s[f]||{init:function(){s[f].q=arguments}};
+l=u.createElement(r);y=u.getElementsByTagName(r)[0];l.async=1;
+l.src='https://surfly.com/surfly.js';y.parentNode.insertBefore(l,y);})
+(window,document,'script','Surfly');
+
+var settings = {
+    // Surfly session options can be set here, or at the Company/Plan levels.
+    widget_key: '8dbaf4fe49274aa0ba1ad4919fb8ba3f',
+};
+
+Surfly.init(settings, function(initResult) {
+    if (initResult.success) {
+        // API calls can now be made!
+        if (!Surfly.isInsideSession) {
+
+        }
+    }
+    else{
+        console.log("Surfly was unable to initialize properly.")
+    }
+});
+  </script>
+  <script>
     (function(n,u){
 window.CXoneDfo=n,
 window[n]=window[n]||function(){(window[n].q=window[n].q||[]).push(arguments)},window[n].u=u,
@@ -184,7 +207,7 @@ cxone('chat','setAgentImage','https://w241-cp53sp1.cct-solutions.com:39001/NiceI
     });
 
     function startCobrowse() {
-      let customerWidgetKey = "134f5fd2ac8842c0a1cd6062818eee74"; //set customer widget key to variable
+      let customerWidgetKey = "8dbaf4fe49274aa0ba1ad4919fb8ba3f"; //set customer widget key to variable
       window.parent.Surfly.settings.widget_key = customerWidgetKey; //set customer widget key to widget_key high level
       if (window.parent.Surfly.settings.widget_key === customerWidgetKey) {
         // check if it worked to avoid null
