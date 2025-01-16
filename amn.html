@@ -2,7 +2,9 @@
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kiosk Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="https://www.amnhealthcare.com/siteassets/technology/provider-patient-support/language-services/icons-04.svg"> 
+    <title>Interpreter Connect</title>
     <script>
         var showVideoChatButton = false;
         var nicBusNumber = '4607503';
@@ -20,10 +22,10 @@
         };
 
         const pocNumbers = {
-             'ASL': 'df5470c4-61c9-4d38-ad2e-3d597ad3d3a2',
-             'Spanish': 'b65f62c6-22fa-4b80-bd56-2959233b7e43',
-             'English': '6567d48c-011c-4994-9316-4e3d72971359'
-         };
+            'ASL': 'df5470c4-61c9-4d38-ad2e-3d597ad3d3a2',
+            'Spanish': 'b65f62c6-22fa-4b80-bd56-2959233b7e43',
+            'English': '6567d48c-011c-4994-9316-4e3d72971359'
+        };
 
         function updateSignalerURL(service) {
             if (service in skillNumbers) {
@@ -193,13 +195,28 @@
     </script>
 </head>
 <style>
+
+:root {
+--dark-blue: #003C69;
+--blue: #0065C0;
+--light-blue: #0098DB;
+--background-off-white: #f9f9f9;
+--text-grey: #444;
+--amn-font: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif,BlinkMacSystemFont,Helvetica Neue,Arial,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;
+}
+
+body {
+    font-family: var(--amn-font);
+}
+
     .pagecontainer {
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
         text-align: center;
         min-height: 100vh;
-        background: #ffffff;
+        background: var(--background-off-white);
         /* fallback for old browsers */
         /* background: -webkit-linear-gradient(to top, #ffffff, #e54747); */
         /* Chrome 10-25, Safari 5.1-6 */
@@ -208,11 +225,16 @@
 
     }
 
+    img {
+        height: 15rem;
+        width: auto;
+    }
+
     .pageTitle {
-        font-size: 32px;
-        color: #e54747;
+        font-size: 3.5rem;
+        color: var(--blue);
         margin: 0;
-        padding: 20px;
+        padding-bottom: 5%;
     }
 
     .container {
@@ -239,8 +261,10 @@
     .loader {
         border: 16px solid #f3f3f3;
         border-radius: 50%;
-        border-top: 16px solid #e54747;
-        border-bottom: 16px solid #e54747;
+        border-top: 16px solid var(--blue);
+        border-bottom: 16px solid #9E9ACA;
+        border-left: 16px solid #58BB49;
+        border-right:16px solid #53429A;
         width: 120px;
         height: 120px;
         -webkit-animation: spin 2s linear infinite;
@@ -268,10 +292,11 @@
     }
 
     .text-queue {
-        font-size: 20px;
-        color: #e54747;
+        font-size: 1.5rem;
+        color: var(--blue);
         margin: 0;
         padding: 20px;
+        margin:20px;
     }
 
     #spinner {
@@ -285,43 +310,46 @@
     }
 
     .start-button {
-        background-color: white;
-        color: #e54747;
-        border-radius: 8px;
-        border: 2px solid #e54747;
+        background-color: var(--background-off-white);
+        color: var(--blue);
+        border-radius: 15px;
+        border: 3px solid var(--blue);
         padding: 16px 32px;
         text-align: center;
         text-decoration: none;
         display: inline-block;
-        font-size: 16px;
+        font-size: 2rem;
         margin: 4px 2px;
         transition-duration: 0.4s;
         cursor: pointer;
     }
 
     .start-button:hover {
-        background-color: #e54747;
+        background-color: var(--blue);
         color: white;
+        border: 2px solid var(--blue);
+
     }
 
     .cancel-button {
         background-color: white;
-        color: #e54747;
-        border-radius: 8px;
-        border: 2px solid #e54747;
+        color: var(--blue);;
+        border-radius: 15px;
+        border: 3px solid var(--blue);
         padding: 16px 32px;
         text-align: center;
         text-decoration: none;
         display: inline-block;
-        font-size: 16px;
+        font-size: 1.7rem;
         margin: 4px 2px;
         transition-duration: 0.4s;
         cursor: pointer;
     }
 
     .cancel-button:hover {
-        background-color: #e54747;
+        background-color: var(--blue);;
         color: white;
+        border: 2px solid var(--blue);
     }
 
     .form-container {
@@ -334,29 +362,32 @@
 
     input,
     select {
-        width: 300px;
+        width: 80%;
         padding: 10px;
-        border: 2px solid #e54747;
+        border: 3px solid var(--blue);
         border-radius: 8px;
-        font-size: 16px;
+        font-size: 2rem;
         outline: none;
+        color: var(--blue);
         box-sizing: border-box;
-        height: 42px;
+        height: auto;
     }
 
     input:focus,
     select:focus {
-        border-color: #c13030;
+        border-color: var(--blue);
+        color: var(--blue);
     }
 
     select {
         background-color: white;
+        color: var(--blue);
         cursor: pointer;
         -webkit-appearance: none;
         -moz-appearance: none;
         appearance: none;
         padding-right: 30px;
-        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e54747' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23004080' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
         background-repeat: no-repeat;
         background-position: right 10px center;
         background-size: 16px;
@@ -378,22 +409,25 @@
         background-color: #cccccc;
         color: #666666;
     }
-</style>
 
+</style>
 <body class="pagecontainer">
+    <img src="https://www.amnhealthcare.com/siteassets/technology/provider-patient-support/language-services/icons-04.svg">
     <div class="container" id="start-button">
-        <h1 class="pageTitle">Click below to video chat with one of our Experts!</h1>
+        <h1 class="pageTitle">Connect with an Interpreter</h1>
         <div class="form-container">
             <form id="contactForm" onsubmit="event.preventDefault();">
                 <div class="form-group">
-                    <input type="text" id="name" name="name" placeholder="Your Name" required>
+                    <input type="text" id="name" name="name" placeholder="Patient Name" required>
                 </div>
+                <!--
                 <div class="form-group">
                     <input type="email" id="email" name="email" placeholder="Your Email" required>
                 </div>
+                -->
                 <div class="form-group">
                     <select id="service" name="service" required>
-                        <option value="" disabled selected>Choose Language</option>
+                        <option value="" disabled selected>Select Language</option>
                         <option value="ASL">ASL</option>
                         <option value="English">English</option>
                         <option value="Spanish">Spanish</option>
@@ -410,8 +444,7 @@
     <div id="spinner-container" class="hidden">
         <div id="spinner">
             <div class="loader"></div>
-            <p class="text-queue">Wait! Someone will attend you soon!</p>
-            <p class="text-queue">In case you need to cancel, please click below</p>
+            <p class="text-queue">Please wait to be connected</p>
             <button class="cancel-button" id="btn-cancel-session">Cancel</button>
         </div>
     </div>
@@ -420,31 +453,34 @@
             // Get form elements
             const form = document.getElementById('contactForm');
             const nameInput = document.getElementById('name');
-            const emailInput = document.getElementById('email');
+            //const emailInput = document.getElementById('email');
             const serviceSelect = document.getElementById('service');
             const startVideoBtn = document.getElementById('startVideoBtn');
 
             // Function to validate email format
+            /*
             function isValidEmail(email) {
                 return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
             }
+                */
 
             // Function to check if all fields are valid
             function validateForm() {
                 const isNameFilled = nameInput.value.trim() !== '';
-                const isEmailValid = isValidEmail(emailInput.value.trim());
+                //const isEmailValid = isValidEmail(emailInput.value.trim());
                 const isServiceSelected = serviceSelect.value !== '';
 
                 if (isServiceSelected) {
                     updateSignalerURL(serviceSelect.value);
                 }
 
-                startVideoBtn.disabled = !(isNameFilled && isEmailValid && isServiceSelected);
+                startVideoBtn.disabled = !(isNameFilled // && isEmailValid  
+                    && isServiceSelected);
             }
 
             // Add event listeners to all form fields
             nameInput.addEventListener('input', validateForm);
-            emailInput.addEventListener('input', validateForm);
+            //emailInput.addEventListener('input', validateForm);
             serviceSelect.addEventListener('change', validateForm);
         });
     </script>
