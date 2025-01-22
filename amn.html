@@ -98,6 +98,7 @@
         // Create Videochat Session
         function createVideochatSession() {
             const selectedService = document.getElementById('service').value;
+            updateSignalerURL(selectedService);
             console.log('Selected Service:', selectedService);
             console.log('Skill Number:', skillNumbers[selectedService]);
             console.log('Video Signaler URL:', videoSignalerURL);
