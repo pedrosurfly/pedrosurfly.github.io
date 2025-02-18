@@ -404,34 +404,6 @@ body {
             <button class="cancel-button" id="btn-cancel-session">Cancel</button>
         </div>
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Get form elements
-            const form = document.getElementById('contactForm');
-            const nameInput = document.getElementById('name');
-            //const emailInput = document.getElementById('email');
-            const serviceSelect = document.getElementById('service');
-            const startVideoBtn = document.getElementById('startVideoBtn');
-
-            
-            // Function to check if all fields are valid
-            function validateForm() {
-                const isNameFilled = nameInput.value.trim() !== '';
-                const isServiceSelected = serviceSelect.value !== '';
-
-                if (isServiceSelected) {
-                    updateSignalerURL(serviceSelect.value);
-                }
-
-                startVideoBtn.disabled = !(isNameFilled && isServiceSelected);
-            }
-
-            // Add event listeners to all form fields
-            nameInput.addEventListener('input', validateForm);
-            //emailInput.addEventListener('input', validateForm);
-            serviceSelect.addEventListener('change', validateForm);
-        });
-    </script>
 </body>
 
 </html>
