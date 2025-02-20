@@ -85,7 +85,10 @@
                 start_muted: false,
             });
 
-            var surflyMetadata = { "name": "Pedro Pereira", "email": "pedro@surfly.com" };
+            var surflyMetadata = { 
+                "name": document.getElementById('name').value, 
+                "email": "pedro@surfly.com" 
+            };
 
             videochatSession.on("session_created", function (session, event) {
                 console.log('Waiting for confirmation');
@@ -398,7 +401,8 @@ body {
         <div class="form-container">
             <form id="contactForm" onsubmit="event.preventDefault();">
                 <div class="form-group">
-                    <input type="text" id="name" name="name" placeholder="Your Name" required>
+                    <input type="text" id="name" name="name" placeholder="Your Name" required />
+                    <input type="text" id="email" name="email" placeholder="youremail@example.com" required />
                 </div>
                 <div class="form-group">
                     <select id="service" name="service" required>
