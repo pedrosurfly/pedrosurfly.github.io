@@ -3,8 +3,8 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/svg+xml" href="https://www.amnhealthcare.com/siteassets/technology/provider-patient-support/language-services/icons-04.svg"> 
-    <title>Interpreter Connect</title>
+    <link rel="shortcut icon" href="https://www.navyfederal.org/etc.clientlibs/nfculibs/clientlibs/uife/clientlib-uife-nfculibs-site/resources/images/favicon.ico" type="image/x-icon">
+    <title>Member Connect</title>
     <script>
         var showVideoChatButton = false;
         var nicBusNumber = '4599130';
@@ -173,9 +173,9 @@
 <style>
 
 :root {
---dark-blue: #003C69;
---blue: #0065C0;
---light-blue: #0098DB;
+--dark-blue: #032955;
+--blue: #144881;
+--light-blue: #0667BA;
 --background-off-white: #f9f9f9;
 --text-grey: #444;
 --amn-font: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif,BlinkMacSystemFont,Helvetica Neue,Arial,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;
@@ -238,9 +238,9 @@ body {
         border: 16px solid #f3f3f3;
         border-radius: 50%;
         border-top: 16px solid var(--blue);
-        border-bottom: 16px solid #9E9ACA;
-        border-left: 16px solid #58BB49;
-        border-right:16px solid #53429A;
+        border-bottom: 16px solid #ED780F;
+        border-left: 16px solid #89ADD0;
+        border-right:16px solid #9A4E0A;
         width: 120px;
         height: 120px;
         -webkit-animation: spin 2s linear infinite;
@@ -301,7 +301,7 @@ body {
     }
 
     .start-button:hover {
-        background-color: var(--blue);
+        background-color: #ED780F;
         color: white;
         border: 2px solid var(--blue);
 
@@ -388,10 +388,28 @@ body {
 
 </style>
 <body class="pagecontainer">
-    <img src="https://www.amnhealthcare.com/siteassets/technology/provider-patient-support/language-services/icons-04.svg">
+    <div class="logo-container" style="display: flex; flex-direction: row; justify-content: center; gap: 20px; margin-bottom: 3rem;">
+        <img src="https://dm-assets.navyfederal.org/is/content/nfcu/icon-card-balance-transfer?ts=1739894542697&dpr=off" style="width: 10rem;; align-self: flex-end;">
+        <img src="https://dm-assets.navyfederal.org/is/content/nfcu/icon-house-bill%20(1)?ts=1739894542389&dpr=off" style="width: 100%;">
+        <img src="https://dm-assets.navyfederal.org/is/content/nfcu/icon-coin-save%20(1)?ts=1737039922225&dpr=off" style="width: 10rem;; align-self: flex-end;">
+    </div>
     <div class="container" id="start-button">
-        <h1 class="pageTitle">Connect with an Interpreter</h1>
+        <h1 class="pageTitle">Connect with a Representative</h1>
         <div class="form-container">
+            <form id="contactForm" onsubmit="event.preventDefault();">
+                <div class="form-group">
+                    <input type="text" id="name" name="name" placeholder="Your Name" required>
+                </div>
+                <div class="form-group">
+                    <select id="service" name="service" required>
+                        <option value="" disabled selected>How can we help?</option>
+                        <option value="ASL">Mortgages</option>
+                        <option value="English">Savings</option>
+                        <option value="Spanish">Checking</option>
+                        <option value="Dutch_test">Auto Loans</option>
+                    </select>
+                </div>
+            </form>
         </div>
         <div>
             <button onclick={createVideochatSession()} class="start-button" id="startVideoBtn">
