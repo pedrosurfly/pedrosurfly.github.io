@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surfly Design Test</title>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body Styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f7f7f7;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            background-color: #e54747;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+
+        header .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        header nav ul {
+            list-style: none;
+            display: flex;
+        }
+
+        header nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        header nav ul li a {
+            text-decoration: none;
+            color: #fff;
+            transition: color 0.3s ease;
+        }
+
+        header nav ul li a:hover {
+            color: #e54747;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 3rem 1rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .hero button {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            color: white;
+            background-color: #e54747;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .hero button:hover {
+            background-color: #d13d3d;
+        }
+
+        /* Dynamic Content Section */
+        #dynamic-content {
+            padding: 2rem 1rem;
+            text-align: center;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            margin: 2rem auto;
+            max-width: 600px;
+            border-radius: 5px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background-color: #e54747;
+            color: white;
+        }
+
+        /* Popup Styles */
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .popup-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .popup-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="logo">Surfly Test</div>
+        <nav>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>Welcome to the Surfly Test Page</h1>
+        <p>Experience the simplicity and flexibility of a Surfly-inspired
+            design.</p>
+    </section>
+
+    <section id="dynamic-content" class="hidden">
+        <h2>Dynamic Content</h2>
+        <p>This content was dynamically loaded using JavaScript!</p>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Surfly Test. All rights reserved.</p>
+        <button id="btn-request-session">
+            <span id="button-icon"
+                style="background-color: #e54747; color: white; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer;">🖥️</span>
+        </button>
+    </footer>
+
+    <!-- Add this before the closing body tag -->
+    <div class="popup-overlay" id="sessionPopup">
+        <div class="popup-content">
+            <span class="popup-close" onclick="closePopup()">&times;</span>
+            <h2>Start Session</h2>
+            <p>Would you like to start a new session?</p>
+            <div id="session-id" style="margin: 1rem 0; font-size: 1.2rem;"></div>
+            <button id="btn-start-session" style="margin: 1rem 0; padding: 0.5rem 1rem;">Agree</button>
+            <button id="btn-cancel-session" class="hidden" style="margin: 1rem 0; padding: 0.5rem 1rem;">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('btn-request-session').addEventListener('click', function () {
+            document.getElementById('sessionPopup').style.display = 'flex';
+        });
+
+        function closePopup() {
+            document.getElementById('sessionPopup').style.display = 'none';
+        }
+
+        document.getElementById('sessionPopup').addEventListener('click', function (e) {
+            if (e.target === this) {
+                closePopup();
+            }
+        });
+
+        //Add the Surfly snippet
+        (function (s, u, r, f, l, y) {
+            s[f] = s[f] || { init: function () { s[f].q = arguments; } };
+            l = u.createElement(r); y = u.getElementsByTagName(r)[0]; l.async = 1;
+            l.src = 'https://surfly.com/surfly.js'; y.parentNode.insertBefore(l, y);
+        })
+            (window, document, 'script', 'Surfly');
+
+        // Surfly session options, you need to provide your own widget key
+        var settings = {
+            widget_key: "134f5fd2ac8842c0a1cd6062818eee74",
+            block_until_agent_joins: false,
+            hide_until_agent_joins: true,
+            session_start_confirmation: false,
+        };
+
+        // Initialize the JS API
+        Surfly.init(settings, function (init) {
+            if (init.success && !Surfly.isInsideSession) {
+                // If API is initialized successfully, show the start button
+                var startButton = document.querySelector("#btn-request-session");
+                startButton.classList.remove("hidden");
+                startButton.addEventListener("click", function () {
+                    // when a user clicks the start button, show the start popup
+                    var popup = document.querySelector("#sessionPopup").classList.remove("hidden");
+                });
+
+                // when the Agree button is clicked, start a co-browsing session
+                document.querySelector("#btn-start-session").addEventListener("click", sessionStart);
+            }
+        });
+
+        // sessionStart() is called when a user clicks the Agree button
+        function sessionStart() {
+            // hide the Agree button so that it cannot be clicked twice
+            document.querySelector("#btn-start-session").classList.add("hidden");
+            // Close the popup
+            closePopup();
+
+            // Create a co-browsing session
+            Surfly.session()
+                // When the session is started, show the session PIN so that it can be passed to the helpdesk agent
+                .on("session_created", function (session, event) {
+                    // display the session PIN in the button
+                    var buttonIcon = document.querySelector("#button-icon");
+                    buttonIcon.textContent = session.pin;
+                    buttonIcon.style.color = "#808080"; // Keep the grey color
+
+                    // Display the Cancel button
+                    var cancelButton = document.querySelector("#btn-cancel-session");
+                    cancelButton.classList.remove("hidden");
+
+                    // If the Cancel button is clicked, end the session
+                    cancelButton.addEventListener("click", function () {
+                        session.end();
+                        buttonIcon.textContent = "🖥️";
+                    });
+                })
+                // Start the session immediately
+                .startLeader();
+        }
+    </script>
+</body>
+
+</html>
