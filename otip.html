@@ -268,7 +268,7 @@
             // Create a co-browsing session
             Surfly.session()
                 // When the session is started, show the session PIN so that it can be passed to the helpdesk agent
-                .on("session_created", function (session, event) {
+                .on("session_started", function (session, event) {
                     console.log('Session created successfully');
                     console.log('Session PIN:', session.pin);
 
