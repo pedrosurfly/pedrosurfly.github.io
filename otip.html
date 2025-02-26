@@ -256,32 +256,44 @@
 
         // sessionStart() is called when a user clicks the Agree button
         function sessionStart() {
+            console.log('Starting session process...');
             // hide the Agree button so that it cannot be clicked twice
             document.querySelector("#btn-start-session").classList.add("hidden");
+            console.log('Agree button hidden');
+
             // Close the popup
             closePopup();
+            console.log('Popup closed');
 
             // Create a co-browsing session
             Surfly.session()
                 // When the session is started, show the session PIN so that it can be passed to the helpdesk agent
                 .on("session_created", function (session, event) {
+                    console.log('Session created successfully');
+                    console.log('Session PIN:', session.pin);
+
                     // display the session PIN in the button
                     var buttonIcon = document.querySelector("#button-icon");
                     buttonIcon.textContent = session.pin;
-                    buttonIcon.style.color = "#ffffff"; // Keep the grey color
+                    buttonIcon.style.color = "#808080"; // Keep the grey color
+                    console.log('Button icon updated with PIN');
 
                     // Display the Cancel button
                     var cancelButton = document.querySelector("#btn-cancel-session");
                     cancelButton.classList.remove("hidden");
+                    console.log('Cancel button displayed');
 
                     // If the Cancel button is clicked, end the session
                     cancelButton.addEventListener("click", function () {
+                        console.log('Cancel button clicked, ending session...');
                         session.end();
-                        buttonIcon.textContent = "🖥️";
+                        buttonIcon.textContent = "👁";
+                        console.log('Session ended, icon reset to eye');
                     });
                 })
                 // Start the session immediately
                 .startLeader();
+            console.log('Session leader started');
         }
 
         // Language translations
