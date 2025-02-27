@@ -212,13 +212,6 @@
             <button id="btn-cancel-session" class="hidden" style="margin: 1rem 0; padding: 0.5rem 1rem;">Cancel</button>
         </div>
     </div>
-
-    <script>
-        // Establishes connection with Scaledrone
-        const drone = new Scaledrone('fygLrCqVZQCdZfs6');
-        const room = drone.subscribe('otip');
-    </script>    
-
     <script>
         document.getElementById('btn-request-session').addEventListener('click', function () {
             document.getElementById('sessionPopup').style.display = 'flex';
