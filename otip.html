@@ -252,7 +252,10 @@
                     return console.error(error);
                   }
           // Connected to room
+            console.log('connect to room')
         });
+
+        room.on('message', message => console.log('Received message:', message));
 
         // Initialize the JS API
         Surfly.init(settings, function (init) {
