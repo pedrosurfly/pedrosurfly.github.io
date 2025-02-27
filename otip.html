@@ -287,7 +287,7 @@
                 .on("session_created", function (session, event) {
                     console.log('Session created successfully');
                     console.log('Session PIN:', session.pin);
-                    console.log('Session ID:', session);
+                    console.log('Session ID:', session.sessionID);
 
                     // Create room with Surfly session ID
                     const sessionRoom = `otip-${session.id}`;
@@ -299,7 +299,7 @@
                         message: {
                             type: 'session_pin',
                             pin: session.pin,
-                            sessionId: session.id
+                            sessionId: session.sessionID
                         }
                     });
                     console.log('Session PIN sent to Scaledrone channel');
