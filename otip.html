@@ -292,17 +292,6 @@
                     console.log('Session created successfully');
                     console.log('Session PIN:', session.pin);
 
-                    drone.on('open', error => {
-                      if (error) {
-                        return console.error(error);
-                      }
-                      drone.publish({
-                        room: 'otip',
-                        message: {message: 'Hello world!', score: session.pin}
-                      });
-                    });
-                    
-                    
                     // Hide the button and show session PIN
                     document.querySelector("#btn-request-session").style.display = "none";
                     document.querySelector("#session-pin").style.display = "block";
