@@ -261,7 +261,6 @@
 
         // Initialize Scaledrone
         const drone = new Scaledrone('fygLrCqVZQCdZfs6');
-        const room = 'otip';
 
         drone.on('open', error => {
             if (error) {
@@ -288,16 +287,23 @@
                 .on("session_created", function (session, event) {
                     console.log('Session created successfully');
                     console.log('Session PIN:', session.pin);
+                    console.log('Session ID:', session.id);
+
+                    // Create room with Surfly session ID
+                    const sessionRoom = `otip-${session.id}`;
+                    console.log('Creating Scaledrone room:', sessionRoom);
 
                     // Send session PIN to Scaledrone channel
                     drone.publish({
-                        room: room,
+                        room: sessionRoom,
                         message: {
                             type: 'session_pin',
                             pin: session.pin
+                            sessionId: session.id
                         }
                     });
                     console.log('Session PIN sent to Scaledrone channel');
+                    console.log('Session PIN sent to Scaledrone room:', sessionRoom);
 
                     // Hide the button and show session PIN
                     document.querySelector("#btn-request-session").style.display = "none";
