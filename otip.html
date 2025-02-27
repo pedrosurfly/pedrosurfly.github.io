@@ -290,7 +290,7 @@
                     // console.log('Session ID:', session.sessionID);
 
                     // Create room with Surfly session ID
-                    const sessionRoom = `otip-${session.id}`;
+                    const sessionRoom = `otip-sessionId`;
                     console.log('Creating Scaledrone room:', sessionRoom);
 
                     // Send session PIN to Scaledrone channel
@@ -298,8 +298,7 @@
                         room: sessionRoom,
                         message: {
                             type: 'session_pin',
-                            pin: session.pin,
-                            sessionId: 'sessionID'
+                            pin: session.pin
                         }
                     });
                     console.log('Session PIN sent to Scaledrone channel');
