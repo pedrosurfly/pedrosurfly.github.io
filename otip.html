@@ -245,18 +245,7 @@
         };
 
         const drone = new Scaledrone('fygLrCqVZQCdZfs6');
-        const room = drone.subscribe('otip');
-
-        room.on('open', error => {
-              if (error) {
-                    return console.error(error);
-                  }
-          // Connected to room
-            console.log('connect to room')
-        });
-
-        room.on('message', message => console.log('Received message:', message));
-
+        
         // Initialize the JS API
         Surfly.init(settings, function (init) {
             if (init.success && !Surfly.isInsideSession) {
@@ -291,10 +280,28 @@
                     console.log('Session created successfully');
                     console.log('Session PIN:', session.pin);
 
-                    drone.publish({
-                      room: 'room_name',
-                      message: {hello: 'world'}
+                    drone.on('open', error => {
+                      if (error) {
+                        return console.error(error);
+                      }
+                      drone.publish({
+                        room: 'otip',
+                        message: {message: 'Hello world!', score: session.pin}
+                      });
                     });
+                    
+                    const room = drone.subscribe('otip');
+                    room.on('open', error => {
+                      if (error) {
+                        console.error(error);
+                      } else {
+                        console.log('Connected to room');
+                      }
+                    });
+                    room.on('message', message => console.log('Received message:', message));
+                    
+                    drone.on('error', error => console.error(error));
+                    
                     // Hide the button and show session PIN
                     document.querySelector("#btn-request-session").style.display = "none";
                     document.querySelector("#session-pin").style.display = "block";
