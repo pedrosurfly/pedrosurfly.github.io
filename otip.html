@@ -245,6 +245,7 @@
         };
 
         const drone = new Scaledrone('fygLrCqVZQCdZfs6');
+        const room = drone.subscribe('otip');
 
         room.on('open', error => {
               if (error) {
