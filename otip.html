@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src='https://cdn.scaledrone.com/scaledrone.min.js' type='text/javascript'></script>
     <title>Surfly Design Test</title>
     <style>
         /* General Reset */
@@ -242,6 +243,15 @@
             hide_until_agent_joins: true,
             session_start_confirmation: false
         };
+
+        const drone = new Scaledrone('fygLrCqVZQCdZfs6');
+
+        room.on('open', error => {
+              if (error) {
+                    return console.error(error);
+                  }
+          // Connected to room
+        });
 
         // Initialize the JS API
         Surfly.init(settings, function (init) {
