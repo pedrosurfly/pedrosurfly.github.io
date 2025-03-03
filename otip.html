@@ -274,7 +274,7 @@
 
         room.on('message', message => {
           const {data, id, timestamp, clientId, member} = message;
-            console.log(data, id, timestamp, clientId, member, 'scaledrone object');
+            console.log(data.contactId, 'scaledrone object');
         });
 
         // sessionStart() is called when a user clicks the Agree button
