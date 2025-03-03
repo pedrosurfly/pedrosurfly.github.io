@@ -273,7 +273,8 @@
         const room = drone.subscribe('cobrowse');
 
         room.on('message', message => {
-          console.log('Scaledrone message' + message) // Received message from room
+            const {data} = message;
+          console.log('Scaledrone message' + data) // Received message from room
         });
 
         // sessionStart() is called when a user clicks the Agree button
