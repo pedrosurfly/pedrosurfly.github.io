@@ -317,7 +317,7 @@
                         document.querySelector("#session-pin").style.display = "none";
                         console.log('Session ended, button restored');
                     });
-                })
+                }).log('contacId:' contactId)
                 // Start the session immediately
                 .startLeader();
             console.log('Session leader started');
