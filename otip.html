@@ -272,9 +272,12 @@
 
         const room = drone.subscribe('cobrowse');
 
+        var contactId = ''
+
         room.on('message', message => {
           const {data, id, timestamp, clientId, member} = message;
-            console.log(data.contactId, 'scaledrone object');
+            contactId = data.contactId
+            console.log(contactId, 'scaledrone object');
         });
 
         // sessionStart() is called when a user clicks the Agree button
