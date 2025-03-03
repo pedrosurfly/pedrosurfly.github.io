@@ -260,7 +260,7 @@
         });
 
         // Initialize Scaledrone
-        const drone = new Scaledrone('fygLrCqVZQCdZfs6');
+        const drone = new Scaledrone('cobrowse');
 
         drone.on('open', error => {
             if (error) {
@@ -268,6 +268,10 @@
                 return;
             }
             console.log('Successfully connected to Scaledrone');
+        });
+
+        room.on('message', message => {
+          console.log('Scaledrone message' + message) // Received message from room
         });
 
         // sessionStart() is called when a user clicks the Agree button
@@ -287,23 +291,7 @@
                 .on("session_created", function (session, event) {
                     console.log('Session created successfully');
                     console.log('Session PIN:', session.pin);
-                    // console.log('Session ID:', session.sessionID);
-
-                    // Create room with Surfly session ID
-                    const sessionRoom = `otip-sessionId`;
-                    console.log('Creating Scaledrone room:', sessionRoom);
-
-                    // Send session PIN to Scaledrone channel
-                    drone.publish({
-                        room: 'cobrowse',
-                        message: {
-                            type: 'session_pin',
-                            pin: session.pin
-                        }
-                    });
-                    console.log('Session PIN sent to Scaledrone channel');
-                    console.log('Session PIN sent to Scaledrone room:', sessionRoom);
-
+                    
                     // Hide the button and show session PIN
                     document.querySelector("#btn-request-session").style.display = "none";
                     document.querySelector("#session-pin").style.display = "block";
