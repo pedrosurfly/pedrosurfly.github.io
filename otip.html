@@ -270,7 +270,9 @@
             console.log('Successfully connected to Scaledrone');
         });
 
-        drone.on('message', message => {
+        const room = drone.subscribe('cobrowse');
+
+        room.on('message', message => {
           console.log('Scaledrone message' + message) // Received message from room
         });
 
