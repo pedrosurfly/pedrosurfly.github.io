@@ -272,7 +272,7 @@
 
         const room = drone.subscribe('cobrowse');
 
-        var contactId = ''
+        let contactId = ''
 
         room.on('message', message => {
           const {data, id, timestamp, clientId, member} = message;
