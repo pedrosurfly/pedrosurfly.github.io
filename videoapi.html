@@ -170,7 +170,7 @@
                             const sessionId = session._sessionId;
 
                             if (sessionId) {
-                                const data = { sessionId, customerName, language };
+                                const data = `${sessionId}|${customerName}|${language}`;
                                 sendDataToApi(data); // Send webhook data
                             }
                         })
