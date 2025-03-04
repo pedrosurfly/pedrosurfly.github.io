@@ -94,11 +94,11 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: {
+                    body: JSON.stringify({
                         skillId: "29228362",
                         scriptPath: "on_call_test",
-                        parameters: JSON.stringify(data)
-                    }
+                        parameters: data,
+                    }),
                 });
 
                 if (!response.ok) {
