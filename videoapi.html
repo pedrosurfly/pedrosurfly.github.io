@@ -89,7 +89,7 @@
 
             try {
                 console.log('Sending data to api:', data);
-                const response = await fetch(webhookUrl, {
+                const response = await fetch(apiURL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
