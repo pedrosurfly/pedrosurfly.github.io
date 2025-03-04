@@ -86,7 +86,7 @@
         // Function to send data to the NICE API
         async function sendDataToApi(data) {
             const apiURL = 'https://api-nice.onrender.com/api/v1/nice/start-script';
-
+            console.log('Sending data to api:', data);
             try {
                 console.log('Sending data to api:', data);
                 const response = await fetch(apiURL, {
