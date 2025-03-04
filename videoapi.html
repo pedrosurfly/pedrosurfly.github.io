@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,13 +14,16 @@
         body {
             background-color: #f8f9fa;
         }
+
         .container {
             margin-top: 50px;
         }
+
         .form-icon {
             font-size: 3rem;
             color: #007bff;
         }
+
         /* Loading overlay styles */
         #loadingOverlay {
             display: none;
@@ -33,12 +37,14 @@
             text-align: center;
             padding-top: 200px;
         }
+
         .spinner-border {
             width: 3rem;
             height: 3rem;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="text-center mb-4">
@@ -48,7 +54,8 @@
         <form id="customerForm" class="bg-white p-4 rounded shadow-sm">
             <div class="form-group">
                 <label for="customerName">Name</label>
-                <input type="text" class="form-control" id="customerName" name="customerName" placeholder="Enter your name" required>
+                <input type="text" class="form-control" id="customerName" name="customerName"
+                    placeholder="Enter your name" required>
             </div>
             <div class="form-group">
                 <label for="language">Preferred Language</label>
@@ -79,7 +86,7 @@
         // Function to send data to the NICE API
         async function sendDataToApi(data) {
             const apiURL = 'https://api-nice.onrender.com/api/v1/nice/start-script';
-            
+
             try {
                 console.log('Sending data to api:', data);
                 const response = await fetch(webhookUrl, {
@@ -88,10 +95,10 @@
                         'Content-Type': 'application/json',
                     },
                     body: {
-                      skillId: "29228362",
-                      scriptPath:"on_call_test",
-                      JSON.stringify(data)
-                      }
+                        skillId: "29228362",
+                        scriptPath: "on_call_test",
+                        parameters: JSON.stringify(data)
+                    }
                 });
 
                 if (!response.ok) {
@@ -136,7 +143,7 @@
                         start_with_fullscreen_videochat: true,
                         videochat_prompt: false,  //switched to false
                         start_muted: false,
-                        });
+                    });
 
                     if (!session) {
                         console.error('Failed to create session.');
@@ -161,7 +168,7 @@
                             console.log('Event: session_started');
 
                             const sessionId = session._sessionId;
-                            
+
                             if (sessionId) {
                                 const data = { sessionId, customerName, language };
                                 sendDataToApi(data); // Send webhook data
@@ -180,4 +187,5 @@
         });
     </script>
 </body>
+
 </html>
