@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interpreter Connect</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <script src="https://surfly.com/surfly.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .form-icon {
+            font-size: 3rem;
+            color: #007bff;
+        }
+        /* Loading overlay styles */
+        #loadingOverlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 1000;
+            text-align: center;
+            padding-top: 200px;
+        }
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="text-center mb-4">
+            <i class="fas fa-video form-icon"></i>
+            <h1 class="h3 mt-2">Connect with an Interpreter</h1>
+        </div>
+        <form id="customerForm" class="bg-white p-4 rounded shadow-sm">
+            <div class="form-group">
+                <label for="customerName">Name</label>
+                <input type="text" class="form-control" id="customerName" name="customerName" placeholder="Enter your name" required>
+            </div>
+            <div class="form-group">
+                <label for="language">Preferred Language</label>
+                <select class="form-control" id="language" name="language" required>
+                    <option value="ASL">ASL</option>
+                    <option value="English">English</option>
+                    <option value="Spanish">Spanish</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Start Video</button>
+        </form>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+        <p class="mt-3">Waiting for an agent to connect...</p>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        // Function to send data to the NICE API
+        async function sendDataToApi(data) {
+            const apiURL = 'https://api-nice.onrender.com/api/v1/nice/start-script';
+            
+            try {
+                console.log('Sending data to api:', data);
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: {
+                      skillId: "29228362",
+                      scriptPath:"on_call_test",
+                      JSON.stringify(data)
+                      }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const responseData = await response.json();
+                console.log('Webhook response:', responseData);
+            } catch (error) {
+                console.error('Error sending data to webhook:', error);
+            }
+        }
+
+        document.getElementById('customerForm').addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // Capture form data
+            const customerName = document.getElementById('customerName').value.trim();
+            const language = document.getElementById('language').value;
+
+            console.log('Form submitted. Initializing Surfly...');
+
+            // Initialize Surfly
+            Surfly.init(
+                {
+                    widget_key: '134f5fd2ac8842c0a1cd6062818eee74', // Replace with your actual widget key
+                },
+                function (result) {
+                    console.log('Surfly.init callback invoked.');
+                    if (!result.success) {
+                        console.error('Surfly initialization failed:', result.error);
+                        return;
+                    }
+
+                    console.log('Surfly initialized successfully');
+
+                    // Create a session
+                    const session = Surfly.session({
+                        block_until_agent_joins: false,
+                        hide_until_agent_joins: true,
+                        videochat_autostart: true,
+                        start_with_fullscreen_videochat: true,
+                        videochat_prompt: false,  //switched to false
+                        start_muted: false,
+                        });
+
+                    if (!session) {
+                        console.error('Failed to create session.');
+                        return;
+                    }
+
+                    console.log('Session object created:', session);
+
+                    // Attach event listeners
+                    session
+                        .on('session_created', () => {
+                            console.log('Event: session_created');
+                            console.log('Session details:', session);
+                            // Show loading overlay
+                            document.getElementById('loadingOverlay').style.display = 'block';
+                        })
+                        .on('viewer_joined', () => {
+                            console.log('Event: viewer_joined');
+                            // Keep spinner until agent joins
+                        })
+                        .on('session_started', () => {
+                            console.log('Event: session_started');
+
+                            const sessionId = session._sessionId;
+                            
+                            if (sessionId) {
+                                const data = { sessionId, customerName, language };
+                                sendDataToApi(data); // Send webhook data
+                            }
+                        })
+                        .on('session_ended', () => {
+                            console.log('Event: session_ended');
+                            // Hide loading overlay
+                            document.getElementById('loadingOverlay').style.display = 'none';
+                        });
+
+                    // Start the session as the leader
+                    session.startLeader();
+                }
+            );
+        });
+    </script>
+</body>
+</html>
