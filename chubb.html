@@ -135,7 +135,7 @@
         <h1>Welcome to the Surfly Test Page</h1>
         <p>Experience the simplicity and flexibility of a Surfly-inspired
             design.</p>
-        <button onclick="sessionStart()">Start a Cobrowse Session</button>
+        <button id="startSessionBtn" onclick="sessionStart()" disabled>Start a Cobrowse Session</button>
     </section>
 
     <section id="dynamic-content" class="hidden">
@@ -161,56 +161,125 @@
         })(window, document, 'script', 'Surfly');
 
         var SurflySession;
+        let isInitialized = false;
+
+        // UI Elements
+        const startButton = document.getElementById('startSessionBtn');
+
+        // Log status to console
+        function logStatus(message, isError = false) {
+            if (isError) {
+                console.error(message);
+            } else {
+                console.log(message);
+            }
+        }
 
         // Get the agent ID for the Cobrowse Session
         async function getAgentId() {
+            logStatus('Fetching agent information...');
             // TODO: Change for the actual API key, please don't hardcode it add to .env file
             const apiKey = "d76f04f9ebc34ef7bfcc699bd5ed65c2";
+
             try {
                 const response = await fetch("https://surfly.com/v2/agents/?api_key=" + apiKey + "&email=" + agentEmail);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
                 const data = await response.json();
+
+                if (!data || !data[0] || !data[0].agent_id) {
+                    throw new Error('No agent found with the provided email');
+                }
+
+                console.log('Agent ID retrieved:', data[0].agent_id);
                 return data[0].agent_id;
             } catch (error) {
                 console.error('Error getting agent ID:', error);
+                logStatus('Failed to get agent information: ' + error.message, true);
                 return null;
             }
         }
 
         // Initialize Surfly with agent ID
         async function initializeSurfly() {
-            const agentId = await getAgentId();
+            try {
+                logStatus('Initializing Surfly...');
+                const agentId = await getAgentId();
 
-            // Surfly session options, you need to provide your own widget key
-            var settings = {
-                // TODO: Change for the actual widget key
-                "widget_key": "61c30ab2090a46d488cc5f41cc624fb4",
-                "agent_id": agentId
-            };
-
-            // Initialize the JS API
-            Surfly.init(settings, function (init) {
-                if (init.success && !Surfly.isInsideSession) {
-                    console.log("surfly initialized");
+                if (!agentId) {
+                    throw new Error('Failed to get agent ID');
                 }
-            });
+
+                // Surfly session options, you need to provide your own widget key
+                const settings = {
+                    // TODO: Change for the actual widget key
+                    "widget_key": "61c30ab2090a46d488cc5f41cc624fb4",
+                    "agent_id": agentId,
+                    // Added error handling for initialization
+                    "on_error": function (error) {
+                        console.error('Surfly initialization error:', error);
+                        logStatus('Failed to initialize Surfly: ' + error, true);
+                    }
+                };
+
+                // Initialize the JS API
+                Surfly.init(settings, function (init) {
+                    if (init.success) {
+                        if (!Surfly.isInsideSession) {
+                            console.log("Surfly initialized successfully");
+                            isInitialized = true;
+                            startButton.disabled = false;
+                            logStatus('Ready to start cobrowsing session');
+                        }
+                    } else {
+                        throw new Error('Surfly initialization failed');
+                    }
+                });
+            } catch (error) {
+                console.error('Initialization error:', error);
+                logStatus('Failed to initialize: ' + error.message, true);
+                startButton.disabled = true;
+            }
         }
 
         // Call initialize function when the script loads
-        initializeSurfly();
+        window.addEventListener('load', initializeSurfly);
 
+        // Start the cobrowse session
         function sessionStart() {
-            // Add customer metadata to the session
-            //surflyMetadata = {
-            //    "name": agentEmail,
-            //    "email": agentName
-            //};
+            if (!isInitialized) {
+                logStatus('Please wait for initialization to complete', true);
+                return;
+            }
 
-            Surfly.session().on("session_created", function (session, event) {
-                console.log("session created");
-                session.startLeader(null);
-            }).on('participant_joined', function (session, event) {
-                console.log("participant joined");
-            }).create();
+            try {
+                logStatus('Starting cobrowse session...');
+                startButton.disabled = true;
+
+                Surfly.session()
+                    .on("session_created", function (session, event) {
+                        console.log("Session created successfully");
+                        logStatus('Session created, starting leader...');
+                        session.startLeader(null);
+                    })
+                    .on('participant_joined', function (session, event) {
+                        console.log("Participant joined the session");
+                        logStatus('Participant joined the session');
+                    })
+                    .on('error', function (error) {
+                        console.error('Session error:', error);
+                        logStatus('Session error: ' + error.message, true);
+                        startButton.disabled = false;
+                    })
+                    .create();
+            } catch (error) {
+                console.error('Error starting session:', error);
+                logStatus('Failed to start session: ' + error.message, true);
+                startButton.disabled = false;
+            }
         }
     </script>
 </body>
