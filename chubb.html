@@ -200,14 +200,14 @@
 
         function sessionStart() {
             // Add customer metadata to the session
-            surflyMetadata = {
-                "name": "Customer Name",
-                "email": "customeremail@exmaple.com"
-            };
+            //surflyMetadata = {
+            //    "name": agentEmail,
+            //    "email": agentName
+            //};
 
             Surfly.session().on("session_created", function (session, event) {
                 console.log("session created");
-                session.startLeader(null, surflyMetadata);
+                session.startLeader(null);
             }).on('participant_joined', function (session, event) {
                 console.log("participant joined");
             }).create();
