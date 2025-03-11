@@ -180,25 +180,46 @@
             logStatus('Fetching agent information...');
             // TODO: Change for the actual API key, please don't hardcode it add to .env file
             const apiKey = "d76f04f9ebc34ef7bfcc699bd5ed65c2";
+            const baseUrl = "https://surfly.com/v2/agents/";
 
             try {
-                const response = await fetch("https://surfly.com/v2/agents/?api_key=" + apiKey + "&email=" + agentEmail);
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
+                // First try to get existing agent
+                const response = await fetch(`${baseUrl}?api_key=${apiKey}&email=${agentEmail}`);
                 const data = await response.json();
 
-                if (!data || !data[0] || !data[0].agent_id) {
-                    throw new Error('No agent found with the provided email');
+                // If agent exists, return their ID
+                if (response.ok && data && data[0] && data[0].agent_id) {
+                    console.log('Agent ID retrieved:', data[0].agent_id);
+                    return data[0].agent_id;
                 }
 
-                console.log('Agent ID retrieved:', data[0].agent_id);
-                return data[0].agent_id;
+                // SSO - Single Sign On
+                // If agent doesn't exist, create new one
+                logStatus('No existing agent found, creating new agent...');
+                const createResponse = await fetch(`${baseUrl}?api_key=${apiKey}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: agentName,
+                        agent_email: agentEmail,
+                        password: "Pass@123",
+                        role: "agent"
+                    })
+                });
+
+                if (!createResponse.ok) {
+                    throw new Error(`Failed to create agent: ${createResponse.status}`);
+                }
+
+                const newAgent = await createResponse.json();
+                console.log('New agent created with ID:', newAgent.agent_id);
+                return newAgent.agent_id;
+
             } catch (error) {
-                console.error('Error getting agent ID:', error);
-                logStatus('Failed to get agent information: ' + error.message, true);
+                console.error('Error in agent management:', error);
+                logStatus('Failed to get or create agent: ' + error.message, true);
                 return null;
             }
         }
