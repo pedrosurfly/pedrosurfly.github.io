@@ -165,19 +165,24 @@
         // Get the agent ID for the Cobrowse Session
         var agentId = getAgentId();
 
-        function getAgentId() {
-            var result = fetch("https://surfly.com/v2/agents/?api_key=d76f04f9ebc34ef7bfcc699bd5ed65c2&email=" + agentEmail)
+        async function getAgentId() {
+            var agentId;
+            // TODO: Change for the actual API key, please don't hardcode it add to .env file
+            const apiKey = "d76f04f9ebc34ef7bfcc699bd5ed65c2";
+            const result = await fetch("https://surfly.com/v2/agents/?api_key=" + apiKey + "&email=" + agentEmail)
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
+                    console.log(data[0].agent_id);
+                    agentId = data[0].agent_id;
                 });
 
-            var agentId = result.data[0].agent_id;
+            console.log(agentId, 'getting agent id');
             return agentId;
         }
 
         // Surfly session options, you need to provide your own widget key
         var settings = {
+            // TODO: Change for the actual widget key
             "widget_key": "61c30ab2090a46d488cc5f41cc624fb4",
             "agent_id": agentId
         };
