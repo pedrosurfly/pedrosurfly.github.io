@@ -135,7 +135,7 @@
         <h1>Welcome to the Surfly Test Page</h1>
         <p>Experience the simplicity and flexibility of a Surfly-inspired
             design.</p>
-        <button id="btn-request-session">Start a Cobrowse Session</button>
+        <button onclick="sessionStart()">Start a Cobrowse Session</button>
     </section>
 
     <section id="dynamic-content" class="hidden">
@@ -190,11 +190,7 @@
         // Initialize the JS API
         Surfly.init(settings, function (init) {
             if (init.success && !Surfly.isInsideSession) {
-                // If API is initialized successfully, show the start button
-                var startButton = document.querySelector("#btn-request-session");
-
-                // when the Agree button is clicked, start a co-browsing session
-                document.querySelector("#btn-start-session").addEventListener("click", sessionStart);
+                console.log("surfly initialized");
             }
         });
 
