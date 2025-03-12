@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Westfield DFO Test</title>
+    <title>Surfly Design Test</title>
     <style>
         /* General Reset */
         * {
@@ -177,7 +177,7 @@
             if (event.data && event.data.actionType === "MESSAGE_RECEIVED") {
                 console.log(event.data.actionType, 'ACTION TYPE');
                 const messageContent = event.data.action.message;
-
+                console.log(messageContent, 'messageContent');
                 // Check if the message content is "#COBROWSE#"
                 if (messageContent === "#COBRO#") {
                     console.log("Cobrowse message received:", event.data);
@@ -186,29 +186,53 @@
             }
         });
 
-        function startCobrowse() {
-            let customerWidgetKey = "55a27f67fede435c825c24d42384accb"; //set customer widget key to variable
-            window.parent.Surfly.settings.widget_key = customerWidgetKey; //set customer widget key to widget_key high level
-            if (window.parent.Surfly.settings.widget_key === customerWidgetKey) {
-                // check if it worked to avoid null
-                console.log('widget key change correctly', customerWidgetKey);
-                Surfly.session().on(
-                    'session_created',
-                    function (session, event) {
-                        console.log("Session created", session, event);
-                        var surflySessionPin = session.pin;
-                        console.log("Surfly session pin", surflySessionPin);
-                        if (surflySessionPin) {
-                            console.log(document, 'document');
-                            //document.getElementsByName("reply-box")[0].value = surflySessionPin;
-                        }
-                    }
-                ).on('session_started', function (session, event) {
-                    console.log("Session started", session, event);
+        (function (s, u, r, f, l, y) {
+            s[f] = s[f] || { init: function () { s[f].q = arguments; } };
+            l = u.createElement(r); y = u.getElementsByTagName(r)[0]; l.async = 1;
+            l.src = 'https://surfly.com/surfly.js'; y.parentNode.insertBefore(l, y);
+        })(window, document, 'script', 'Surfly');
 
-                }).startLeader();
+
+
+        const settings = {
+            // TODO: Change for the actual widget key
+            "widget_key": "61c30ab2090a46d488cc5f41cc624fb4",
+            // Added error handling for initialization
+            "on_error": function (error) {
+                console.error('Surfly initialization error:', error);
+                logStatus('Failed to initialize Surfly: ' + error, true);
             }
+        };
 
+        // Initialize the JS API
+        Surfly.init(settings, function (init) {
+            if (init.success) {
+                if (!Surfly.isInsideSession) {
+                    console.log("Surfly initialized successfully");
+                    isInitialized = true;
+                    startButton.disabled = false;
+                    logStatus('Ready to start cobrowsing session');
+                }
+            } else {
+                throw new Error('Surfly initialization failed');
+            }
+        });
+
+        function startCobrowse() {
+            Surfly.session().on(
+                'session_created',
+                function (session, event) {
+                    console.log("Session created", session, event);
+                    var surflySessionPin = session.pin;
+                    console.log("Surfly session pin", surflySessionPin);
+                    if (surflySessionPin) {
+                        console.log(document, 'document');
+                        //document.getElementsByName("reply-box")[0].value = surflySessionPin;
+                    }
+                }
+            ).on('session_started', function (session, event) {
+                console.log("Session started", session, event);
+            }).startLeader();
         }
     </script>
 </body>
