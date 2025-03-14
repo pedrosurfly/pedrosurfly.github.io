@@ -50,12 +50,12 @@
         // Start a Work Item
         function signalWorkItem(followerLink) {
             randomId();
-            console.log('signal Work Item', videoSignalerURL);
             var url = new URL(videoSignalerURL);
             url.searchParams.set('p1', 'startWorkItem');
             url.searchParams.set('p2', followerLink);
             url.searchParams.set('p3', randomIdNice);
             url.searchParams.set('p5', `${webpageId}`);
+            console.log('URL Spawned', url)
             fetch(url, { mode: "no-cors" });
         }
 
