@@ -50,7 +50,7 @@
         // Start a Work Item
         function signalWorkItem(followerLink) {
             randomId();
-            console.log('signal Work Item');
+            console.log('signal Work Item', videoSignalerURL);
             var url = new URL(videoSignalerURL);
             url.searchParams.set('p1', 'startWorkItem');
             url.searchParams.set('p2', followerLink);
