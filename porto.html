@@ -11,7 +11,9 @@
         var surflyWidgetKey = '9155037f5d3d474d9da63cde34ba2e1c';
         var videoSignalerURL = "https://home-c210.nice-incontact.com/inContact/Manage/Scripts/Spawn.aspx?scriptName=Surfly_Signaler&bus_no=4608272&scriptId=191308692&skill_no=23120684&p1=&p2=&p3=&p4=&p5=&Guid=49cadfaa-07f5-4739-a389-0fda47f929d5";
         var randomIdNice = '';
+
         let NicHomeURL = "https://home-" + clusterNiC + ".nice-incontact.com";
+
 
         var chatSrc = document.createElement("script");
         chatSrc.src = NicHomeURL + "/inContact/ChatClient/js/embed.min.js";
@@ -29,6 +31,11 @@
             loadSurfly();
         };
 
+        // Get webpage parameter from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const webpage = urlParams.get('webpage') || 'A'; // Default to 'A' if not provided
+        console.log('Webpage parameter:', webpage);
+
 
         function signalContact(contactId, followerLink, sessionPin, type) {
             console.log('signal contact');
@@ -40,17 +47,6 @@
             fetch(url);
         }
 
-        // 
-        function updateStudioScript(contactId, type) {
-            console.log('udpate Studio Script');
-            var url = new URL(chatSignalerURL);
-            url.searchParams.set('p1', contactId);
-            url.searchParams.set('p2', 'NA');
-            url.searchParams.set('p3', `sessionended-${type}`);
-            url.searchParams.set('p4', 'NA');
-            fetch(url);
-        }
-
         // Start a Work Item
         function signalWorkItem(followerLink) {
             randomId();
@@ -59,6 +55,7 @@
             url.searchParams.set('p1', 'startWorkItem');
             url.searchParams.set('p2', followerLink);
             url.searchParams.set('p3', randomIdNice);
+            url.searchParams.set('p5', webpageId);
             fetch(url, { mode: "no-cors" });
         }
 
