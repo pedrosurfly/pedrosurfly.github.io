@@ -55,7 +55,7 @@
             url.searchParams.set('p1', 'startWorkItem');
             url.searchParams.set('p2', followerLink);
             url.searchParams.set('p3', randomIdNice);
-            url.searchParams.set('p5', webpageId);
+            url.searchParams.set('p5', `${webpageId}`);
             fetch(url, { mode: "no-cors" });
         }
 
