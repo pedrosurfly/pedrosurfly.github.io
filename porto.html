@@ -36,17 +36,6 @@
         const webpage = urlParams.get('webpage') || 'A'; // Default to 'A' if not provided
         console.log('Webpage parameter:', webpage);
 
-
-        function signalContact(contactId, followerLink, sessionPin, type) {
-            console.log('signal contact');
-            var url = new URL(chatSignalerURL);
-            url.searchParams.set('p1', contactId);
-            url.searchParams.set('p2', followerLink);
-            url.searchParams.set('p3', sessionPin);
-            url.searchParams.set('p4', type);
-            fetch(url);
-        }
-
         // Start a Work Item
         function signalWorkItem(followerLink) {
             randomId();
@@ -54,7 +43,7 @@
             url.searchParams.set('p1', 'startWorkItem');
             url.searchParams.set('p2', followerLink);
             url.searchParams.set('p3', randomIdNice);
-            url.searchParams.set('p5', 'A');
+            url.searchParams.set('p5', webpage);
             console.log('URL Spawned', url)
             fetch(url, { mode: "no-cors" });
         }
