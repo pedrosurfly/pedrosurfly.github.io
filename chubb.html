@@ -295,7 +295,7 @@
                         logStatus('Session error: ' + error.message, true);
                         startButton.disabled = false;
                     })
-                    .create();
+                    .startLeader();
             } catch (error) {
                 console.error('Error starting session:', error);
                 logStatus('Failed to start session: ' + error.message, true);
