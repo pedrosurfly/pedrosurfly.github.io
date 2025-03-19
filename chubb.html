@@ -255,6 +255,9 @@
                             startButton.disabled = false;
                             logStatus('Ready to start cobrowsing session');
                         }
+
+                        Surfly.listSessions()[0].log({ "email": agentEmail, "name": agentName });
+
                     } else {
                         throw new Error('Surfly initialization failed');
                     }
@@ -298,7 +301,6 @@
             }
         }
 
-        Surfly.session.log('test');
     </script>
 </body>
 
