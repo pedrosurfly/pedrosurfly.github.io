@@ -290,11 +290,7 @@
                         console.log("Participant joined the session");
                         logStatus('Participant joined the session');
                     })
-                    .on('error', function (error) {
-                        console.error('Session error:', error);
-                        logStatus('Session error: ' + error.message, true);
-                        startButton.disabled = false;
-                    })
+                    .log('Added to the log')
                     .startLeader();
             } catch (error) {
                 console.error('Error starting session:', error);
