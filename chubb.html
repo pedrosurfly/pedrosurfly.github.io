@@ -290,7 +290,6 @@
                         console.log("Participant joined the session");
                         logStatus('Participant joined the session');
                     })
-                    .log('Added to the log:' + agentEmail)
                     .startLeader();
             } catch (error) {
                 console.error('Error starting session:', error);
@@ -298,6 +297,8 @@
                 startButton.disabled = false;
             }
         }
+
+        Surfly.session.log('test');
     </script>
 </body>
 
