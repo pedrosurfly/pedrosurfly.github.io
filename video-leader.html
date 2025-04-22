@@ -66,28 +66,17 @@
 
             videochatSession.on("session_created", function (session, event) {
                 console.log('Waiting for confirmation');
-                session.startLeader(null, {name: "Agente"})
+                session.startLeader(null, { name: "Agente" });
             }).on("session_started", function (session, event) {
                 var surflySessionPin = session.pin;
                 var surflyLeaderLink = session.leaderLink;
                 signalWorkItem(surflyLeaderLink);
                 console.log("Videochat session started");
                 console.log('Session Pin: ' + surflySessionPin);
+
+            }).on("participant_joined", function (session, event) {
+                console.log("participant_joined", event, session);
                 // Display the Queue Spinner
-                var spinner = document.querySelector("#spinner-container");
-                spinner.classList.remove("hidden");
-
-                var cancelButton = document.querySelector("#btn-cancel-session");
-                // If the Cancel button is clicked, end the work item and end the session
-                cancelButton.addEventListener("click", function () {
-                    session.end();
-                });
-
-                // Remove the button
-                var button = document.querySelector("#start-button");
-                button.classList.add("hidden");
-            }).on("viewer_joined", function (session, event) {
-                window.nicVideochatContactId = event.userData.contactId;
             }).on("session_ended", function (session, event) {
                 console.log("Videochat session ended", event, session);
 
