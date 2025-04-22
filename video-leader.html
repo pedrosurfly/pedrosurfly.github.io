@@ -64,14 +64,9 @@
                 hide_element_by_selector: "#username,#user"
             });
 
-            var surflyMetadata = { 
-                "name": "Agent", 
-                "email": "support@surfly.com" 
-            };
-
             videochatSession.on("session_created", function (session, event) {
                 console.log('Waiting for confirmation');
-                session.startFollower(null, surflyMetadata);
+                session.startFollower(null, {name: "Agente", email: "support@surfly.com"});
             }).on("session_started", function (session, event) {
                 var surflySessionPin = session.pin;
                 var surflyLeaderLink = session.leaderLink;
