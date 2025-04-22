@@ -93,7 +93,7 @@
 
             videochatSession.on("session_created", function (session, event) {
                 console.log('Waiting for confirmation');
-                session.startLeader(null, surflyMetadata);
+                session.startFollower(null, {name: "Agente", email: "porto@portoseguro.com"});
             }).on("session_started", function (session, event) {
                 var surflySessionPin = session.pin;
                 var surflyFollowerLink = session.followerLink;
