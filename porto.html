@@ -32,28 +32,28 @@
         };
 
         // Get webpage parameter from URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const webpage = urlParams.get('webpage') || 'A'; // Default to 'A' if not provided
+        const url = window.location.href;
+        const webpage = url.substring(url.lastIndexOf('/') + 1); // Default to 'A' if empty
         console.log('Webpage parameter:', webpage);
 
         // Start a Work Item
-        function signalWorkItem(followerLink) {
+        function signalWorkItem(leaderLink) {
             randomId();
             var url = new URL(videoSignalerURL);
             url.searchParams.set('p1', 'startWorkItem');
-            url.searchParams.set('p2', followerLink);
+            url.searchParams.set('p2', `${leaderLink}`);
             url.searchParams.set('p3', randomIdNice);
             url.searchParams.set('p5', webpage);
-            console.log('URL Spawned', url)
+            console.log('URL Spawned', url);
             fetch(url, { mode: "no-cors" });
         }
 
         // End a workItem
-        function endWorkItem(followerLink) {
+        function endWorkItem(leaderLink) {
             console.log('End Work Item', randomIdNice);
             var url = new URL(videoSignalerURL);
             url.searchParams.set('p1', 'endWorkItem');
-            url.searchParams.set('p2', followerLink);
+            url.searchParams.set('p2', leaderLink);
             url.searchParams.set('p3', randomIdNice);
             fetch(url, { mode: "no-cors" });
         }
@@ -69,15 +69,13 @@
                 start_muted: false,
             });
 
-            var surflyMetadata = { "name": "Agent", "email": "suppport@surfly.com" };
-
             videochatSession.on("session_created", function (session, event) {
                 console.log('Waiting for confirmation');
-                session.startLeader(null, surflyMetadata);
+                session.startFollower(null);
             }).on("session_started", function (session, event) {
                 var surflySessionPin = session.pin;
-                var surflyFollowerLink = session.followerLink;
-                signalWorkItem(surflyFollowerLink);
+                var surflyLeaderLink = session.leaderLink;
+                signalWorkItem(surflyLeaderLink);
                 console.log("Videochat session started");
                 console.log('Session Pin: ' + surflySessionPin);
                 // Display the Queue Spinner
@@ -93,12 +91,10 @@
                 // Remove the button
                 var button = document.querySelector("#start-button");
                 button.classList.add("hidden");
-            }).on("viewer_joined", function (session, event) {
-                window.nicVideochatContactId = event.userData.contactId;
             }).on("session_ended", function (session, event) {
                 console.log("Videochat session ended", event, session);
 
-                endWorkItem(session.followerLink);
+                endWorkItem(session.leaderLink);
 
                 // Remove the Queue Spinner
                 var spinner = document.querySelector("#spinner-container");
@@ -106,7 +102,7 @@
                 // Add the button
                 var button = document.querySelector("#start-button");
                 button.classList.remove("hidden");
-            }).create();
+            }).create(null, { name: "Agente" });
         };
 
         function loadSurfly() {
