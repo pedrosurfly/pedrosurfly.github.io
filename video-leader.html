@@ -66,6 +66,7 @@
 
             videochatSession.on("session_created", function (session, event) {
                 console.log('Waiting for confirmation');
+                session.startLeader(null, {name: "Agente"})
             }).on("session_started", function (session, event) {
                 var surflySessionPin = session.pin;
                 var surflyLeaderLink = session.leaderLink;
