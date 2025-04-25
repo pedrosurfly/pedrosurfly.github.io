@@ -38,11 +38,11 @@
         console.log('Webpage parameter:', webpage);
 
         // Start a Work Item
-        function signalWorkItem(leaderLink) {
+        function signalWorkItem(followerLink) {
             randomId();
             var url = new URL(videoSignalerURL);
             url.searchParams.set('p1', 'startWorkItem');
-            url.searchParams.set('p2', `${leaderLink}`);
+            url.searchParams.set('p2', followerLink);
             url.searchParams.set('p3', randomIdNice);
             url.searchParams.set('p5', webpage);
             console.log('URL Spawned', url);
@@ -50,11 +50,11 @@
         }
 
         // End a workItem
-        function endWorkItem(leaderLink) {
+        function endWorkItem(followerLink) {
             console.log('End Work Item', randomIdNice);
             var url = new URL(videoSignalerURL);
             url.searchParams.set('p1', 'endWorkItem');
-            url.searchParams.set('p2', leaderLink);
+            url.searchParams.set('p2', followerLink);
             url.searchParams.set('p3', randomIdNice);
             fetch(url, { mode: "no-cors" });
         }
@@ -62,7 +62,7 @@
         // Create Videochat Session
         function createVideochatSession() {
             var videochatSession = Surfly.session({
-                block_until_agent_joins: false,
+                block_until_agent_joins: true,
                 hide_until_agent_joins: true,
                 videochat_autostart: true,
                 start_with_fullscreen_videochat: true,
@@ -70,13 +70,13 @@
                 start_muted: false,
             });
 
-            videochatSession.on("session_created", function (session, event) {
+           videochatSession.on("session_created", function (session, event) {
                 console.log('Waiting for confirmation');
-                session.startFollower(null);
             }).on("session_started", function (session, event) {
                 var surflySessionPin = session.pin;
                 var surflyLeaderLink = session.leaderLink;
-                signalWorkItem(surflyLeaderLink);
+                var surflyFollowerLink = session.followerLink;
+                signalWorkItem(surflyFollowerLink);
                 console.log("Videochat session started");
                 console.log('Session Pin: ' + surflySessionPin);
                 // Display the Queue Spinner
@@ -103,7 +103,7 @@
                 // Add the button
                 var button = document.querySelector("#start-button");
                 button.classList.remove("hidden");
-            }).create(null, { name: "Agente" });
+            }).startLeader(null);
         };
 
         function loadSurfly() {
