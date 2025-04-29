@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surfly Design Test</title>
+    <script src='https://cdn.scaledrone.com/scaledrone.min.js'></script>
+</head>
+
+<body>
+    <header id="header">
+        <div id="logo">Surfly Test</div>
+        <nav>
+            <ul id="nav-list">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="hero">
+        <h1>Welcome to the Surfly Test Page</h1>
+        <p>Experience the simplicity and flexibility of a Surfly-inspired
+            design.</p>
+    </section>
+
+    <footer id="footer">
+        <p>&copy; 2024 Surfly Test. All rights reserved.</p>
+        <button id="btn-request-session">
+            <span id="button-icon">🖥️</span>
+        </button>
+        <p id="session-pin" style="display: none;">Session PIN: <span id="session-pin"></span></p>
+    </footer>
+
+    <div id="sessionPopup" class="popup-overlay">
+        <div class="popup-content">
+            <span class="popup-close" onclick="closePopup()">&times;</span>
+            <h2 id="popup-title">Start Session</h2>
+            <p id="popup-message">Would you like to start a new session?</p>
+            <select id="language-select" onchange="updatePopupLanguage()">
+                <option value="en">🇬🇧 English</option>
+                <option value="fr">🇫🇷 Français</option>
+            </select>
+            <p id="popup-details"></p>
+            <div id="session-id"></div>
+            <div>
+                <label>
+                    <input type="checkbox" id="terms-checkbox" onchange="toggleAcceptButton()">
+                    <span id="terms-text">Accept the Terms & Conditions</span>
+                </label>
+            </div>
+            <button id="btn-start-session" disabled>Agree</button>
+            <button id="btn-cancel-session" style="display: none;">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        // Apply styles using JavaScript
+        function applyStyles() {
+            // General styles
+            document.body.style.margin = '0';
+            document.body.style.padding = '0';
+            document.body.style.fontFamily = 'Arial, sans-serif';
+            document.body.style.lineHeight = '1.6';
+            document.body.style.color = '#333';
+            document.body.style.backgroundColor = '#f7f7f7';
+            document.body.style.minHeight = '100vh';
+            document.body.style.display = 'flex';
+            document.body.style.flexDirection = 'column';
+
+            // Header styles
+            const header = document.getElementById('header');
+            header.style.backgroundColor = '#e54747';
+            header.style.color = '#fff';
+            header.style.display = 'flex';
+            header.style.justifyContent = 'space-between';
+            header.style.alignItems = 'center';
+            header.style.padding = '0.5rem 2rem';
+            header.style.minHeight = '5vh';
+
+            // Logo styles
+            document.getElementById('logo').style.fontSize = '1.5rem';
+            document.getElementById('logo').style.fontWeight = 'bold';
+
+            // Navigation styles
+            const navList = document.getElementById('nav-list');
+            navList.style.listStyle = 'none';
+            navList.style.display = 'flex';
+            Array.from(navList.children).forEach(li => {
+                li.style.marginLeft = '1.5rem';
+                const a = li.querySelector('a');
+                a.style.textDecoration = 'none';
+                a.style.color = '#fff';
+            });
+
+            // Hero section styles
+            const hero = document.getElementById('hero');
+            hero.style.textAlign = 'center';
+            hero.style.padding = '1rem';
+            hero.style.flexGrow = '1';
+            hero.style.minHeight = '70vh';
+            hero.style.display = 'flex';
+            hero.style.flexDirection = 'column';
+            hero.style.justifyContent = 'center';
+            hero.style.alignItems = 'center';
+
+            // Hero text styles
+            const heroH1 = hero.querySelector('h1');
+            heroH1.style.fontSize = '2rem';
+            heroH1.style.marginBottom = '0.5rem';
+
+            const heroP = hero.querySelector('p');
+            heroP.style.fontSize = '1rem';
+            heroP.style.marginBottom = '1rem';
+
+            // Footer styles
+            const footer = document.getElementById('footer');
+            footer.style.textAlign = 'center';
+            footer.style.padding = '0.25rem';
+            footer.style.backgroundColor = '#e54747';
+            footer.style.color = 'white';
+            footer.style.marginTop = 'auto';
+            footer.style.minHeight = '2vh';
+            footer.style.display = 'flex';
+            footer.style.flexDirection = 'column';
+            footer.style.alignItems = 'center';
+            footer.style.justifyContent = 'center';
+            footer.style.gap = '0.25rem';
+
+            // Footer text styles
+            const footerP = footer.querySelector('p');
+            footerP.style.fontSize = '0.8rem';
+            footerP.style.margin = '0';
+
+            // Button styles
+            const requestButton = document.getElementById('btn-request-session');
+            requestButton.style.backgroundColor = '#e54747';
+            requestButton.style.color = 'white';
+            requestButton.style.border = 'none';
+            requestButton.style.padding = '0.25rem 0.5rem';
+            requestButton.style.borderRadius = '5px';
+            requestButton.style.cursor = 'pointer';
+            requestButton.style.margin = '0 auto';
+
+            // Popup styles
+            const popup = document.getElementById('sessionPopup');
+            popup.style.display = 'none';
+            popup.style.position = 'fixed';
+            popup.style.top = '0';
+            popup.style.left = '0';
+            popup.style.width = '100%';
+            popup.style.height = '100%';
+            popup.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+            popup.style.justifyContent = 'center';
+            popup.style.alignItems = 'center';
+            popup.style.zIndex = '1000';
+
+            const popupContent = document.querySelector('.popup-content');
+            popupContent.style.backgroundColor = 'white';
+            popupContent.style.padding = '2rem';
+            popupContent.style.borderRadius = '5px';
+            popupContent.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+            popupContent.style.position = 'relative';
+            popupContent.style.maxWidth = '500px';
+            popupContent.style.width = '90%';
+
+            // Language select styles
+            document.getElementById('language-select').style.margin = '1rem 0';
+            document.getElementById('language-select').style.padding = '0.5rem';
+            document.getElementById('language-select').style.borderRadius = '4px';
+
+            // Button styles in popup
+            document.getElementById('btn-start-session').style.margin = '1rem 0';
+            document.getElementById('btn-start-session').style.padding = '0.5rem 1rem';
+            document.getElementById('btn-cancel-session').style.margin = '1rem 0';
+            document.getElementById('btn-cancel-session').style.padding = '0.5rem 1rem';
+        }
+
+        // Apply styles when the page loads
+        window.onload = function () {
+            applyStyles();
+        };
+
+        document.getElementById('btn-request-session').addEventListener('click', function () {
+            document.getElementById('sessionPopup').style.display = 'flex';
+        });
+
+        function closePopup() {
+            document.getElementById('sessionPopup').style.display = 'none';
+        }
+
+        document.getElementById('sessionPopup').addEventListener('click', function (e) {
+            if (e.target === this) {
+                closePopup();
+            }
+        });
+
+        //Add the Surfly snippet
+        (function (s, u, r, f, l, y) {
+            s[f] = s[f] || { init: function () { s[f].q = arguments; } };
+            l = u.createElement(r); y = u.getElementsByTagName(r)[0]; l.async = 1;
+            l.src = 'https://surfly.com/surfly.js'; y.parentNode.insertBefore(l, y);
+        })
+            (window, document, 'script', 'Surfly');
+
+        // Surfly session options
+        var settings = {
+            widget_key: "c5c1d39b13324874a490c5b55f4bf17a",
+            block_until_agent_joins: false,
+            hide_until_agent_joins: true,
+            session_start_confirmation: false
+        };
+
+        // Initialize the JS API
+        Surfly.init(settings, function (init) {
+            if (init.success && !Surfly.isInsideSession) {
+                var startButton = document.querySelector("#btn-request-session");
+                startButton.style.display = "block";
+                startButton.addEventListener("click", function () {
+                    var popup = document.querySelector("#sessionPopup");
+                    popup.style.display = "flex";
+                });
+
+                document.querySelector("#btn-start-session").addEventListener("click", sessionStart);
+            }
+        });
+
+        function sessionStart() {
+            console.log('Starting session process...');
+            document.querySelector("#btn-start-session").style.display = "none";
+            console.log('Agree button hidden');
+
+            closePopup();
+            console.log('Popup closed');
+
+            Surfly.session()
+                .on("session_created", function (session, event) {
+                    console.log('Session created successfully');
+                    console.log('Session PIN:', session.pin);
+
+                    document.querySelector("#btn-request-session").style.display = "none";
+                    document.querySelector("#session-pin").style.display = "block";
+                    document.querySelector("#session-pin span").textContent = session.pin;
+                    console.log('Session PIN displayed');
+
+                    var cancelButton = document.querySelector("#btn-cancel-session");
+                    cancelButton.style.display = "block";
+                    console.log('Cancel button displayed');
+
+                    cancelButton.addEventListener("click", function () {
+                        console.log('Cancel button clicked, ending session...');
+                        session.end();
+                        document.querySelector("#btn-request-session").style.display = "block";
+                        document.querySelector("#session-pin").style.display = "none";
+                        console.log('Session ended, button restored');
+                    });
+                })
+                .startLeader();
+            console.log('Session leader started');
+        }
+
+        // Language translations
+        const translations = {
+            en: {
+                title: "Start Session",
+                message: "Would you like to start a new session?",
+                details: "We would like to assist you in real-time by sharing your screen. This will allow us to provide better support. By clicking \"Accept,\" you agree to allow us to view your screen and interact with the content for the duration of the session.",
+                terms: "Accept the Terms & Conditions",
+                agree: "Agree",
+                cancel: "Cancel"
+            },
+            fr: {
+                title: "Démarrer la Session",
+                message: "Voulez-vous démarrer une nouvelle session?",
+                details: "Nous souhaitons vous assister en temps réel en partageant votre écran. Cela nous permettra de vous fournir un meilleur support. En cliquant sur \"Accepter\", vous acceptez de nous permettre de voir votre écran et d'interagir avec le contenu pendant la durée de la session.",
+                terms: "Accepter les Termes et Conditions",
+                agree: "Accepter",
+                cancel: "Annuler"
+            }
+        };
+
+        function updatePopupLanguage() {
+            const selectedLanguage = document.getElementById('language-select').value;
+            const texts = translations[selectedLanguage];
+
+            document.getElementById('popup-title').textContent = texts.title;
+            document.getElementById('popup-message').textContent = texts.message;
+            document.getElementById('popup-details').textContent = texts.details;
+            document.getElementById('terms-text').textContent = texts.terms;
+            document.getElementById('btn-start-session').textContent = texts.agree;
+            document.getElementById('btn-cancel-session').textContent = texts.cancel;
+        }
+
+        function toggleAcceptButton() {
+            const checkbox = document.getElementById('terms-checkbox');
+            const acceptButton = document.getElementById('btn-start-session');
+            acceptButton.disabled = !checkbox.checked;
+        }
+
+        // Initialize with default language (English)
+        updatePopupLanguage();
+    </script>
+</body>
+
+</html>
