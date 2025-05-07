@@ -159,7 +159,6 @@
             color: #666;
         }
     </style>
-    <script src='https://cdn.scaledrone.com/scaledrone.min.js'></script>
 </head>
 
 <body>
@@ -257,27 +256,6 @@
                 // when the Agree button is clicked, start a co-browsing session
                 document.querySelector("#btn-start-session").addEventListener("click", sessionStart);
             }
-        });
-
-        // Initialize Scaledrone
-        const drone = new Scaledrone('fygLrCqVZQCdZfs6');
-
-        drone.on('open', error => {
-            if (error) {
-                console.error('Error connecting to Scaledrone:', error);
-                return;
-            }
-            console.log('Successfully connected to Scaledrone');
-        });
-
-        const room = drone.subscribe('cobrowse');
-
-        let contactId = ''
-
-        room.on('message', message => {
-          const {data, id, timestamp, clientId, member} = message;
-            contactId = data.contactId
-            console.log(contactId, 'scaledrone object');
         });
 
         // sessionStart() is called when a user clicks the Agree button
