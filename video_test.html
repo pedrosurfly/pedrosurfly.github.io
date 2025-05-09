@@ -42,34 +42,23 @@
             fetch(url);
         }
 
-        // 
-        function updateStudioScript(contactId, type) {
-            console.log('udpate Studio Script');
-            var url = new URL(chatSignalerURL);
-            url.searchParams.set('p1', contactId);
-            url.searchParams.set('p2', 'NA');
-            url.searchParams.set('p3', `sessionended-${type}`);
-            url.searchParams.set('p4', 'NA');
-            fetch(url);
-        }
-
         // Start a Work Item
-        function signalWorkItem(followerLink) {
+        function signalWorkItem(leaderLink) {
             randomId();
             console.log('signal Work Item');
             var url = new URL(videoSignalerURL);
             url.searchParams.set('p1', 'startWorkItem');
-            url.searchParams.set('p2', followerLink);
+            url.searchParams.set('p2', leaderLink);
             url.searchParams.set('p3', randomIdNice);
             fetch(url, { mode: "no-cors" });
         }
 
         // End a workItem
-        function endWorkItem(followerLink) {
+        function endWorkItem(leaderLink) {
             console.log('End Work Item', randomIdNice);
             var url = new URL(videoSignalerURL);
             url.searchParams.set('p1', 'endWorkItem');
-            url.searchParams.set('p2', followerLink);
+            url.searchParams.set('p2', leaderLink);
             url.searchParams.set('p3', randomIdNice);
             fetch(url, { mode: "no-cors" });
         }
@@ -83,21 +72,15 @@
                 start_with_fullscreen_videochat: true,
                 videochat_prompt: true,
                 start_muted: false,
-                hide_element_by_selector: "#username,#user"
             });
-
-            var surflyMetadata = { 
-                "name": document.getElementById('name').value, 
-                "email": "pedro@surfly.com" 
-            };
 
             videochatSession.on("session_created", function (session, event) {
                 console.log('Waiting for confirmation');
-                session.startFollower(null, {name: "Agente", email: "porto@portoseguro.com"});
+                session.startLeader(null, { name: "Agent" });
             }).on("session_started", function (session, event) {
                 var surflySessionPin = session.pin;
-                var surflyFollowerLink = session.followerLink;
-                signalWorkItem(surflyFollowerLink);
+                var surflyLeaderLink = session.leaderLink;
+                signalWorkItem(surflyLeaderLink);
                 console.log("Videochat session started");
                 console.log('Session Pin: ' + surflySessionPin);
                 // Display the Queue Spinner
@@ -128,6 +111,7 @@
                 button.classList.remove("hidden");
             }).create();
         };
+
 
         function loadSurfly() {
             // Setup settings from API
