@@ -208,9 +208,16 @@
         // Surfly session options
         var settings = {
             widget_key: "c5c1d39b13324874a490c5b55f4bf17a",
-            block_until_agent_joins: false,
-            hide_until_agent_joins: true,
-            session_start_confirmation: false
+            auto_restore: false,
+            session_start_confirmation: false,
+            hidden: false,
+            disable_end_redirect: true,
+            require_password: false,
+            agent_can_request_control: true,
+            automated_session_recording_enabled: true,
+            end_redirect_enabled: true,
+            new_urls_allowed: true,
+            non_hosts_can_open_tabs: true,
         };
 
         // Initialize the JS API
