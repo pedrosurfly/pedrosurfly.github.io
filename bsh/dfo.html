@@ -171,7 +171,8 @@
                 console.log("Surfly was unable to initialize properly.")
             }
         });
-
+        </script>
+ <script>
         (function (n, u) {
             window.CXoneDfo = n,
                 window[n] = window[n] || function () { (window[n].q = window[n].q || []).push(arguments) }, window[n].u = u,
@@ -180,6 +181,7 @@
         })('cxone', 'https://web-modules-de-eu1.niceincontact.com/loader/1/loader.js');
         cxone('init', '1110');
         cxone('chat', 'init', 1110, 'chat_91a8ac2a-ec3c-4659-9726-1983b1595e13');
+        cxone('getOngoingThreads');
         cxone('setAllowedExternalMessageTypes', ['MESSAGE_SENT', 'MESSAGE_RECEIVED']);
         window.addEventListener("message", function (event) {
             console.log(event, 'listener event');
