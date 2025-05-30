@@ -163,7 +163,7 @@
 
         cxone('init', '1332');
         cxone('chat', 'init', 1332, 'chat_1c365a59-2701-4e39-bab9-bfb996282be0');
-        cxone('setAllowedExternalMessageTypes', ['MESSAGE_SENT', 'MESSAGE_RECEIVED']);
+        cxone('chat', 'setAllowedExternalMessageTypes', ['MESSAGE_SENT', 'MESSAGE_RECEIVED']);
         window.addEventListener("message", function (event) {
             console.log(event, 'listener event');
             // Ensure the data structure is as expected
