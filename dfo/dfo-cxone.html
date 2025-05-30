@@ -163,9 +163,10 @@
                 window[n] = window[n] || function () { (window[n].q = window[n].q || []).push(arguments); }, window[n].u = u,
                 e = document.createElement("script"), e.async = 1, e.src = u + "?" + Math.round(Date.now() / 1e3 / 3600),
                 document.head.appendChild(e);
-        })('cxone', 'https://livechat-static-de-na1.niceincontact.com/4/chat.js');
+        })('cxone', 'https://livechat-static-de-na1.niceincontact.com/loader/1/chat.js');
 
-        cxone('init', 1022, 'chat_4bc8d701-a316-4b5f-bc12-9c45f766dbd0');
+        cxone('init', '1022');
+        cxone('chat, 'init', 1022, 'chat_4bc8d701-a316-4b5f-bc12-9c45f766dbd0');
         cxone('setAllowedExternalMessageTypes', ['MESSAGE_SENT', 'MESSAGE_RECEIVED']);
         window.addEventListener("message", function (event) {
             console.log(event, 'listener event');
