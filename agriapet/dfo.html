@@ -193,7 +193,7 @@
             // Added error handling for initialization
             "on_error": function (error) {
                 console.error('Surfly initialization error:', error);
-                logStatus('Failed to initialize Surfly: ' + error, true);
+                console.log('Failed to initialize Surfly: ' + error, true);
             }
         };
 
@@ -203,7 +203,7 @@
                 if (!Surfly.isInsideSession) {
                     console.log("Surfly initialized successfully");
                     isInitialized = true;
-                    logStatus('Ready to start cobrowsing session');
+                    console.log('Ready to start cobrowsing session');
                 }
             } else {
                 throw new Error('Surfly initialization failed');
