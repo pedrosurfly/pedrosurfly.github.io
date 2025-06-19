@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Start Video Meeting</title>
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: #f7f9fa;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        .container {
+            text-align: center;
+            background: #fff;
+            padding: 2rem 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07);
+            max-width: 90vw;
+            width: 350px;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #222;
+        }
+
+        .start-btn {
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            box-shadow: 0 1px 4px rgba(37, 99, 235, 0.08);
+        }
+
+        .start-btn:hover,
+        .start-btn:focus {
+            background: #1d4ed8;
+            outline: none;
+        }
+
+        @media (max-width: 500px) {
+            .container {
+                padding: 1.2rem 0.5rem;
+                width: 98vw;
+            }
+
+            h1 {
+                font-size: 1.1rem;
+            }
+
+            .start-btn {
+                width: 100%;
+                padding: 1rem 0;
+                font-size: 1rem;
+            }
+        }
+
+        .spinner {
+            margin: 0 auto 1rem auto;
+            border: 4px solid #e5e7eb;
+            border-top: 4px solid #2563eb;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            animation: spin 1s linear infinite;
+            display: block;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .wait-msg {
+            font-size: 1.1rem;
+            color: #2563eb;
+            margin-top: 0.5rem;
+        }
+
+        .pin-display {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2563eb;
+            margin-top: 1rem;
+            display: none;
+        }
+    </style>
+    <script>
+        window.onload = function () {
+            (function (w, e, b, f, u, s) {
+                w[f] = w[f] || {
+                    initSpace: function () {
+                        return new Promise(resolve => {
+                            w[f].q = arguments;
+                            w[f].resolve = resolve;
+                        });
+                    },
+                };
+                u = e.createElement(b);
+                s = e.getElementsByTagName(b)[0];
+                u.async = 1;
+                u.src = 'https://webfuse.com/surfly.js';
+                s.parentNode.insertBefore(u, s);
+            })(window, document, 'script', 'Webfuse');
+        }
+
+        async function startMeeting() {
+            console.log('Starting meeting');
+            Webfuse.initSpace(
+                'wk_Lxy5UDEK_PGwVeAPt7q9dVtS2P0PJpCO',
+                '830',
+                {
+                    block_until_agent_joins: false,
+                    hide_until_agent_joins: true,
+                    videochat_autostart: true,
+                    start_with_fullscreen_videochat: true,
+                    videochat_prompt: false,
+                    start_muted: false,
+
+                },
+            ).then(async space => {
+                console.log('Space initialized');
+                console.log('Space:', space);
+                console.log('Space ID:', space.id);
+                console.log('Space slug:', space.slug);
+
+                // Create a new session
+                const session = space.session();
+
+                // Add event listeners
+                session.on('session_started', session => {
+                    console.log('Session has started');
+                    var btn = document.getElementById('startBtn');
+                    var spinner = document.getElementById('spinnerContainer');
+                    var cancelBtn = document.getElementById('cancelBtn');
+                    var pinDisplay = document.getElementById('pinDisplay');
+                    var pin = session.pin;
+                    console.log('Pin', pin);
+                    btn.disabled = true;
+                    btn.style.opacity = '0.6';
+                    spinner.style.display = 'block';
+                    cancelBtn.style.display = 'inline-block';
+                    btn.style.display = 'none';
+                    pinDisplay.textContent = `PIN: ${pin}`;
+                    pinDisplay.style.display = 'block';
+                });
+
+                session.on('participant_joined', (session, event) => {
+                    console.log('A participant joined with client index:', event.clientIndex);
+                });
+
+                session.on('session_ended', session => {
+                    console.log('Session has ended');
+                });
+
+                // Start the session
+                await session.start();
+
+            })
+                .catch(error => {
+                    console.error('Failed:', error);
+                });
+
+
+        }
+        
+        async function cancelWaiting() {
+            const space = Webfuse.session()[0]
+
+            console.log('Space', space);
+            var btn = document.getElementById('startBtn');
+            var spinner = document.getElementById('spinnerContainer');
+            var cancelBtn = document.getElementById('cancelBtn');
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            btn.style.display = 'inline-block';
+            spinner.style.display = 'none';
+
+            await space.end()
+            // await space.session().end();
+        }
+
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Click the button below to start your Video Meeting</h1>
+        <button class="start-btn" id="startBtn" onclick="startMeeting()">Start Video Meeting</button>
+        <div id="spinnerContainer" style="display:none; margin-top:2rem;">
+            <div class="spinner"></div>
+            <div class="wait-msg">Please wait, you will be attended soon.</div>
+            <div id="pinDisplay" class="pin-display"></div>
+            <button class="start-btn" id="cancelBtn" style="margin-top:1.5rem; background:#e11d48; display:none;"
+                onclick="cancelWaiting()">Cancel</button>
+        </div>
+    </div>
+</body>
+
+</html>
