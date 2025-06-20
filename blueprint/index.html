@@ -109,28 +109,269 @@
             margin-top: 1rem;
             display: none;
         }
+
+        .header {
+            width: 100vw;
+            max-width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2vw 1.5rem 2vw;
+            box-sizing: border-box;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            margin-bottom: 2rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(to right, #2563eb, #4f46e5);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-svg {
+            width: 24px;
+            height: 24px;
+            color: #fff;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .header-subtitle {
+            color: #64748b;
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        .header-right {
+            text-align: right;
+        }
+
+        .header-time-label {
+            font-size: 0.95rem;
+            color: #64748b;
+        }
+
+        .header-time-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #334155;
+            margin-top: 0.1rem;
+            letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 600px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+                padding: 1rem 2vw 1rem 2vw;
+            }
+
+            .header-left {
+                gap: 0.7rem;
+            }
+
+            .header-title {
+                font-size: 1.1rem;
+            }
+
+            .header-subtitle {
+                font-size: 0.9rem;
+            }
+
+            .header-time-value {
+                font-size: 1rem;
+            }
+        }
+
+        .main-bg {
+            min-height: 100vh;
+            width: 100vw;
+            background: linear-gradient(135deg, #eff6ff 0%, #fff 60%, #e0e7ff 100%);
+        }
+
+        .main-container {
+            max-width: 64rem;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            background: none;
+            border-radius: 16px;
+            box-sizing: border-box;
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 700px) {
+            .main-container {
+                padding: 1.2rem 0.5rem;
+                width: 98vw;
+            }
+        }
+
+        .container {
+            background: none;
+            box-shadow: none;
+            padding: 0;
+            border-radius: 0;
+            max-width: none;
+            width: 100%;
+            text-align: center;
+        }
+
+        .custom-h1 {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #1f2937;
+            line-height: 1.15;
+        }
+
+        @media (min-width: 768px) {
+            .custom-h1 {
+                font-size: 3.75rem;
+            }
+        }
+
+        .custom-p-main {
+            font-size: 1.5rem;
+            color: #4b5563;
+            max-width: 48rem;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.625;
+        }
+
+        @media (min-width: 768px) {
+            .custom-p-main {
+                font-size: 1.875rem;
+            }
+        }
+
+        .custom-p-secondary {
+            font-size: 1.125rem;
+            color: #4b5563;
+            max-width: 28rem;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .rep-available-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: #16a34a;
+            margin-bottom: 1.5rem;
+        }
+        .rep-available-dot {
+            width: 0.75rem;
+            height: 0.75rem;
+            background: #22c55e;
+            border-radius: 9999px;
+            animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(1.2);
+            }
+        }
+        .rep-available-text {
+            font-weight: 500;
+        }
     </style>
+
+</head>
+
+<body>
+    <div class="main-bg">
+        <header class="header">
+            <div class="header-left">
+                <div class="header-icon">
+                    <svg class="icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="header-title">Customer Support</h2>
+                    <p class="header-subtitle">Retail Assistance Kiosk</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="header-time-label">Current Time</div>
+                <div class="header-time-value" id="currentTime"></div>
+            </div>
+        </header>
+        <div class="main-container">
+            <div
+                style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem;">
+                <div style="text-align: center;">
+                    <h1 class="custom-h1">Need Help?</h1>
+                    <p class="custom-p-main">Connect with our friendly customer service team for personalized assistance
+                    </p>
+                </div>
+                <div class="rep-available-container">
+                    <div class="rep-available-dot"></div>
+                    <span class="rep-available-text">Representatives Available</span>
+                </div>
+                <button class="start-btn" id="startBtn">Start Video Meeting</button>
+                <p class="custom-p-secondary" style="text-align: center;">Tap the button above to connect with a customer service representative via
+                    video call</p>
+                <div id="spinnerContainer" style="display:none; margin-top:2rem; text-align: center;">
+                    <div class="spinner"></div>
+                    <div class="wait-msg" style="text-align: center;">Please wait, you will be attended soon.</div>
+                    <div id="pinDisplay" class="pin-display"></div>
+                    <button class="start-btn" id="cancelBtn"
+                        style="margin-top:1.5rem; background:#e11d48; display:none;" ">Cancel</button>
+                   
+            </div> 
+            </div>
+            
+        </div>
+    </div>
     <script>
-        window.onload = function () {
-            (function (w, e, b, f, u, s) {
-                w[f] = w[f] || {
-                    initSpace: function () {
-                        return new Promise(resolve => {
-                            w[f].q = arguments;
-                            w[f].resolve = resolve;
-                        });
-                    },
-                };
+        // Attach event handler
+        document.getElementById("startBtn").addEventListener("click", function (e) {
+            e.preventDefault(); (function (w,
+                e, b, f, u, s) {
+                    w[f] = w[f] || {
+                        initSpace: function () {
+                            return new Promise(resolve => {
+                                w[f].q = arguments;
+                                w[f].resolve = resolve;
+                            });
+                        },
+                    };
                 u = e.createElement(b);
                 s = e.getElementsByTagName(b)[0];
                 u.async = 1;
                 u.src = 'https://webfuse.com/surfly.js';
                 s.parentNode.insertBefore(u, s);
             })(window, document, 'script', 'Webfuse');
-        }
 
-        async function startMeeting() {
-            console.log('Starting meeting');
             Webfuse.initSpace(
                 'wk_D5DEVYDEnvd34TRNhw63YVj9LUM88scm',
                 '838',
@@ -141,85 +382,60 @@
                     start_with_fullscreen_videochat: true,
                     videochat_prompt: false,
                     start_muted: false,
+                }
+            )
+                .then(async space => {
+                    const session = space.session();
+                    const response = await session.start();
 
-                },
-            ).then(async space => {
-                console.log('Space initialized');
-                console.log('Space:', space);
-                console.log('Space ID:', space.id);
-                console.log('Space slug:', space.slug);
+                    session.on('session_started', session => {
+                        console.log('Session has started');
+                        console.log('Session has started');
+                        var btn = document.getElementById('startBtn');
+                        var spinner = document.getElementById('spinnerContainer');
+                        var cancelBtn = document.getElementById('cancelBtn');
+                        var pinDisplay = document.getElementById('pinDisplay');
+                        var pin = session.pin;
+                        console.log('Pin', pin);
+                        btn.disabled = true;
+                        btn.style.opacity = '0.6';
+                        spinner.style.display = 'block';
+                        cancelBtn.style.display = 'inline-block';
+                        btn.style.display = 'none';
+                        pinDisplay.textContent = `PIN: ${pin}`;
+                        pinDisplay.style.display = 'block';
 
-                // Create a new session
-                const session = space.session();
+                        document.getElementById('cancelBtn').addEventListener('click', function (e) {
+                            e.preventDefault();
+                            session.end();
+                        });
+                    });
 
-                // Add event listeners
-                session.on('session_started', session => {
-                    console.log('Session has started');
-                    var btn = document.getElementById('startBtn');
-                    var spinner = document.getElementById('spinnerContainer');
-                    var cancelBtn = document.getElementById('cancelBtn');
-                    var pinDisplay = document.getElementById('pinDisplay');
-                    var pin = session.pin;
-                    console.log('Pin', pin);
-                    btn.disabled = true;
-                    btn.style.opacity = '0.6';
-                    spinner.style.display = 'block';
-                    cancelBtn.style.display = 'inline-block';
-                    btn.style.display = 'none';
-                    pinDisplay.textContent = `PIN: ${pin}`;
-                    pinDisplay.style.display = 'block';
-                });
+                    session.on('participant_joined', (session, event) => {
+                        console.log('A participant joined with client index:', event.clientIndex);
+                    });
 
-                session.on('participant_joined', (session, event) => {
-                    console.log('A participant joined with client index:', event.clientIndex);
-                });
-
-                session.on('session_ended', session => {
-                    console.log('Session has ended');
-                });
-
-                // Start the session
-                await session.start();
-
-            })
+                    session.on('session_ended', session => {
+                        console.log('Session has ended');
+                        window.location.reload();
+                    });
+                })
                 .catch(error => {
                     console.error('Failed:', error);
                 });
+        });
 
-
+        // Live clock for header
+        function updateTime() {
+            const el = document.getElementById('currentTime');
+            if (el) {
+                const now = new Date();
+                el.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
         }
-        
-        async function cancelWaiting() {
-            const space = Webfuse.session()[0]
-
-            console.log('Space', space);
-            var btn = document.getElementById('startBtn');
-            var spinner = document.getElementById('spinnerContainer');
-            var cancelBtn = document.getElementById('cancelBtn');
-            btn.disabled = false;
-            btn.style.opacity = '1';
-            btn.style.display = 'inline-block';
-            spinner.style.display = 'none';
-
-            await space.end()
-            // await space.session().end();
-        }
-
+        setInterval(updateTime, 1000);
+        updateTime();
     </script>
-</head>
-
-<body>
-    <div class="container">
-        <h1>Click the button below to start your Video Meeting</h1>
-        <button class="start-btn" id="startBtn" onclick="startMeeting()">Start Video Meeting</button>
-        <div id="spinnerContainer" style="display:none; margin-top:2rem;">
-            <div class="spinner"></div>
-            <div class="wait-msg">Please wait, you will be attended soon.</div>
-            <div id="pinDisplay" class="pin-display"></div>
-            <button class="start-btn" id="cancelBtn" style="margin-top:1.5rem; background:#e11d48; display:none;"
-                onclick="cancelWaiting()">Cancel</button>
-        </div>
-    </div>
 </body>
 
 </html>
