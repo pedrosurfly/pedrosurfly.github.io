@@ -155,16 +155,17 @@
     });
   </script>
   <script>
-    (function (n, u) {
-      window.BrandEmbassy = n,
-        window[n] = window[n] || function () { (window[n].q = window[n].q || []).push(arguments); }, window[n].u = u,
-        e = document.createElement("script"), e.async = 1, e.src = u + "?" + Math.round(Date.now() / 1e3 / 3600),
-        document.head.appendChild(e);
-    })('brandembassy', 'https://livechat-static-de-na1.niceincontact.com/4/chat.js');
-
-    brandembassy('init', 1022, 'chat_4bc8d701-a316-4b5f-bc12-9c45f766dbd0');
-    brandembassy('getOngoingThreads');
-    brandembassy('setAllowedExternalMessageTypes', ['MESSAGE_SENT', 'MESSAGE_RECEIVED']);
+        (function(n,u){
+    window.CXoneDfo=n,
+    window[n]=window[n]||function(){(window[n].q=window[n].q||[]).push(arguments)},window[n].u=u,
+    e=document.createElement("script"),e.type="module",e.src=u+"?"+Math.round(Date.now()/1e3/3600),
+    document.head.appendChild(e)
+    })('cxone','https://web-modules-de-na1.niceincontact.com/loader/1/loader.js');
+    
+    cxone('init', '5326');
+    cxone('guide','init');
+    cxone('chat','getOngoingThreads');
+    cxone('chat', 'setAllowedExternalMessageTypes', ['MESSAGE_SENT', 'MESSAGE_RECEIVED']);
     window.addEventListener("message", function (event) {
       console.log(event, 'listener event');
       // Ensure the data structure is as expected
@@ -181,7 +182,7 @@
     });
 
     function startCobrowse() {
-      let customerWidgetKey = "134f5fd2ac8842c0a1cd6062818eee74"; //set customer widget key to variable
+      let customerWidgetKey = "42bd8010c6d64f80b21d521f4ce71ed2"; //set customer widget key to variable
       window.parent.Surfly.settings.widget_key = customerWidgetKey; //set customer widget key to widget_key high level
       if (window.parent.Surfly.settings.widget_key === customerWidgetKey) {
         // check if it worked to avoid null
