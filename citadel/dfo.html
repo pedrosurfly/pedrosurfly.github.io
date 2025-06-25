@@ -193,12 +193,7 @@
     });
 
     function startCobrowse() {
-      let customerWidgetKey = "42bd8010c6d64f80b21d521f4ce71ed2"; //set customer widget key to variable
-      window.parent.Surfly.settings.widget_key = customerWidgetKey; //set customer widget key to widget_key high level
-      if (window.parent.Surfly.settings.widget_key === customerWidgetKey) {
-        // check if it worked to avoid null
-        console.log('widget key change correctly', customerWidgetKey);
-        Surfly.session().on(
+      Surfly.session().on(
           'session_created',
           function (session, event) {
             console.log("Session created", session, event);
@@ -214,8 +209,6 @@
 
         }).startLeader();
       }
-
-    }
   </script>
 </body>
 
