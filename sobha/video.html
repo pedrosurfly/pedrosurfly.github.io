@@ -3,7 +3,9 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="shortcut icon" href="https://www.navyfederal.org/etc.clientlibs/nfculibs/clientlibs/uife/clientlib-uife-nfculibs-site/resources/images/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon"
+        href="https://www.navyfederal.org/etc.clientlibs/nfculibs/clientlibs/uife/clientlib-uife-nfculibs-site/resources/images/favicon.ico"
+        type="image/x-icon">
     <title>Member Connect</title>
     <script>
         var showVideoChatButton = false;
@@ -32,9 +34,8 @@
         };
 
         // Get webpage parameter from URL
-        const url = window.location.href;
-        const agentId = url.substring(url.lastIndexOf('/') + 1); // Default to 'A' if empty
-        //const webpage = 'A'
+        const urlParams = new URLSearchParams(window.location.search);
+        const agentId = urlParams.get('agentId');
         console.log('Webpage parameter:', agentId);
 
         // Start a Work Item
@@ -70,7 +71,7 @@
                 start_muted: false,
             });
 
-           videochatSession.on("session_created", function (session, event) {
+            videochatSession.on("session_created", function (session, event) {
                 console.log('Waiting for confirmation');
             }).on("session_started", function (session, event) {
                 var surflySessionPin = session.pin;
