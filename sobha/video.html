@@ -33,7 +33,7 @@
 
         // Get webpage parameter from URL
         const url = window.location.href;
-        const webpage = url.substring(url.lastIndexOf('/') + 1); // Default to 'A' if empty
+        const agentId = url.substring(url.lastIndexOf('/') + 1); // Default to 'A' if empty
         //const webpage = 'A'
         console.log('Webpage parameter:', webpage);
 
@@ -44,7 +44,7 @@
             url.searchParams.set('p1', 'startWorkItem');
             url.searchParams.set('p2', followerLink);
             url.searchParams.set('p3', randomIdNice);
-            url.searchParams.set('p5', webpage);
+            url.searchParams.set('p5', agentId);
             console.log('URL Spawned', url);
             fetch(url, { mode: "no-cors" });
         }
