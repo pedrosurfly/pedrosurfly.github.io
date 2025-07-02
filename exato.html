@@ -32,34 +32,32 @@
             loadSurfly();
         };
 
-
-        function signalContact(contactId, followerLink, sessionPin, type) {
-            console.log('signal contact');
-            var url = new URL(chatSignalerURL);
-            url.searchParams.set('p1', contactId);
-            url.searchParams.set('p2', followerLink);
-            url.searchParams.set('p3', sessionPin);
-            url.searchParams.set('p4', type);
-            fetch(url);
-        }
+        var skillNumberMap = {
+            "English": "25162081",
+            "Hindi": "25162082",
+            "German": "25162083",
+            "Spanish": "25162084",
+        };
+        var skillNumber = skillNumberMap["English"]; // Default to first option
 
         // Start a Work Item
-        function signalWorkItem(leaderLink) {
+        function signalWorkItem(followerLink) {
             randomId();
-            console.log('signal Work Item');
             var url = new URL(videoSignalerURL);
             url.searchParams.set('p1', 'startWorkItem');
-            url.searchParams.set('p2', leaderLink);
+            url.searchParams.set('p2', followerLink);
             url.searchParams.set('p3', randomIdNice);
+            url.searchParams.set('p5', skillNumber);
+            console.log('URL Spawned', url);
             fetch(url, { mode: "no-cors" });
         }
 
         // End a workItem
-        function endWorkItem(leaderLink) {
+        function endWorkItem(followerLink) {
             console.log('End Work Item', randomIdNice);
             var url = new URL(videoSignalerURL);
             url.searchParams.set('p1', 'endWorkItem');
-            url.searchParams.set('p2', leaderLink);
+            url.searchParams.set('p2', followerLink);
             url.searchParams.set('p3', randomIdNice);
             fetch(url, { mode: "no-cors" });
         }
@@ -67,7 +65,7 @@
         // Create Videochat Session
         function createVideochatSession() {
             var videochatSession = Surfly.session({
-                block_until_agent_joins: false,
+                block_until_agent_joins: true,
                 hide_until_agent_joins: true,
                 videochat_autostart: true,
                 start_with_fullscreen_videochat: true,
@@ -77,11 +75,11 @@
 
             videochatSession.on("session_created", function (session, event) {
                 console.log('Waiting for confirmation');
-                session.startLeader(null, { name: "Agent" });
             }).on("session_started", function (session, event) {
                 var surflySessionPin = session.pin;
                 var surflyLeaderLink = session.leaderLink;
-                signalWorkItem(surflyLeaderLink);
+                var surflyFollowerLink = session.followerLink;
+                signalWorkItem(surflyFollowerLink);
                 console.log("Videochat session started");
                 console.log('Session Pin: ' + surflySessionPin);
                 // Display the Queue Spinner
@@ -97,12 +95,10 @@
                 // Remove the button
                 var button = document.querySelector("#start-button");
                 button.classList.add("hidden");
-            }).on("viewer_joined", function (session, event) {
-                window.nicVideochatContactId = event.userData.contactId;
             }).on("session_ended", function (session, event) {
                 console.log("Videochat session ended", event, session);
 
-                endWorkItem(session.followerLink);
+                endWorkItem(session.leaderLink);
 
                 // Remove the Queue Spinner
                 var spinner = document.querySelector("#spinner-container");
@@ -110,7 +106,7 @@
                 // Add the button
                 var button = document.querySelector("#start-button");
                 button.classList.remove("hidden");
-            }).create();
+            }).startLeader(null);
         };
 
 
@@ -159,6 +155,14 @@
             console.log("random ID for Nice: " + uniquePageId);
             randomIdNice = uniquePageId;
         }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            var serviceSelect = document.getElementById("service");
+            serviceSelect.addEventListener("change", function() {
+                skillNumber = skillNumberMap[this.value];
+                console.log("Skill number set to:", skillNumber);
+            });
+        });
     </script>
 </head>
 <style>
@@ -396,11 +400,10 @@ body {
                 </div>
                 <div class="form-group">
                     <select id="service" name="service" required>
-                        <option value="" disabled selected>How can we help?</option>
-                        <option value="ASL">Mortgages</option>
-                        <option value="English">Savings</option>
-                        <option value="Spanish">Checking</option>
-                        <option value="Dutch_test">Auto Loans</option>
+                        <option value="English">English</option>
+                        <option value="Hindi">Hindi</option>
+                        <option value="German">German</option>
+                        <option value="Spanish">Spanish</option>
                     </select>
                 </div>
             </form>
