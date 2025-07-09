@@ -1,0 +1,41 @@
+<script>
+    (function(n,u){
+    window.BrandEmbassy=n,
+    window[n]=window[n]||function(){(window[n].q=window[n].q||[]).push(arguments)},window[n].u=u,
+    e=document.createElement("script"),e.async=1,e.src=u+"?"+Math.round(Date.now()/1e3/3600),
+    document.head.appendChild(e)
+    })('brandembassy','https://livechat-static-de-na1.niceincontact.com/4/chat.js');
+
+    brandembassy('init', 1154, 'chat_64e0162b-13da-43c5-adc5-98fe318a268c');
+
+
+
+brandembassy('setAllowedExternalMessageTypes', ['MESSAGE_SENT', 'MESSAGE_RECEIVED']); window.addEventListener("message", function (event) {       console.log(event, 'listener event');       // Ensure the data structure is as expected       
+if (event.data && event.data.actionType === "MESSAGE_RECEIVED") {         console.log(event.data.actionType, 'ACTION TYPE');         
+const messageContent = event.data.action.message;         // Check if the message content is "#COBROWSE#"     
+if (messageContent === "#COBROWSE#") {       console.log("Cobrowse message received:", event.data);       startCobrowse();     }   } });  
+function startCobrowse() {   let customerWidgetKey = "4a2fd2310c364b709a6a92bdf0b0b689"; //set customer widget key to variable
+  window.parent.Surfly.settings.widget_key = customerWidgetKey; //set customer widget key to widget_key high level
+  if (window.parent.Surfly.settings.widget_key === customerWidgetKey) {
+    // check if it worked to avoid null
+    console.log('widget key change correctly', customerWidgetKey);
+    Surfly.session().on(
+      'session_created',
+      function (session, event) {
+        console.log("Session created", session, event);
+        var surflySessionPin = session.pin;
+        console.log("Surfly session pin", surflySessionPin);
+        if (surflySessionPin) {
+          console.log(document, 'document');
+          document.getElementsByName("reply-box")[0].value = surflySessionPin;
+        }
+      }
+    ).on('session_started', function (session, event) {
+      console.log("Session started", session, event);
+
+    }).startLeader();
+  }
+
+}
+
+</script>
