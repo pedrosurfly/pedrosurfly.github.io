@@ -823,7 +823,6 @@
                 var surflySessionPin = session.pin;
                 var surflyLeaderLink = session.leaderLink;
                 var surflyFollowerLink = session.followerLink;
-                signalWorkItem(surflyFollowerLink);
                 console.log("Videochat session started");
                 console.log('Session Pin: ' + surflySessionPin);
 
@@ -842,9 +841,6 @@
                 spinner.classList.add("hidden");
             }).on("session_ended", function (session, event) {
                 console.log("Videochat session ended", event, session);
-
-                endWorkItem(session.followerLink);
-
                 // Remove the Queue Spinner
                 var spinner = document.querySelector("#spinner-container");
                 spinner.classList.add("hidden");
