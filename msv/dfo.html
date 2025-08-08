@@ -153,6 +153,28 @@
             dynamicContent.classList.toggle('hidden');
         });
     </script>
+    <script>
+        (function(s,u,r,f,l,y){s[f]=s[f]||{init:function(){s[f].q=arguments}};
+    l=u.createElement(r);y=u.getElementsByTagName(r)[0];l.async=1;
+    l.src='https://surfly.com/surfly.js';y.parentNode.insertBefore(l,y);})
+    (window,document,'script','Surfly');
+
+    var settings = {
+        // Surfly session options can be set here, or at the Company/Plan levels.
+        widget_key: 'd98be3368ca146669dc38374c9cd4867',
+    };
+
+     Surfly.init(settings, function (init) {
+            if (init.success) {
+                if (!Surfly.isInsideSession) {
+                    console.log("Surfly initialized successfully");
+                    isInitialized = true;
+                }
+            } else {
+                throw new Error('Surfly initialization failed');
+            }
+        });
+  </script>
 
      <script>
         (function(n,u){
