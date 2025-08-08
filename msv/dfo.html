@@ -185,8 +185,8 @@
         })('cxone','https://web-modules-de-uk1.niceincontact.com/loader/1/loader.js');
          
         cxone('init', '1403');
-        // cxone('chat','init', 1403, 'chat_422632cd-891e-4b12-a81e-80447f2564ce');
-        cxone('guide','init');
+        cxone('chat','init', 1403, 'chat_422632cd-891e-4b12-a81e-80447f2564ce');
+        //cxone('guide','init');
         cxone('chat', 'setAllowedExternalMessageTypes', ['MESSAGE_SENT', 'MESSAGE_RECEIVED']);
         window.addEventListener("message", function (event) {
             console.log(event, 'listener event');
