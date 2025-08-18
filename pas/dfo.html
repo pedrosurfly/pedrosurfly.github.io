@@ -184,8 +184,10 @@
     document.head.appendChild(e)
     })('cxone','https://web-modules-de-na1.niceincontact.com/loader/1/loader.js');
     
+    // cxone('init', '5659');
+    // cxone('chat','init', 5659, 'chat_b56c7a0f-36db-48a5-a881-2f97e79fd5a4');
     cxone('init', '5659');
-    cxone('chat','init', 5659, 'chat_b56c7a0f-36db-48a5-a881-2f97e79fd5a4');
+    cxone('guide','init');
     cxone('chat','getOngoingThreads');
     cxone('chat', 'setAllowedExternalMessageTypes', ['MESSAGE_SENT', 'MESSAGE_RECEIVED']);
     window.addEventListener("message", function (event) {
