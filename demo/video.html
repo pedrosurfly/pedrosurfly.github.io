@@ -34,22 +34,22 @@
         };
 
         // Start a Work Item
-        function signalWorkItem(followerLink) {
+        function signalWorkItem(leaderLink) {
             randomId();
             console.log('signal Work Item');
             var url = new URL(videoSignalerURL);
             url.searchParams.set('p1', 'startWorkItem');
-            url.searchParams.set('p2', surflyLeaderLink);
+            url.searchParams.set('p2', leaderLink);
             url.searchParams.set('p3', randomIdNice);
             fetch(url, { mode: "no-cors" });
         }
 
         // End a workItem
-        function endWorkItem(followerLink) {
+        function endWorkItem(leaderLink) {
             console.log('End Work Item', randomIdNice);
             var url = new URL(videoSignalerURL);
             url.searchParams.set('p1', 'endWorkItem');
-            url.searchParams.set('p2', surflyLeaderLink);
+            url.searchParams.set('p2', leaderLink);
             url.searchParams.set('p3', randomIdNice);
             fetch(url, { mode: "no-cors" });
         }
@@ -71,7 +71,7 @@
                 var surflySessionPin = session.pin;
                 var surflyLeaderLink = session.leaderLink;
                 var surflyFollowerLink = session.followerLink;
-                signalWorkItem(surflyFollowerLink);
+                signalWorkItem(surflyLeaderLink);
                 console.log("Videochat session started");
                 console.log('Session Pin: ' + surflySessionPin);
 
