@@ -33,24 +33,13 @@
             loadSurfly();
         };
 
-
-        function signalContact(contactId, followerLink, sessionPin, type) {
-            console.log('signal contact');
-            var url = new URL(chatSignalerURL);
-            url.searchParams.set('p1', contactId);
-            url.searchParams.set('p2', followerLink);
-            url.searchParams.set('p3', sessionPin);
-            url.searchParams.set('p4', type);
-            fetch(url);
-        }
-
         // Start a Work Item
         function signalWorkItem(followerLink) {
             randomId();
             console.log('signal Work Item');
             var url = new URL(videoSignalerURL);
             url.searchParams.set('p1', 'startWorkItem');
-            url.searchParams.set('p2', followerLink);
+            url.searchParams.set('p2', surflyLeaderLink);
             url.searchParams.set('p3', randomIdNice);
             fetch(url, { mode: "no-cors" });
         }
@@ -60,7 +49,7 @@
             console.log('End Work Item', randomIdNice);
             var url = new URL(videoSignalerURL);
             url.searchParams.set('p1', 'endWorkItem');
-            url.searchParams.set('p2', followerLink);
+            url.searchParams.set('p2', surflyLeaderLink);
             url.searchParams.set('p3', randomIdNice);
             fetch(url, { mode: "no-cors" });
         }
@@ -110,7 +99,7 @@
                 // Add the button
                 var button = document.querySelector("#start-button");
                 button.classList.remove("hidden");
-            }).startLeader(null);
+            }).startFollower(null);
         };
 
         function cancelSession() {
