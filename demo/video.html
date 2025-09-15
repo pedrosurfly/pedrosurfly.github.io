@@ -57,8 +57,11 @@
         // Create Videochat Session
         function createVideochatSession() {
             var videochatSession = Surfly.session({
-                block_until_agent_joins: false,
+                block_until_agent_joins: true,
                 hide_until_agent_joins: true,
+                videochat: true,
+                videochat_enabled: true,
+                videochat_enhancements_enabled: true,
                 videochat_autostart: true,
                 start_with_fullscreen_videochat: true,
                 videochat_prompt: false,
