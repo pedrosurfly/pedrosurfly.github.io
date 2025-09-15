@@ -86,7 +86,7 @@
                 var button = document.querySelector("#start-button");
                 button.classList.add("hidden");
                 
-            }).on("participant_joined", function (session, event) {
+            }).on("viewer_joined", function (session, event) {
                 console.log("Participant joined");
                 // Display the Queue Spinner
                 var spinner = document.querySelector("#spinner-container");
