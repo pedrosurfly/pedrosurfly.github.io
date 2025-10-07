@@ -153,6 +153,13 @@
       const dynamicContent = document.getElementById('dynamic-content');
       dynamicContent.classList.toggle('hidden');
     });
+
+    window.addEventListener('load', () => {
+  const iframe = document.querySelector('surfly-iframe');
+  if (iframe) {
+    iframe.style.cssText += 'position: relative; z-index: 2147483547 !important;';
+  }
+});
   </script>
   <script>
     (function (n, u) {
