@@ -23,7 +23,7 @@
     brandembassy('setAllowedExternalMessageTypes', ['MessageSent', 'MessageReceived']);
 
     window.addEventListener("message", function (event) {
-        console.log(event);
+        console.log(event, `event ${new Date().toISOString()}`);
 
         // Ensure the data structure is as expected
         if (event.data && event.data.actionType === "MESSAGE_RECEIVED") {
