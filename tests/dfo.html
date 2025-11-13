@@ -24,7 +24,7 @@
             const messageContent = event.data.action?.message;
             
             // Check if the message content is "#COBROWSE#"
-            if (messageContent === "#COBROWSE#") {
+            if (messageContent === "Starting Cobrowse") {
                 console.log("Cobrowse message received:", event.data);
 
                 // Check if Surfly is defined before calling session()
