@@ -6,21 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
  <script>
-    (function (n, u) {
-        window.BrandEmbassy = n;
-        window[n] = window[n] || function () {
-            (window[n].q = window[n].q || []).push(arguments);
-        };
-        window[n].u = u;
+    (function(n,u){
+    window.CXoneDfo=n,
+    window[n]=window[n]||function(){(window[n].q=window[n].q||[]).push(arguments)},window[n].u=u,
+    e=document.createElement("script"),e.type="module",e.src=u+"?"+Math.round(Date.now()/1e3/3600),
+    document.head.appendChild(e)
+    })('cxone','https://web-modules-de-na1.niceincontact.com/loader/1/loader.js');
 
-        const e = document.createElement("script");
-        e.async = true;
-        e.src = u + "?" + Math.round(Date.now() / 1e3 / 3600);
-        document.head.appendChild(e);
-    })('brandembassy', 'https://livechat-static-de-na1.niceincontact.com/4/chat.js');
-
-    brandembassy('init', 1022, 'chat_4bc8d701-a316-4b5f-bc12-9c45f766dbd0');
-    brandembassy('setAllowedExternalMessageTypes', ['MessageSent', 'MessageReceived']);
+    cxone('init', '1022');
+    cxone('chat', 'init', 1022, 'chat_66370294-009c-46c6-8460-b1986d72b2b6');
+    cxone('chat', 'setAllowedExternalMessageTypes', ['MessageSent', 'MessageReceived']);
 
     window.addEventListener("message", function (event) {
         console.log(event, `event ${new Date().toISOString()}`);
