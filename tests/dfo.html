@@ -14,7 +14,25 @@
 
     cxone('init', '1022');
     cxone('chat', 'init', 1022, 'chat_d32a7935-bce8-438c-ae3e-8e894f49037c');
-     cxone('chat', 'setAllowedExternalMessageTypes', ['MessageSent', 'MessageReceived']);
+    cxone('chat', 'setAllowedExternalMessageTypes', ['MessageSent', 'MessageReceived']);
+
+    window.addEventListener("message", function (event) {
+        console.log(event, `event ${new Date().toISOString()}`);
+
+        // Ensure the data structure is as expected
+        if (event.data && event.data.actionType === "MESSAGE_RECEIVED") {
+            const messageContent = event.data.action?.message;
+            
+            // Check if the message content is "#COBROWSE#"
+            if (messageContent === "#COBROWSE#") {
+                console.log("Cobrowse message received:", event.data);
+
+                // Check if Surfly is defined before calling session()
+                    Surfly.session().startLeader();
+
+            }
+        }
+    });
 </script>
 
 </head>
