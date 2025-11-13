@@ -183,9 +183,9 @@
     e=document.createElement("script"),e.type="module",e.src=u+"?"+Math.round(Date.now()/1e3/3600),
     document.head.appendChild(e)
     })('cxone','https://web-modules-de-na1.niceincontact.com/loader/1/loader.js');
-    
+
     cxone('init', '5326');
-    cxone('chat','init', 5326, 'chat_ab3601bb-9fc1-4ff8-8051-c1c2f638492f');
+    cxone('guide','init');
     cxone('chat','getOngoingThreads');
     cxone('chat', 'setAllowedExternalMessageTypes', ['MESSAGE_SENT', 'MESSAGE_RECEIVED']);
     window.addEventListener("message", function (event) {
