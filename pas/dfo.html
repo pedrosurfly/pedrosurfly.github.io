@@ -177,17 +177,29 @@
         });
   </script>
   <script>
-    (function(n,u){
-    window.CXoneDfo=n,
-    window[n]=window[n]||function(){(window[n].q=window[n].q||[]).push(arguments)},window[n].u=u,
-    e=document.createElement("script"),e.type="module",e.src=u+"?"+Math.round(Date.now()/1e3/3600),
-    document.head.appendChild(e)
-    })('cxone','https://web-modules-de-na1.niceincontact.com/loader/1/loader.js');
-    
-    // cxone('init', '5659');
-    // cxone('chat','init', 5659, 'chat_b56c7a0f-36db-48a5-a881-2f97e79fd5a4');
-    cxone('init', '5659');
-    cxone('guide','init');
+    (function (n, u) {
+            window.CXoneDfo = n,
+                window[n] = window[n] || function () { (window[n].q = window[n].q || []).push(arguments) }, window[n].u = u,
+                e = document.createElement("script"), e.type = "module", e.src = u + "?" + Math.round(Date.now() / 1e3 / 3600),
+                document.head.appendChild(e)
+        })('cxone', 'https://web-modules-de-na1.niceincontact.com/loader/1/loader.js');
+
+        cxone('init', '5659');
+        cxone('guide', 'init');
+
+        let cxoneparams = new URLSearchParams(window.location.search);
+        
+        cxone('guide', 'setCustomFields', {
+            contactCustomFields: [
+                { ident: 'url', value: window.location.href, hidden: true },
+                { ident: 'utm_campaign', value: cxoneparams.get("utm_campaign") ?? "", hidden: true },
+                { ident: 'utm_content', value: cxoneparams.get("utm_content") ?? "", hidden: true },
+                { ident: 'utm_medium', value: cxoneparams.get("utm_medium") ?? "", hidden: true },
+                { ident: 'source', value: cxoneparams.get("utm_source") ?? "", hidden: true }
+            ]
+        });
+        cxone('chat', 'getOngoingThreads');
+        cxone('chat', 'setAllowedExternalMessageTypes', ['MESSAGE_SENT', 'MESSAGE_RECEIVED']);
     cxone('chat','getOngoingThreads');
     cxone('chat', 'setAllowedExternalMessageTypes', ['MESSAGE_SENT', 'MESSAGE_RECEIVED']);
     window.addEventListener("message", function (event) {
