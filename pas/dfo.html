@@ -118,42 +118,6 @@
       color: white;
     }
   </style>
-</head>
-
-<body>
-  <header>
-    <div class="logo">Surfly Test</div>
-    <nav>
-      <ul>
-        <li><a href="#home">Home</a></li>
-        <li><a href="#features">Features</a></li>
-        <li><a href="#contact">Contact</a></li>
-      </ul>
-    </nav>
-  </header>
-
-  <section class="hero">
-    <h1>Welcome to the Surfly Test Page</h1>
-    <p>Experience the simplicity and flexibility of a Surfly-inspired
-      design.</p>
-    <button id="load-content">Load More Content</button>
-  </section>
-
-  <section id="dynamic-content" class="hidden">
-    <h2>Dynamic Content</h2>
-    <p>This content was dynamically loaded using JavaScript!</p>
-  </section>
-
-  <footer>
-    <p>&copy; 2024 Surfly Test. All rights reserved.</p>
-  </footer>
-
-  <script>
-    document.getElementById('load-content').addEventListener('click', function () {
-      const dynamicContent = document.getElementById('dynamic-content');
-      dynamicContent.classList.toggle('hidden');
-    });
-  </script>
   <script>
         (function(s,u,r,f,l,y){s[f]=s[f]||{init:function(){s[f].q=arguments}};
     l=u.createElement(r);y=u.getElementsByTagName(r)[0];l.async=1;
@@ -215,6 +179,43 @@
       }
     });
   </script>
+</head>
+
+<body>
+  <header>
+    <div class="logo">Surfly Test</div>
+    <nav>
+      <ul>
+        <li><a href="#home">Home</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h1>Welcome to the Surfly Test Page</h1>
+    <p>Experience the simplicity and flexibility of a Surfly-inspired
+      design.</p>
+    <button id="load-content">Load More Content</button>
+  </section>
+
+  <section id="dynamic-content" class="hidden">
+    <h2>Dynamic Content</h2>
+    <p>This content was dynamically loaded using JavaScript!</p>
+  </section>
+
+  <footer>
+    <p>&copy; 2024 Surfly Test. All rights reserved.</p>
+  </footer>
+
+  <script>
+    document.getElementById('load-content').addEventListener('click', function () {
+      const dynamicContent = document.getElementById('dynamic-content');
+      dynamicContent.classList.toggle('hidden');
+    });
+  </script>
+  
 </body>
 
 </html>
