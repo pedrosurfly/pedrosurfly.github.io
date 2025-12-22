@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Script Test</title>
+    <script>
+      (function (s, u, r, f, l, y) {
+        s[f] = s[f] || {
+          init: function () {
+            s[f].q = arguments;
+          },
+        };
+        l = u.createElement(r);
+        y = u.getElementsByTagName(r)[0];
+        l.async = 1;
+        l.src = "https://surfly.com/surfly.js";
+        y.parentNode.insertBefore(l, y);
+      })(window, document, "script", "Surfly");
+
+      var settings = {
+        // Surfly session options can be set here, or at the Company/Plan levels.
+        widget_key: "a6912da72cfa4897860ac237667b957f",
+      };
+
+      Surfly.init(settings, function (initResult) {
+        if (initResult.success) {
+          // API calls can now be made!
+          if (!Surfly.isInsideSession) {
+            //Surfly.button();
+          }
+        } else {
+          console.log("Surfly was unable to initialize properly.");
+        }
+      });
+    </script>
+
+    <script>
+      (function (n, u) {
+        (window.CXoneDfo = n),
+          (window[n] =
+            window[n] ||
+            function () {
+              (window[n].q = window[n].q || []).push(arguments);
+            }),
+          (window[n].u = u),
+          (e = document.createElement("script")),
+          (e.type = "module"),
+          (e.src = u + "?" + Math.round(Date.now() / 1e3 / 3600)),
+          document.head.appendChild(e);
+      })(
+        "cxone",
+        "https://web-modules-de-au1.niceincontact.com/loader/1/loader.js"
+      );
+
+      cxone("init", "1446");
+      cxone("guide", "init");
+
+      cxone("chat", "setAllowedExternalMessageTypes", [
+        "MESSAGE_SENT",
+        "MESSAGE_RECEIVED",
+      ]);
+
+      window.addEventListener("message", function (event) {
+        console.log(event, "listener event");
+        // Ensure the data structure is as expected
+        if (event.data && event.data.actionType === "MESSAGE_RECEIVED") {
+          console.log(event.data.actionType, "ACTION TYPE");
+          const messageContent = event.data.action.message;
+
+          // Check if the message content is "#COBROWSE#"
+          if (messageContent === "#COBROWSE#") {
+            console.log("Cobrowse message received:", event.data);
+            startCobrowse();
+          }
+        }
+      });
+
+      function startCobrowse() {
+        let customerWidgetKey = "a6912da72cfa4897860ac237667b957f"; //set customer widget key to variable
+        window.parent.Surfly.settings.widget_key = customerWidgetKey; //set customer widget key to widget_key high level
+        if (window.parent.Surfly.settings.widget_key === customerWidgetKey) {
+          // check if it worked to avoid null
+          console.log("widget key change correctly", customerWidgetKey);
+          Surfly.session()
+            .on("session_created", function (session, event) {
+              console.log("Session created", session, event);
+              var surflySessionPin = session.pin;
+              console.log("Surfly session pin", surflySessionPin);
+              if (surflySessionPin) {
+                console.log(document, "document");
+                //document.getElementsByName("reply-box")[0].value = surflySessionPin;
+              }
+            })
+            .on("session_started", function (session, event) {
+              console.log("Session started", session, event);
+            })
+            .startLeader();
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Script Test Page</h1>
+    <p>Open the browser console to see the script output.</p>
+
+    <script>
+      console.log("Script loaded successfully!");
+      alert("Hello! The script is working.");
+    </script>
+  </body>
+</html>
