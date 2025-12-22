@@ -61,42 +61,21 @@
       ]);
 
       window.addEventListener("message", function (event) {
-        console.log(event, "listener event");
+        console.log(event, `event ${new Date().toISOString()}`);
+
         // Ensure the data structure is as expected
         if (event.data && event.data.actionType === "MESSAGE_RECEIVED") {
-          console.log(event.data.actionType, "ACTION TYPE");
-          const messageContent = event.data.action.message;
+            const messageContent = event.data.action?.message;
+            
+            // Check if the message content is "#COBROWSE#"
+            if (messageContent === "#COBROWSE#") {
+                console.log("Cobrowse message received:", event.data);
 
-          // Check if the message content is "#COBROWSE#"
-          if (messageContent === "#COBROWSE#") {
-            console.log("Cobrowse message received:", event.data);
-            startCobrowse();
-          }
+                // Check if Surfly is defined before calling session()
+                    Surfly.session().startLeader();
+            }
         }
-      });
-
-      function startCobrowse() {
-        let customerWidgetKey = "a6912da72cfa4897860ac237667b957f"; //set customer widget key to variable
-        window.parent.Surfly.settings.widget_key = customerWidgetKey; //set customer widget key to widget_key high level
-        if (window.parent.Surfly.settings.widget_key === customerWidgetKey) {
-          // check if it worked to avoid null
-          console.log("widget key change correctly", customerWidgetKey);
-          Surfly.session()
-            .on("session_created", function (session, event) {
-              console.log("Session created", session, event);
-              var surflySessionPin = session.pin;
-              console.log("Surfly session pin", surflySessionPin);
-              if (surflySessionPin) {
-                console.log(document, "document");
-                //document.getElementsByName("reply-box")[0].value = surflySessionPin;
-              }
-            })
-            .on("session_started", function (session, event) {
-              console.log("Session started", session, event);
-            })
-            .startLeader();
-        }
-      }
+    });
     </script>
   </head>
   <body>
