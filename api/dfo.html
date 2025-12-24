@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DFO Chat Test - CxAgent + Surfly</title>
+    <script>
+(function(s,u,r,f,l,y){s[f]=s[f]||{init:function(){s[f].q=arguments}};
+l=u.createElement(r);y=u.getElementsByTagName(r)[0];l.async=1;
+l.src='https://surfly.com/surfly.js';y.parentNode.insertBefore(l,y);})
+(window,document,'script','Surfly');
+
+var settings = {
+    // Surfly session options can be set here, or at the Company/Plan levels.
+    widget_key: '134f5fd2ac8842c0a1cd6062818eee74',
+};
+
+Surfly.init(settings, function(initResult) {
+    if (initResult.success) {
+        // API calls can now be made!
+        if (!Surfly.isInsideSession) {
+                    console.log("It is inside of a Surfly Session.")
+        }
+    }
+    else{
+        console.log("Surfly was unable to initialize properly.")
+    }
+});
+</script>
+    <script>
+    (function(n,u){
+    window.CXoneDfo=n,
+    window[n]=window[n]||function(){(window[n].q=window[n].q||[]).push(arguments)},window[n].u=u,
+    e=document.createElement("script"),e.type="module",e.src=u+"?"+Math.round(Date.now()/1e3/3600),
+    document.head.appendChild(e)
+    })('cxone','https://web-modules-de-na1.niceincontact.com/loader/1/loader.js');
+
+    cxone('init', '1022');
+    cxone('chat', 'init', 1022, 'chat_01c62e59-dec5-4ebf-b16c-dc834f43eda9');
+</script>
+  </head>
+  <body>
+    <h1>Page dedicated to test DFO chat with CxAgent and Surfly using API</h1>
+  </body>
+</html>
