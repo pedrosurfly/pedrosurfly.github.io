@@ -5,6 +5,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
+<script>
+    
+      (function (s, u, r, f, l, y) {
+        s[f] = s[f] || {
+          init: function () {
+            s[f].q = arguments;
+          },
+        };
+        l = u.createElement(r);
+        y = u.getElementsByTagName(r)[0];
+        l.async = 1;
+        l.src = "https://surfly.com/surfly.js";
+        y.parentNode.insertBefore(l, y);
+      })(window, document, "script", "Surfly");
+
+      var settings = {
+        // Surfly session options can be set here, or at the Company/Plan levels.
+        widget_key: "134f5fd2ac8842c0a1cd6062818eee74",
+      };
+
+      Surfly.init(settings, function (initResult) {
+        if (initResult.success) {
+          // API calls can now be made!
+          if (!Surfly.isInsideSession) {
+            //Surfly.button();
+          }
+        } else {
+          console.log("Surfly was unable to initialize properly.");
+        }
+      });
+</script>
  <script>
     (function(n,u){
     window.CXoneDfo=n,
@@ -14,7 +45,7 @@
     })('cxone','https://web-modules-de-na1.niceincontact.com/loader/1/loader.js');
 
     cxone('init', '1022');
-    cxone('chat', 'init', 1022, 'chat_66370294-009c-46c6-8460-b1986d72b2b6');
+    cxone('chat', 'init', 1022, 'chat_4bc8d701-a316-4b5f-bc12-9c45f766dbd0');
     cxone('chat', 'setAllowedExternalMessageTypes', ['MessageSent', 'MessageReceived']);
 
     window.addEventListener("message", function (event) {
