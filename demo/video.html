@@ -54,42 +54,42 @@
             fetch(url, { mode: "no-cors" });
         }
 
-        // Create Videochat Session
+         // Create Videochat Session
         function createVideochatSession() {
             var videochatSession = Surfly.session({
-                block_until_agent_joins: true,
+                block_until_agent_joins: false,
                 hide_until_agent_joins: true,
-                videochat: true,
-                videochat_enabled: true,
-                videochat_enhancements_enabled: true,
                 videochat_autostart: true,
                 start_with_fullscreen_videochat: true,
-                videochat_prompt: false,
+                videochat_prompt: true,
                 start_muted: false,
+                anyone_can_deactivate_space: true,
             });
 
-            videochatSession.on("session_started", function (session, event) {
-                console.log("Session started");
+            videochatSession.on("session_created", function (session, event) {
+                console.log('Waiting for confirmation');
+                session.startLeader(null, { name: "Agent" });
+            }).on("session_started", function (session, event) {
                 var surflySessionPin = session.pin;
-                var surflyLeaderLink = session.leaderLink;
-                var surflyFollowerLink = session.followerLink;
+                var surflyLeaderLink = session.followerLink;
                 signalWorkItem(surflyLeaderLink);
                 console.log("Videochat session started");
                 console.log('Session Pin: ' + surflySessionPin);
-
                 // Display the Queue Spinner
                 var spinner = document.querySelector("#spinner-container");
                 spinner.classList.remove("hidden");
 
-                // Remove the start button
+                var cancelButton = document.querySelector("#btn-cancel-session");
+                // If the Cancel button is clicked, end the work item and end the session
+                cancelButton.addEventListener("click", function () {
+                    session.end();
+                });
+
+                // Remove the button
                 var button = document.querySelector("#start-button");
                 button.classList.add("hidden");
-                
             }).on("viewer_joined", function (session, event) {
-                console.log("Participant joined");
-                // Display the Queue Spinner
-                var spinner = document.querySelector("#spinner-container");
-                spinner.classList.add("hidden");
+                window.nicVideochatContactId = event.userData.contactId;
             }).on("session_ended", function (session, event) {
                 console.log("Videochat session ended", event, session);
 
@@ -101,7 +101,7 @@
                 // Add the button
                 var button = document.querySelector("#start-button");
                 button.classList.remove("hidden");
-            }).startFollower(null, {name: "Customer"});
+            }).create();
         };
 
         function cancelSession() {
