@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Connect</title>
+    <script>
+        var showVideoChatButton = false;
+        var nicBusNumber = '4606004';
+        var nicChatPOC = 'a6a81d5b-047b-415a-b076-bad37fe861a1';
+        var clusterNiC = 'b32';
+        var surflyWidgetKey = 'da7a0b7ca24542418cae7387af4361fd';
+        var videoSignalerURL = "https://home-b32.nice-incontact.com/inContact/Manage/Scripts/Spawn.aspx?scriptName=Surfly_Signaler&bus_no=4606004&scriptId=315293335&skill_no=35726582&p1=&p2=&p3=&p4=&p5=&Guid=b508c7e7-6db0-4bf8-8895-8fda2ec2a017";
+        var randomIdNice = '';
+        let NicHomeURL = "https://home-" + clusterNiC + ".nice-incontact.com";
+
+        var chatSrc = document.createElement("script");
+        chatSrc.src = NicHomeURL + "/inContact/ChatClient/js/embed.min.js";
+
+        var head = document.getElementsByTagName("head")[0];
+        head.appendChild(chatSrc);
+
+        chatSrc.onload = function () {
+            (function (s, u, r, f, l, y) {
+                s[f] = s[f] || { init: function () { s[f].q = arguments; } };
+                l = u.createElement(r); y = u.getElementsByTagName(r)[0]; l.async = 1;
+                l.src = 'https://surfly.com/surfly.js'; y.parentNode.insertBefore(l, y);
+            })
+                (window, document, 'script', 'Surfly');
+            loadSurfly();
+        };
+
+        // Start a Work Item
+        function signalWorkItem(leaderLink) {
+            randomId();
+            console.log('signal Work Item');
+            var url = new URL(videoSignalerURL);
+            url.searchParams.set('p1', 'startWorkItem');
+            url.searchParams.set('p2', leaderLink);
+            url.searchParams.set('p3', randomIdNice);
+            fetch(url, { mode: "no-cors" });
+        }
+
+        // End a workItem
+        function endWorkItem(leaderLink) {
+            console.log('End Work Item', randomIdNice);
+            var url = new URL(videoSignalerURL);
+            url.searchParams.set('p1', 'endWorkItem');
+            url.searchParams.set('p2', leaderLink);
+            url.searchParams.set('p3', randomIdNice);
+            fetch(url, { mode: "no-cors" });
+        }
+
+         // Create Videochat Session
+        function createVideochatSession() {
+            var videochatSession = Surfly.session({
+                block_until_agent_joins: false,
+                hide_until_agent_joins: true,
+                videochat_autostart: true,
+                start_with_fullscreen_videochat: true,
+                videochat_prompt: true,
+                start_muted: false,
+                anyone_can_deactivate_space: true,
+            });
+
+            videochatSession.on("session_created", function (session, event) {
+                console.log('Waiting for confirmation');
+                session.startLeader(null, { name: "Agent" });
+            }).on("session_started", function (session, event) {
+                var surflySessionPin = session.pin;
+                var surflyLeaderLink = session.followerLink;
+                signalWorkItem(surflyLeaderLink);
+                console.log("Videochat session started");
+                console.log('Session Pin: ' + surflySessionPin);
+                // Display the Queue Spinner
+                var spinner = document.querySelector("#spinner-container");
+                spinner.classList.remove("hidden");
+
+                var cancelButton = document.querySelector("#btn-cancel-session");
+                // If the Cancel button is clicked, end the work item and end the session
+                cancelButton.addEventListener("click", function () {
+                    session.end();
+                });
+
+                // Remove the button
+                var button = document.querySelector("#start-button");
+                button.classList.add("hidden");
+            }).on("viewer_joined", function (session, event) {
+                window.nicVideochatContactId = event.userData.contactId;
+            }).on("session_ended", function (session, event) {
+                console.log("Videochat session ended", event, session);
+
+                endWorkItem(session.followerLink);
+
+                // Remove the Queue Spinner
+                var spinner = document.querySelector("#spinner-container");
+                spinner.classList.add("hidden");
+                // Add the button
+                var button = document.querySelector("#start-button");
+                button.classList.remove("hidden");
+            }).create();
+        };
+
+        function cancelSession() {
+            console.log("Canceling session...");
+            var currentSession = Surfly.session();
+            if (currentSession) {
+                currentSession.end();
+            }
+        }
+
+
+        function loadSurfly() {
+            // Setup settings from API
+            var settings = {
+                widget_key: surflyWidgetKey,
+                auto_restore: false,
+                session_start_confirmation: false,
+                hidden: false,
+                disable_end_redirect: true,
+                require_password: false,
+                agent_can_request_control: true,
+                automated_session_recording_enabled: true,
+                end_redirect_enabled: true,
+                new_urls_allowed: true,
+                non_hosts_can_open_tabs: true,
+            };
+
+            Surfly.init(settings, function (initResult) {
+                if (initResult.success) {
+                    if (!Surfly.isInsideSession) {
+
+                        if (localStorage.getItem(nicBusNumber + "-uniquePageId")) {
+                            console.log("random: " + localStorage.getItem(nicBusNumber + "-uniquePageId"));
+                        } else {
+                            let randomString = Math.random().toString(36).substring(7);
+                            let dateNow = Date.now();
+                            let uniquePageId = randomString + "-" + dateNow;
+
+                            console.log("random: " + uniquePageId);
+
+                            localStorage.setItem(nicBusNumber + "-uniquePageId", uniquePageId);
+                        }
+
+                    }
+                }
+            });
+        }
+
+        function randomId() {
+            console.log('it got here');
+            let randomString = Math.random().toString(36).substring(7);
+            let dateNow = Date.now();
+            let uniquePageId = randomString + "-" + dateNow;
+            console.log("random ID for Nice: " + uniquePageId);
+            randomIdNice = uniquePageId;
+        }
+    </script>
+</head>
+
+<body class="pagecontainer">
+    <div class="container" id="start-button">
+        <button onclick={createVideochatSession()} class="start-button" id="startVideoBtn">
+            Start Video
+        </button>
+    </div>
+    <div id="spinner-container" class="hidden">
+        <div id="spinner">
+            <div class="loader"></div>
+            <p class="text-queue">Please wait to be connected</p>
+            <button class="cancel-button" id="btn-cancel-session" onclick={cancelSession()}>Cancel</button>
+        </div>
+    </div>
+</body>
+<style>
+    :root {
+        --blue: #144881;
+        --background-off-white: #f9f9f9;
+        --amn-font: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif, BlinkMacSystemFont, Helvetica Neue, Arial, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+    }
+
+    body {
+        font-family: var(--amn-font);
+    }
+
+    .pagecontainer {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        min-height: 100vh;
+        background: var(--background-off-white);
+    }
+
+    .container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .loader {
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid var(--blue);
+        border-bottom: 16px solid #ED780F;
+        border-left: 16px solid #89ADD0;
+        border-right: 16px solid #9A4E0A;
+        width: 120px;
+        height: 120px;
+        -webkit-animation: spin 2s linear infinite;
+        animation: spin 2s linear infinite;
+    }
+
+    @-webkit-keyframes spin {
+        0% {
+            -webkit-transform: rotate(0deg);
+        }
+
+        100% {
+            -webkit-transform: rotate(360deg);
+        }
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .text-queue {
+        font-size: 1.5rem;
+        color: var(--blue);
+        margin: 0;
+        padding: 20px;
+        margin: 20px;
+    }
+
+    #spinner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .hidden {
+        display: none
+    }
+
+    .start-button {
+        background-color: var(--background-off-white);
+        color: var(--blue);
+        border-radius: 15px;
+        border: 3px solid var(--blue);
+        padding: 16px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 2rem;
+        margin: 4px 2px;
+        transition-duration: 0.4s;
+        cursor: pointer;
+    }
+
+    .start-button:hover {
+        background-color: #ED780F;
+        color: white;
+        border: 2px solid var(--blue);
+
+    }
+
+    .cancel-button {
+        background-color: white;
+        color: var(--blue);
+        border-radius: 15px;
+        border: 3px solid var(--blue);
+        padding: 16px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 1.7rem;
+        margin: 4px 2px;
+        transition-duration: 0.4s;
+        cursor: pointer;
+    }
+
+    .cancel-button:hover {
+        background-color: var(--blue);
+        color: white;
+        border: 2px solid var(--blue);
+    }
+
+    .start-button:disabled {
+        background-color: #cccccc;
+        border-color: #cccccc;
+        color: #666666;
+        cursor: not-allowed;
+    }
+
+    .start-button:disabled:hover {
+        background-color: #cccccc;
+        color: #666666;
+    }
+</style>
+
+</html>
