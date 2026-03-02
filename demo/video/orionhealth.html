@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="shortcut icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏥</text></svg>" type="image/svg+xml">
+    <title>Orion Health - Telehealth</title>
+    <script>
+        var showVideoChatButton = false;
+        var nicBusNumber = '4599130';
+        var nicChatPOC = '1605d414-489c-4df4-83b1-334dbeb0ab2c';
+        var clusterNiC = 'b32';
+        var surflyWidgetKey = '134f5fd2ac8842c0a1cd6062818eee74';
+        var videoSignalerURL = "https://home-b32.nice-incontact.com/inContact/Manage/Scripts/Spawn.aspx?scriptName=Surfly_Signaler&bus_no=4599130&scriptId=197588198&skill_no=4137191&p1=&p2=&p3=&p4=&p5=&Guid=602c459a-c935-4539-9fa0-0827ab102c74";
+        var randomIdNice = '';
+        let NicHomeURL = "https://home-" + clusterNiC + ".nice-incontact.com";
+
+        var chatSrc = document.createElement("script");
+        chatSrc.src = NicHomeURL + "/inContact/ChatClient/js/embed.min.js";
+
+        var head = document.getElementsByTagName("head")[0];
+        head.appendChild(chatSrc);
+
+        chatSrc.onload = function () {
+            (function (s, u, r, f, l, y) {
+                s[f] = s[f] || { init: function () { s[f].q = arguments; } };
+                l = u.createElement(r); y = u.getElementsByTagName(r)[0]; l.async = 1;
+                l.src = 'https://surfly.com/surfly.js'; y.parentNode.insertBefore(l, y);
+            })
+                (window, document, 'script', 'Surfly');
+            loadSurfly();
+        };
+
+        // Start a Work Item
+        function signalWorkItem(leaderLink) {
+            randomId();
+            console.log('signal Work Item');
+            var url = new URL(videoSignalerURL);
+            url.searchParams.set('p1', 'startWorkItem');
+            url.searchParams.set('p2', leaderLink);
+            url.searchParams.set('p3', randomIdNice);
+            fetch(url, { mode: "no-cors" });
+        }
+
+        // End a workItem
+        function endWorkItem(leaderLink) {
+            console.log('End Work Item', randomIdNice);
+            var url = new URL(videoSignalerURL);
+            url.searchParams.set('p1', 'endWorkItem');
+            url.searchParams.set('p2', leaderLink);
+            url.searchParams.set('p3', randomIdNice);
+            fetch(url, { mode: "no-cors" });
+        }
+
+         // Create Videochat Session
+        function createVideochatSession() {
+            var videochatSession = Surfly.session({
+                block_until_agent_joins: false,
+                hide_until_agent_joins: true,
+                videochat_autostart: true,
+                start_with_fullscreen_videochat: true,
+                videochat_prompt: true,
+                start_muted: false,
+                anyone_can_deactivate_space: true,
+                end_redirect_enabled: true,
+                follower_redirect_url: "https://orionhealth.com/ca/",
+                leader_redirect_url: "https://orionhealth.com/ca/"
+            });
+
+            videochatSession.on("session_created", function (session, event) {
+                console.log('Waiting for confirmation');
+                session.startLeader(null, { name: "Agent" });
+            }).on("session_started", function (session, event) {
+                var surflySessionPin = session.pin;
+                var surflyLeaderLink = session.followerLink;
+                signalWorkItem(surflyLeaderLink);
+                console.log("Videochat session started");
+                console.log('Session Pin: ' + surflySessionPin);
+                // Display the Queue Spinner
+                var spinner = document.querySelector("#spinner-container");
+                spinner.classList.remove("hidden");
+
+                var cancelButton = document.querySelector("#btn-cancel-session");
+                // If the Cancel button is clicked, end the work item and end the session
+                cancelButton.addEventListener("click", function () {
+                    session.end();
+                });
+
+                // Remove the button
+                var button = document.querySelector("#start-button");
+                button.classList.add("hidden");
+            }).on("viewer_joined", function (session, event) {
+                window.nicVideochatContactId = event.userData.contactId;
+            }).on("session_ended", function (session, event) {
+                console.log("Videochat session ended", event, session);
+
+                endWorkItem(session.followerLink);
+
+                // Remove the Queue Spinner
+                var spinner = document.querySelector("#spinner-container");
+                spinner.classList.add("hidden");
+                // Add the button
+                var button = document.querySelector("#start-button");
+                button.classList.remove("hidden");
+            }).create();
+        };
+
+        function cancelSession() {
+            console.log("Canceling session...");
+            var currentSession = Surfly.session();
+            if (currentSession) {
+                currentSession.end();
+            }
+        }
+
+
+        function loadSurfly() {
+            // Setup settings from API
+            var settings = {
+                widget_key: surflyWidgetKey,
+                auto_restore: false,
+                session_start_confirmation: false,
+                hidden: false,
+                disable_end_redirect: true,
+                require_password: false,
+                agent_can_request_control: true,
+                automated_session_recording_enabled: true,
+                end_redirect_enabled: true,
+                new_urls_allowed: true,
+                non_hosts_can_open_tabs: true,
+            };
+
+            Surfly.init(settings, function (initResult) {
+                if (initResult.success) {
+                    if (!Surfly.isInsideSession) {
+
+                        if (localStorage.getItem(nicBusNumber + "-uniquePageId")) {
+                            console.log("random: " + localStorage.getItem(nicBusNumber + "-uniquePageId"));
+                        } else {
+                            let randomString = Math.random().toString(36).substring(7);
+                            let dateNow = Date.now();
+                            let uniquePageId = randomString + "-" + dateNow;
+
+                            console.log("random: " + uniquePageId);
+
+                            localStorage.setItem(nicBusNumber + "-uniquePageId", uniquePageId);
+                        }
+
+                    }
+                }
+            });
+        }
+
+        function randomId() {
+            console.log('it got here');
+            let randomString = Math.random().toString(36).substring(7);
+            let dateNow = Date.now();
+            let uniquePageId = randomString + "-" + dateNow;
+            console.log("random ID for Nice: " + uniquePageId);
+            randomIdNice = uniquePageId;
+        }
+    </script>
+</head>
+
+<body class="pagecontainer">
+    <header class="header">
+        <div class="logo-container">
+            <span class="logo-orion">ORION</span>
+            <span class="logo-health">HEALTH</span>
+        </div>
+    </header>
+    <div class="container" id="start-button">
+        <h1 class="pageTitle">Talk to the <span class="highlight">health specialists</span></h1>
+        <p class="pageSubtitle">Connect with a healthcare professional via secure video consultation. Get the care you need from the comfort of your home.</p>
+        <div class="form-container">
+            <form id="contactForm" onsubmit="event.preventDefault();">
+                <div class="form-group">
+                    <input type="text" id="name" name="name" placeholder="First name" required />
+                </div>
+                <div class="form-group">
+                    <input type="text" id="email" name="email" placeholder="Email address" required />
+                </div>
+                <div class="form-group">
+                    <select id="service" name="service" required>
+                        <option value="" disabled selected>How can we help?</option>
+                        <option value="ASL">General consultation</option>
+                        <option value="English">Follow-up appointment</option>
+                        <option value="Spanish">Prescription refill</option>
+                        <option value="Dutch_test">Other</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+        <div>
+            <button onclick={createVideochatSession()} class="start-button" id="startVideoBtn">
+                Start Video Call
+            </button>
+        </div>
+    </div>
+    <div id="spinner-container" class="hidden">
+        <div id="spinner">
+            <div class="loader"></div>
+            <p class="text-queue">Please wait to be connected with a healthcare specialist</p>
+            <button class="cancel-button" id="btn-cancel-session" onclick={cancelSession()}>Cancel</button>
+        </div>
+    </div>
+</body>
+<style>
+    :root {
+        --orion-orange: #FF6600;
+        --orion-orange-hover: #E85D04;
+        --orion-orange-light: #FFF5F0;
+        --heading-dark: #1A1A1A;
+        --text-grey: #555555;
+        --text-light: #666666;
+        --border-grey: #E0E0E0;
+        --background-white: #FFFFFF;
+        --background-light: #F8F8F8;
+        --font-family: 'Open Sans', system-ui, -apple-system, sans-serif;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: var(--font-family);
+        margin: 0;
+        padding: 0;
+    }
+
+    .pagecontainer {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        text-align: center;
+        min-height: 100vh;
+        background: var(--background-white);
+    }
+
+    .header {
+        width: 100%;
+        padding: 2rem 3rem;
+        background: var(--background-white);
+        border-bottom: 1px solid var(--border-grey);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .logo-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0;
+    }
+
+    .logo-orion {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--orion-orange);
+        letter-spacing: 0.05em;
+    }
+
+    .logo-health {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--heading-dark);
+        letter-spacing: 0.15em;
+        margin-top: -2px;
+    }
+
+    .pageTitle {
+        font-size: 2.75rem;
+        font-weight: 700;
+        color: var(--heading-dark);
+        margin: 0;
+        padding: 3rem 4rem 0;
+        max-width: 700px;
+        line-height: 1.2;
+    }
+
+    .pageTitle .highlight {
+        font-weight: 700;
+        color: var(--heading-dark);
+        border-bottom: 4px solid var(--orion-orange);
+        padding-bottom: 2px;
+    }
+
+    .pageSubtitle {
+        font-size: 1.1rem;
+        color: var(--text-light);
+        margin: 1.25rem auto 2.5rem;
+        max-width: 600px;
+        line-height: 1.6;
+        padding: 0 2rem;
+    }
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        max-width: 480px;
+    }
+
+    .form-container {
+        margin: 0 0 2rem;
+        width: 100%;
+        padding: 0 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    input,
+    select {
+        width: 100%;
+        padding: 1rem 1.25rem;
+        border: 1px solid var(--border-grey);
+        border-radius: 4px;
+        font-size: 1rem;
+        font-family: var(--font-family);
+        outline: none;
+        color: var(--heading-dark);
+        background: var(--background-white);
+    }
+
+    input:focus,
+    select:focus {
+        border-color: var(--orion-orange);
+        box-shadow: 0 0 0 2px rgba(255, 102, 0, 0.1);
+    }
+
+    select {
+        cursor: pointer;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        padding-right: 2.5rem;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FF6600' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 18px;
+    }
+
+    ::placeholder {
+        color: #999;
+    }
+
+    .start-button {
+        background-color: var(--orion-orange);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 1rem 2.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        font-family: var(--font-family);
+    }
+
+    .start-button:hover {
+        background-color: var(--orion-orange-hover);
+    }
+
+    .start-button:disabled {
+        background-color: #cccccc;
+        color: #666666;
+        cursor: not-allowed;
+    }
+
+    .start-button:disabled:hover {
+        background-color: #cccccc;
+        color: #666666;
+    }
+
+    #spinner-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem;
+    }
+
+    #spinner-container.hidden {
+        display: none;
+    }
+
+    #spinner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .loader {
+        border: 4px solid var(--background-light);
+        border-radius: 50%;
+        border-top: 4px solid var(--orion-orange);
+        width: 80px;
+        height: 80px;
+        -webkit-animation: spin 1s linear infinite;
+        animation: spin 1s linear infinite;
+    }
+
+    @-webkit-keyframes spin {
+        0% { -webkit-transform: rotate(0deg); }
+        100% { -webkit-transform: rotate(360deg); }
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .text-queue {
+        font-size: 1.125rem;
+        color: var(--text-grey);
+        margin: 1.5rem 0;
+        max-width: 400px;
+    }
+
+    .cancel-button {
+        background-color: white;
+        color: var(--orion-orange);
+        border: 2px solid var(--orion-orange);
+        border-radius: 4px;
+        padding: 0.875rem 2rem;
+        font-size: 1rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-family: var(--font-family);
+    }
+
+    .cancel-button:hover {
+        background-color: var(--orion-orange-light);
+    }
+
+    .hidden {
+        display: none !important;
+    }
+</style>
+
+</html>
