@@ -13,7 +13,8 @@
   document.head.appendChild(e)
   })('cxone','https://web-modules-de-na1.niceincontact.com/loader/1/loader.js');
 
-  cxone('init', '1022');
+  if (!Surfly.isInsideSession) {
+    cxone('init', '1022');
   cxone('chat', 'init', 1022, 'chat_4bc8d701-a316-4b5f-bc12-9c45f766dbd0');
   cxone('chat', 'setAllowedExternalMessageTypes', ['MESSAGE_SENT', 'MESSAGE_RECEIVED']);
 
@@ -35,8 +36,7 @@
           }
       }
   });
-
-  function startCobrowse() {
+    function startCobrowse() {
       let customerWidgetKey = "134f5fd2ac8842c0a1cd6062818eee74"; //set customer widget key to variable
       window.parent.Surfly.settings.widget_key = customerWidgetKey; //set customer widget key to widget_key high level
       if (window.parent.Surfly.settings.widget_key === customerWidgetKey) {
@@ -46,6 +46,11 @@
       }
 
     }
+  }
+    
+  
+
+  
 </script>
 </head>
 <body>
