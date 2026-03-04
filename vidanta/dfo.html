@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VW Chat Demo!</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        header,
+        footer {
+
+            max-width: 100%;
+            margin: 0 auto;
+            /* Center the container horizontally */
+            background-size: cover;
+            background-position: center;
+            height: 650px;
+            max-width: 1500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ececec;
+            text-shadow: 0 10px 20 rgb(19, 19, 19);
+            text-align: center;
+            text-shadow: 4px 2px 10px rgba(14, 6, 6, 0.7);
+            font-size: 3em;
+        }
+
+        header {
+            background-image: url('/pp/assets/hikeByLake.jpg');
+        }
+
+        footer {
+            background-image: url('/pp/assets/pp-bkg.jpg');
+        }
+
+        nav {
+            background-color: #e7e7e7;
+            color: rgb(180, 180, 180);
+            padding: 10px 0;
+            text-align: center;
+            text-shadow: 2px 2px 2px rgb(110, 110, 110);
+        }
+
+        nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav ul li {
+            display: inline;
+            margin-right: 20px;
+        }
+
+        nav ul li a {
+            color: rgb(255, 255, 255);
+            text-decoration: none;
+
+        }
+
+        a:hover {
+            text-decoration: underline;
+
+        }
+
+        .content {
+            padding: 50px;
+            max-width: 1500px;
+            margin: 0 auto;
+            /* Center the container horizontally */
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            /* padding: 120px;*/
+            margin: 120px auto;
+            /* Center the container horizontally with top and bottom padding */
+        }
+
+        h1,
+        h2 {
+            text-align: center;
+            font-size: larger;
+        }
+
+        p {
+            margin-bottom: 20px;
+            font-size: large;
+        }
+    </style>
+
+    <script>
+        // (function (n, u) {
+        //     window.CXoneDfo = n,
+        //         window[n] = window[n] || function () { (window[n].q = window[n].q || []).push(arguments) }, window[n].u = u,
+        //         e = document.createElement("script"), e.type = "module", e.src = u + "?" + Math.round(Date.now() / 1e3 / 3600),
+        //         document.head.appendChild(e)
+        // })('cxone', 'https://web-modules-de-na1.niceincontact.com/loader/1/loader.js');
+
+        // cxone('init', '5748');
+        //cxone('guide', 'init', { locale: 'es-US' });
+        //cxone('chat', 'setLocale', 'es-US');
+
+
+        // cxone('chat', 'hideAssignedAgent');
+        // cxone('chat', 'enableCloseIcon', true);
+        // cxone('chat', 'setCustomerName', 'Kurtis Blow');
+        // cxone('chat', 'setContactCustomField', 'email', 'kblow@email.com');
+        // cxone('chat', 'setContactCustomField', 'phone', '4801231234');
+        // cxone('chat', 'setContactCustomField', 'new_lang', 'en-US');
+        // cxone('guide', 'setDesiredGuideWidth', '400px');
+        // cxone('guide', 'setDesiredGuideHeight', '600px');
+        // cxone('guide', 'setButtonSize', '70px');
+        // // cxone('guide','hidePreSurvey');
+        // cxone('chat', 'showCaseInfo');
+
+
+
+
+        // setTimeout(() => {
+        //     // Widget chat window styles
+        //     cxone('chat', 'setCustomCss', `
+        //     [data-selector="HEADER"] {
+        //         background-image: url("https://images.contentstack.io/v3/assets/blt440de00c5519ec3c/blt36649ad5e4aeb190/685c1cd4eff8a306ad9f0106/Logo_VW-2100x702-arriba.png?width=3840&quality=75&format=webp%22") !important;
+        //         background-repeat: no-repeat !important;
+
+        //         background-size: 70%;
+
+        //         height: 85px !important;
+        //     }
+
+        //     [data-selector="SEND_BUTTON"] {
+
+        //         color: orange;  
+
+        //     }
+
+        //     [data-selector="UPLOAD_ATTACHMENT_BUTTON"] {
+
+        //         color: orange; 
+
+        //     }
+
+        //     [data-selector="END_CHAT_SESSION_BUTTON"] {
+
+        //         color: orange;  
+
+        //     }
+
+        //     [data-selector="HEADER_MINIMIZE_WINDOW"] {
+
+        //         color: orange;  
+
+        //     }
+
+        //     [data-selector="CONTENT"] {
+
+        //         background-color: orange;  
+
+        //     }
+
+        //     [data-selector="SKELETON_LOADER"] {
+
+        //         background-color: purple !important;
+
+        //     }
+
+        //     /* Rectangular “message bubble” skeletons */
+        //     [data-selector="SKELETON_LOADER"] .rect-shape {
+
+        //         background-color: black !important;  /* pick your color */
+        //     }
+
+        //     /* Circular avatar skeletons */
+        //     [data-selector="SKELETON_LOADER"] .circle-shape,
+        //     [data-selector="SKELETON_LOADER"] .round-shape {
+        //         background-color: black !important;
+        //     }
+
+        //         /* ---- Precontact form layout ---- */
+        //     [data-selector="PRECONTACT_SURVEY"],
+        //     [data-selector="PRECONTACT_SURVEY_MAIN_CONTAINER"] {
+        //     background-color: orange !important;   /* 1 change */
+        //     border: 2px dashed purple !important;  /* 2 change */
+        //     }
+
+        //     /* ---- Field container (each row) ---- */
+        //     [data-selector="FORM_FIELD_CONTAINER"] {
+        //     border: 2px solid purple !important;   /* 1 change */
+        //     border-radius: 12px !important;        /* 2 change */
+        //     }
+
+        //     /* ---- Inputs / textareas ---- */
+        //     [data-selector="PRECONTACT_SURVEY"] [data-selector="INPUT"] input,
+        //     [data-selector="PRECONTACT_SURVEY"] [data-selector="TEXTAREA"] textarea {
+        //     border: 3px solid orange !important;   /* 1 change */
+        //     border-radius: 999px !important;       /* 2 change (obvious pill) */
+        //     }
+
+        //     /* ---- Form labels ---- */
+        //     [data-selector="PRECONTACT_SURVEY"] [data-selector="FORM_FIELD_LABEL"],
+        //     [data-selector="PRECONTACT_SURVEY"] [data-selector="FORM_FIELD_CONTAINER"] label {
+        //     color: purple !important;              /* 1 change */
+        //     font-weight: 800 !important;           /* 2 change */
+        //     }
+
+        //     /* ---- Required asterisk ---- */
+        //     [data-selector="PRECONTACT_SURVEY"] label span[aria-hidden="true"] {
+        //     color: orange !important;              /* 1 change */
+        //     font-size: 18px !important;            /* 2 change */
+        //     }
+
+
+        //     `);
+        // }, 500); // Delay by 1 second
+
+
+
+
+
+
+
+
+        // CSS to edit black ring around icon - single
+        setTimeout(() => {
+            const style = document.createElement('style');
+            style.innerHTML = `
+            #cxone-guide-container [data-selector="GUIDE_CHANNEL_BUTTON"]:focus,
+            #cxone-guide-container [data-selector="GUIDE_CHANNEL_BUTTON"]:active,
+            #cxone-guide-container [data-selector="GUIDE_CHANNEL_BUTTON"]:focus-visible
+            {
+                
+                outline-color: #D0066B !important;
+                outline-width: 2px !important;
+
+            }
+        `;
+            document.head.appendChild(style);
+        }, 1000);
+
+
+    </script>
+    <!-- <script>
+(function(s,u,r,f,l,y){s[f]=s[f]||{init:function(){s[f].q=arguments}};
+l=u.createElement(r);y=u.getElementsByTagName(r)[0];l.async=1;
+l.src='https://surfly-us.com/surfly.js';y.parentNode.insertBefore(l,y);})
+(window,document,'script','Surfly');
+
+var settings = {
+    // Surfly session options can be set here, or at the Company/Plan levels.
+    widget_key: '16535f127b7b483689a3f51ad17b80d7',
+};
+
+Surfly.init(settings, function(initResult) {
+    if (initResult.success) {
+        // API calls can now be made!
+        if (!Surfly.isInsideSession) {
+            Surfly.button({
+                position: 'bottomright',
+                widget_text: 'Get Live Help',
+                widget_color: '#0000FF'
+            });
+        }
+    }
+    else{
+        console.log("Surfly was unable to initialize properly.")
+    }
+});
+</script> -->
+
+
+    <script>
+        (function (s, u, r, f, l, y) {
+            s[f] = s[f] || {
+                init: function () {
+                    s[f].q = arguments;
+                },
+            };
+            l = u.createElement(r);
+            y = u.getElementsByTagName(r)[0];
+            l.async = 1;
+            l.src = "https://surfly.com/surfly.js";
+            y.parentNode.insertBefore(l, y);
+        })(window, document, "script", "Surfly");
+
+        var settings = {
+            // Surfly session options can be set here, or at the Company/Plan levels.
+            widget_key: "16535f127b7b483689a3f51ad17b80d7",
+        };
+
+        Surfly.init(settings, function (initResult) {
+            if (initResult.success) {
+                // API calls can now be made!
+                if (!Surfly.isInsideSession) {
+                    (function (n, u) {
+            window.CXoneDfo = n,
+                window[n] = window[n] || function () { (window[n].q = window[n].q || []).push(arguments) }, window[n].u = u,
+                e = document.createElement("script"), e.type = "module", e.src = u + "?" + Math.round(Date.now() / 1e3 / 3600),
+                document.head.appendChild(e)
+        })('cxone', 'https://web-modules-de-na1.niceincontact.com/loader/1/loader.js');
+
+
+        cxone('init', '5748');
+        cxone('guide', 'init');
+        cxone('guide', 'setCustomCss', '[data-selector="GUIDE_FRAME_CONTENT"] {z-index: 2147483545 !important;}');
+
+                    cxone("chat", "setAllowedExternalMessageTypes", [
+                        "MESSAGE_SENT",
+                        "MESSAGE_RECEIVED",
+                    ]);
+
+                    window.addEventListener("message", function (event) {
+                        console.log(event, `event ${new Date().toISOString()}`);
+
+                        // Ensure the data structure is as expected
+                        if (event.data && event.data.actionType === "MESSAGE_RECEIVED") {
+                            const messageContent = event.data.action?.message;
+
+                            // Check if the message content is "#COBROWSE#"
+                            if (messageContent === "#COBROWSE#") {
+                                console.log("Cobrowse message received:", event.data);
+
+                                // Check if Surfly is defined before calling session()
+                                Surfly.session().startLeader();
+                            }
+                        }
+                    });
+                }
+            } else {
+                console.log("Surfly was unable to initialize properly.");
+            }
+        });
+    </script>
+
+
+
+
+    <style>
+        /* GUIDE loading background */
+        #cxone-guide-container [data-selector="GUIDE_FRAME_CONTENT"],
+        #cxone-guide-container [data-selector="GUIDE_FRAME_CONTENT"] section,
+        #cxone-guide-container [data-selector="GUIDE_FRAME_CONTENT"] .container {
+            background-color: orange !important;
+        }
+
+        /* GUIDE spinner */
+        #cxone-guide-container [data-selector="GUIDE_FRAME_CONTENT"] .spinner .circle {
+            --color: purple !important;
+            color: purple !important;
+            stroke: purple !important;
+            fill: purple !important;
+        }
+    </style>
+
+</head>
+
+<!-- <body> -->
+
+<nav>
+
+    <ul>
+        <!--<li><a href="/pp/index.html">Chat</a></li>-->
+        <!--  <li><a href="/pp/">Membership</a></li>-->
+        <!-- <li><a href="/pp/">Deals</a></li>-->
+    </ul>
+</nav>
+<header>Vidanta World!</header>
+
+<div class="content">
+    <main>
+        <section>
+            <h2>Soar Through the Skies: Air Travel</h2>
+            <p>Elevate your travel experience with our seamless air travel services. From the moment you book to the
+                second you touch down at your destination, we ensure a smooth and comfortable journey. Say goodbye
+                to long queues and stressful layovers – with Wanderlust Expeditions, every flight is a voyage of
+                luxury and convenience.</p>
+        </section>
+        <section>
+            <h2>Sail Away to Serenity: Sea Travel</h2>
+            <p>Set sail on a voyage of tranquility with our sea travel packages. Whether you crave the calm embrace
+                of a serene cruise or the excitement of a daring expedition, our sea travel options cater to every
+                taste. Relax, unwind, and let the gentle rhythm of the waves carry you to enchanting destinations
+                around the globe.</p>
+        </section>
+        <section>
+            <h2>Conquer Majestic Peaks: Hiking Adventures</h2>
+            <p>Challenge yourself and conquer the world's most majestic peaks with our hiking adventures. Whether
+                you're a seasoned mountaineer or a novice explorer, our expertly crafted hiking expeditions promise
+                breathtaking views and unforgettable experiences. Lace up your boots, breathe in the crisp mountain
+                air, and let the mountains become your playground..</p>
+        </section>
+        <section>
+            <h2>Experience Thrilling Adventures: Adrenaline-Pumping Escapes</h2>
+            <p>Seeking an adrenaline rush? Look no further than our thrilling adventure packages. From
+                heart-pounding activities like bungee jumping and white-water rafting to awe-inspiring encounters
+                with nature's fiercest elements, our adventure escapes are designed to push boundaries and ignite
+                your sense of adventure.</p>
+        </section>
+        <section>
+            <h2>Why Choose Wanderlust Expeditions?</h2>
+            <p>At Wanderlust Expeditions, we believe that travel is not just about reaching a destination – it's
+                about the journey itself. That's why we go above and beyond to curate unforgettable experiences that
+                immerse you in the beauty and wonder of the world. With our dedication to excellence, unwavering
+                commitment to customer satisfaction, and passion for adventure, we guarantee that every journey with
+                us will be an experience of a lifetime.</p>
+        </section>
+        <section>
+            <h2>Ready to Embark on Your Next Adventure?</h2>
+            <p>Don't wait any longer – the world is calling, and your next adventure awaits. Contact us today to
+                start planning your dream getaway with Wanderlust Expeditions. Whether you're craving the freedom of
+                the skies, the vastness of the seas, the challenge of hiking, or the thrill of adventure, we have
+                the perfect escape for you. Let's make memories together – let's wanderlust!</p>
+        </section>
+        <section>
+            <h2>Cobrowse with an Agent</h2>
+            <p> Ready to see what we have to offer? Let's jump on a call and share screen. Once connected to an agent
+                click here:
+                <a href="https://app.surfly-us.com/landing/vidavacations/" target="_blank">Launch Landing Page</a>
+            </p>
+            <button onclick="Surfly.session().startLeader()">Start a session</button>
+        </section>
+    </main>
+</div>
+<footer></footer>
+</body>
+
+</html>
