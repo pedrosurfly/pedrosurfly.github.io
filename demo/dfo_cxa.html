@@ -4,59 +4,82 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>DFO / CXone Test Page</title>
-
     <script>
-      (function (n, u) {
-        ((window.CXoneDfo = n),
-          (window[n] =
-            window[n] ||
-            function () {
-              (window[n].q = window[n].q || []).push(arguments);
-            }),
-          (window[n].u = u),
-          (e = document.createElement("script")),
-          (e.type = "module"),
-          (e.src = u + "?" + Math.round(Date.now() / 1e3 / 3600)),
-          document.head.appendChild(e));
-      })(
-        "cxone",
-        "https://web-modules-de-na1.niceincontact.com/loader/1/loader.js",
-      );
+      (function (s, u, r, f, l, y) {
+        s[f] = s[f] || {
+          init: function () {
+            s[f].q = arguments;
+          },
+        };
+        l = u.createElement(r);
+        y = u.getElementsByTagName(r)[0];
+        l.async = 1;
+        l.src = "https://surfly.com/surfly.js";
+        y.parentNode.insertBefore(l, y);
+      })(window, document, "script", "Surfly");
 
-      cxone("init", "1022");
-      cxone("chat", "init", 1022, "chat_4bc8d701-a316-4b5f-bc12-9c45f766dbd0");
-      cxone("chat", "setAllowedExternalMessageTypes", [
-        "MESSAGE_SENT",
-        "MESSAGE_RECEIVED",
-      ]);
+      var settings = {
+        // Surfly session options can be set here, or at the Company/Plan levels.
+        widget_key: "134f5fd2ac8842c0a1cd6062818eee74",
+      };
 
-      window.addEventListener("message", function (event) {
-        console.log(event, `event ${new Date().toISOString()}`);
+      Surfly.init(settings, function (initResult) {
+        if (initResult.success) {
+          // API calls can now be made!
+          if (!Surfly.isInsideSession) {
+            (function (n, u) {
+              ((window.CXoneDfo = n),
+                (window[n] =
+                  window[n] ||
+                  function () {
+                    (window[n].q = window[n].q || []).push(arguments);
+                  }),
+                (window[n].u = u),
+                (e = document.createElement("script")),
+                (e.type = "module"),
+                (e.src = u + "?" + Math.round(Date.now() / 1e3 / 3600)),
+                document.head.appendChild(e));
+            })(
+              "cxone",
+              "https://web-modules-de-au1.niceincontact.com/loader/1/loader.js",
+            );
 
-        // Ensure the data structure is as expected
-        if (event.data && event.data.actionType === "MESSAGE_RECEIVED") {
-          const messageContent = event.data.action?.message;
+            cxone("init", "1022");
+            cxone("chat", "init", 1022, "chat_4bc8d701-a316-4b5f-bc12-9c45f766dbd0");
 
-          // Check if the message content is "#COBROWSE#"
-          if (messageContent === "#COBROWSE#") {
-            console.log("Cobrowse message received:", event.data);
+            cxone("chat", "setAllowedExternalMessageTypes", [
+              "MESSAGE_SENT",
+              "MESSAGE_RECEIVED",
+            ]);
 
-            // Check if Surfly is defined before calling session()
-            // Surfly.session().startLeader();
-            startCobrowse();
+            window.addEventListener("message", function (event) {
+              console.log(event, `event ${new Date().toISOString()}`);
+
+              // Ensure the data structure is as expected
+              if (event.data && event.data.actionType === "MESSAGE_RECEIVED") {
+                const messageContent = event.data.action?.message;
+
+                // Check if the message content is "#COBROWSE#"
+                if (messageContent === "#COBROWSE#") {
+                  console.log("Cobrowse message received:", event.data);
+
+                  // Check if Surfly is defined before calling session()
+                  Surfly.session().startLeader();
+                }
+              }
+            });
           }
+        } else {
+          console.log("Surfly was unable to initialize properly.");
         }
       });
-      function startCobrowse() {
-        let customerWidgetKey = "134f5fd2ac8842c0a1cd6062818eee74"; //set customer widget key to variable
-        window.parent.Surfly.settings.widget_key = customerWidgetKey; //set customer widget key to widget_key high level
-        if (window.parent.Surfly.settings.widget_key === customerWidgetKey) {
-          // check if it worked to avoid null
-          console.log("widget key change correctly", customerWidgetKey);
-          Surfly.session().startLeader();
-        }
-      }
     </script>
+
+    <style>
+      .be-template {
+          z-index: 2147483549 !important;
+      }
+    </style>
   </head>
   <body>
     <h1>DFO / CXone Chat Tester</h1>
