@@ -314,11 +314,28 @@ Surfly.init(settings, function(initResult) {
 
         cxone('init', '5748');
         cxone('guide', 'init');
+        cxone('guide', 'setCustomCss', '[data-selector="GUIDE_FRAME_CONTENT"] {z-index: 999999999 !important;} [data-selector="GUIDE_SINGLE_MENU_CLOSE_BUTTON"] {z-index: 999999999 !important} #cxone-guide-container, .be-template.be-right {z-index: 9999999999 !important;}');
 
                     cxone("chat", "setAllowedExternalMessageTypes", [
                         "MESSAGE_SENT",
                         "MESSAGE_RECEIVED",
                     ]);
+
+                    // Override z-index: remove inline style so our CSS can apply (inline styles beat external CSS)
+                    function fixGuideZIndex() {
+                        const el = document.getElementById('cxone-guide-container');
+                        if (el) {
+                            el.style.removeProperty('z-index');
+                            el.style.setProperty('z-index', '9999999999', 'important');
+                        }
+                        const beEl = document.querySelector('.be-template.be-right');
+                        if (beEl) {
+                            beEl.style.removeProperty('z-index');
+                            beEl.style.setProperty('z-index', '9999999999', 'important');
+                        }
+                    }
+                    fixGuideZIndex();
+                    new MutationObserver(fixGuideZIndex).observe(document.body, { childList: true, subtree: true });
 
                     window.addEventListener("message", function (event) {
                         console.log(event, `event ${new Date().toISOString()}`);
