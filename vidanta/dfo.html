@@ -314,43 +314,11 @@ Surfly.init(settings, function(initResult) {
 
         cxone('init', '5748');
         cxone('guide', 'init');
-        cxone('guide', 'setCustomCss', '[data-selector="GUIDE_FRAME_CONTENT"] {z-index: 999999999 !important;} [data-selector="GUIDE_SINGLE_MENU_CLOSE_BUTTON"] {z-index: 999999999 !important} #cxone-guide-container, .be-template.be-right {z-index: 9999999999 !important;} section.content, .be-template .container {background: orange !important; background-color: orange !important;}');
 
                     cxone("chat", "setAllowedExternalMessageTypes", [
                         "MESSAGE_SENT",
                         "MESSAGE_RECEIVED",
                     ]);
-
-                    // Override styles: apply directly via JS (inline styles beat everything)
-                    function applyOrangeBg(els) {
-                        els.forEach(el => {
-                            el.style.setProperty('background', 'orange', 'important');
-                            el.style.setProperty('background-color', 'orange', 'important');
-                        });
-                    }
-                    function fixGuideStyles() {
-                        const container = document.getElementById('cxone-guide-container');
-                        if (container) {
-                            container.style.setProperty('z-index', '9999999999', 'important');
-                            applyOrangeBg(container.querySelectorAll('section.content, .container, [data-selector="GUIDE_FRAME_CONTENT"], [data-selector="GUIDE_FRAME_CONTENT"] section, [data-selector="GUIDE_FRAME_CONTENT"] .container'));
-                            // If guide is inside iframe (same-origin only)
-                            container.querySelectorAll('iframe').forEach(iframe => {
-                                try {
-                                    const doc = iframe.contentDocument;
-                                    if (doc) applyOrangeBg(doc.querySelectorAll('section.content, .container, section, [data-selector="GUIDE_FRAME_CONTENT"]'));
-                                } catch (e) {}
-                            });
-                        }
-                        const beEl = document.querySelector('.be-template.be-right');
-                        if (beEl) {
-                            beEl.style.setProperty('z-index', '9999999999', 'important');
-                            applyOrangeBg([beEl]);
-                            applyOrangeBg(beEl.querySelectorAll('section.content, .container, section'));
-                        }
-                    }
-                    fixGuideStyles();
-                    new MutationObserver(fixGuideStyles).observe(document.body, { childList: true, subtree: true });
-                    [1000, 3000, 5000].forEach(ms => setTimeout(fixGuideStyles, ms));
 
                     window.addEventListener("message", function (event) {
                         console.log(event, `event ${new Date().toISOString()}`);
@@ -379,16 +347,12 @@ Surfly.init(settings, function(initResult) {
 
 
     <style>
-        /* GUIDE loading background - target multiple possible structures */
+        /* GUIDE loading background */
         #cxone-guide-container [data-selector="GUIDE_FRAME_CONTENT"],
         #cxone-guide-container [data-selector="GUIDE_FRAME_CONTENT"] section,
-        #cxone-guide-container [data-selector="GUIDE_FRAME_CONTENT"] .container,
-        #cxone-guide-container .be-template section.content,
-        #cxone-guide-container .be-template .container,
-        #cxone-guide-container section.content,
-        #cxone-guide-container .container.svelte-cigsyi {
-            background: orange !important;
+        #cxone-guide-container [data-selector="GUIDE_FRAME_CONTENT"] .container {
             background-color: orange !important;
+            z-index: 9999999999 !important;
         }
 
         /* GUIDE spinner */
