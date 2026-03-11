@@ -321,21 +321,36 @@ Surfly.init(settings, function(initResult) {
                         "MESSAGE_RECEIVED",
                     ]);
 
-                    // Override z-index: remove inline style so our CSS can apply (inline styles beat external CSS)
-                    function fixGuideZIndex() {
-                        const el = document.getElementById('cxone-guide-container');
-                        if (el) {
-                            el.style.removeProperty('z-index');
-                            el.style.setProperty('z-index', '9999999999', 'important');
+                    // Override styles: apply directly via JS (inline styles beat everything)
+                    function applyOrangeBg(els) {
+                        els.forEach(el => {
+                            el.style.setProperty('background', 'orange', 'important');
+                            el.style.setProperty('background-color', 'orange', 'important');
+                        });
+                    }
+                    function fixGuideStyles() {
+                        const container = document.getElementById('cxone-guide-container');
+                        if (container) {
+                            container.style.setProperty('z-index', '9999999999', 'important');
+                            applyOrangeBg(container.querySelectorAll('section.content, .container, [data-selector="GUIDE_FRAME_CONTENT"], [data-selector="GUIDE_FRAME_CONTENT"] section, [data-selector="GUIDE_FRAME_CONTENT"] .container'));
+                            // If guide is inside iframe (same-origin only)
+                            container.querySelectorAll('iframe').forEach(iframe => {
+                                try {
+                                    const doc = iframe.contentDocument;
+                                    if (doc) applyOrangeBg(doc.querySelectorAll('section.content, .container, section, [data-selector="GUIDE_FRAME_CONTENT"]'));
+                                } catch (e) {}
+                            });
                         }
                         const beEl = document.querySelector('.be-template.be-right');
                         if (beEl) {
-                            beEl.style.removeProperty('z-index');
                             beEl.style.setProperty('z-index', '9999999999', 'important');
+                            applyOrangeBg([beEl]);
+                            applyOrangeBg(beEl.querySelectorAll('section.content, .container, section'));
                         }
                     }
-                    fixGuideZIndex();
-                    new MutationObserver(fixGuideZIndex).observe(document.body, { childList: true, subtree: true });
+                    fixGuideStyles();
+                    new MutationObserver(fixGuideStyles).observe(document.body, { childList: true, subtree: true });
+                    [1000, 3000, 5000].forEach(ms => setTimeout(fixGuideStyles, ms));
 
                     window.addEventListener("message", function (event) {
                         console.log(event, `event ${new Date().toISOString()}`);
