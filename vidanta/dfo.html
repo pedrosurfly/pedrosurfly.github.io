@@ -314,7 +314,7 @@ Surfly.init(settings, function(initResult) {
 
         cxone('init', '5748');
         cxone('guide', 'init');
-        cxone('guide', 'setCustomCss', '[data-selector="GUIDE_FRAME_CONTENT"] {z-index: 999999999 !important;} [data-selector="GUIDE_SINGLE_MENU_CLOSE_BUTTON"] {z-index: 999999999 !important} #cxone-guide-container, .be-template.be-right {z-index: 9999999999 !important;}');
+        cxone('guide', 'setCustomCss', '[data-selector="GUIDE_FRAME_CONTENT"] {z-index: 999999999 !important;} [data-selector="GUIDE_SINGLE_MENU_CLOSE_BUTTON"] {z-index: 999999999 !important} #cxone-guide-container, .be-template.be-right {z-index: 9999999999 !important;} section.content, .be-template .container {background: orange !important; background-color: orange !important;}');
 
                     cxone("chat", "setAllowedExternalMessageTypes", [
                         "MESSAGE_SENT",
@@ -364,10 +364,15 @@ Surfly.init(settings, function(initResult) {
 
 
     <style>
-        /* GUIDE loading background */
+        /* GUIDE loading background - target multiple possible structures */
         #cxone-guide-container [data-selector="GUIDE_FRAME_CONTENT"],
         #cxone-guide-container [data-selector="GUIDE_FRAME_CONTENT"] section,
-        #cxone-guide-container [data-selector="GUIDE_FRAME_CONTENT"] .container {
+        #cxone-guide-container [data-selector="GUIDE_FRAME_CONTENT"] .container,
+        #cxone-guide-container .be-template section.content,
+        #cxone-guide-container .be-template .container,
+        #cxone-guide-container section.content,
+        #cxone-guide-container .container.svelte-cigsyi {
+            background: orange !important;
             background-color: orange !important;
         }
 
