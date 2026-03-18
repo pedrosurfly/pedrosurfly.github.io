@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Surfly × NICE CXone — Co-Browse Integration Demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --sf-orange:     #FF6B2B;
+      --sf-orange-lt:  #FF8F5E;
+      --sf-orange-dk:  #D94E10;
+      --nice-blue:     #0057FF;
+      --nice-blue-lt:  #4D8FFF;
+      --nice-cyan:     #00CFFF;
+      --bg:            #09090f;
+      --surface:       #111118;
+      --surface2:      #18181f;
+      --border:        rgba(255,255,255,0.07);
+      --border-hl:     rgba(255,255,255,0.13);
+      --text:          #f0f0f5;
+      --text-muted:    #7a7a8c;
+      --radius:        14px;
+      --radius-lg:     20px;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ═══════════════════════════════════════ HERO ═══════════════════════════════════════ */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center;
+      position: relative;
+      padding: 60px 40px 80px;
+      overflow: hidden;
+    }
+
+    .hero-glow {
+      position: absolute; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 50% 60% at 25% 55%, rgba(255,107,43,0.12) 0%, transparent 65%),
+        radial-gradient(ellipse 45% 55% at 75% 45%, rgba(0,87,255,0.12) 0%, transparent 65%),
+        radial-gradient(ellipse 30% 30% at 50% 10%, rgba(0,207,255,0.06) 0%, transparent 60%);
+    }
+
+    .hero-grid {
+      position: absolute; inset: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 52px 52px;
+      mask-image: radial-gradient(ellipse 90% 70% at 50% 50%, black 20%, transparent 100%);
+    }
+
+    .hero-inner {
+      position: relative;
+      max-width: 1200px; margin: 0 auto;
+      width: 100%;
+    }
+
+    .hero-left { animation: riseIn 0.7s ease both; }
+
+    @keyframes riseIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .integration-badge {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border-hl);
+      border-radius: 100px;
+      padding: 7px 16px 7px 10px;
+      margin-bottom: 28px;
+    }
+
+    .badge-logos {
+      display: flex; align-items: center; gap: 4px;
+    }
+
+    .badge-logo {
+      width: 22px; height: 22px; border-radius: 5px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Sora', sans-serif; font-weight: 800; font-size: 9px;
+      color: #fff;
+    }
+
+    .badge-x {
+      font-size: 13px; color: var(--text-muted); font-weight: 300;
+      margin: 0 2px;
+    }
+
+    .badge-text {
+      font-size: 12px; font-weight: 500;
+      color: var(--text-muted); letter-spacing: 0.3px;
+    }
+
+    h1 {
+      font-family: 'Sora', sans-serif;
+      font-size: clamp(34px, 4.2vw, 56px);
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -2px;
+      color: var(--text);
+      margin-bottom: 22px;
+    }
+
+    h1 .hl-orange {
+      background: linear-gradient(125deg, var(--sf-orange), var(--sf-orange-lt));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    h1 .hl-blue {
+      background: linear-gradient(125deg, var(--nice-blue-lt), var(--nice-cyan));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: 16px; line-height: 1.7;
+      color: var(--text-muted);
+      max-width: 460px;
+      margin-bottom: 36px;
+      font-weight: 300;
+    }
+
+    .hero-actions {
+      display: flex; gap: 12px; flex-wrap: wrap;
+    }
+
+    .btn-cobrowse {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: linear-gradient(135deg, var(--sf-orange), #ff8240);
+      color: #fff;
+      border: none; cursor: pointer;
+      font-family: 'Sora', sans-serif;
+      font-size: 15px; font-weight: 700;
+      padding: 16px 30px; border-radius: 12px;
+      box-shadow: 0 6px 30px rgba(255,107,43,0.35);
+      transition: transform 0.2s, box-shadow 0.2s;
+      animation: surgeGlow 3s ease infinite;
+      letter-spacing: -0.2px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-cobrowse::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+      opacity: 0; transition: opacity 0.2s;
+    }
+
+    .btn-cobrowse:hover::before { opacity: 1; }
+
+    @keyframes surgeGlow {
+      0%,100% { box-shadow: 0 6px 30px rgba(255,107,43,0.35); }
+      50%      { box-shadow: 0 6px 40px rgba(255,107,43,0.6), 0 0 0 6px rgba(255,107,43,0.08); }
+    }
+
+    .btn-cobrowse:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 40px rgba(255,107,43,0.5);
+      animation: none;
+    }
+
+    .btn-cobrowse:active { transform: translateY(-1px); }
+
+    .be-template { z-index: 2147483549 !important; }
+
+    @media (max-width: 960px) {
+      .hero { padding: 40px 20px 60px; }
+    }
+  </style>
+<script>
+  (function (s, u, r, f, l, y) {
+    s[f] = s[f] || {
+      init: function () {
+        s[f].q = arguments;
+      },
+    };
+    l = u.createElement(r);
+    y = u.getElementsByTagName(r)[0];
+    l.async = 1;
+    l.src = "https://surfly.com/surfly.js";
+    y.parentNode.insertBefore(l, y);
+  })(window, document, "script", "Surfly");
+
+  var settings = {
+    // Surfly session options can be set here, or at the Company/Plan levels.
+    widget_key: "134f5fd2ac8842c0a1cd6062818eee74",
+    block_until_agent_joins: true,
+  };
+
+  Surfly.init(settings, function (initResult) {
+    if (initResult.success) {
+      // API calls can now be made!
+      if (!Surfly.isInsideSession) {
+        (function (n, u) {
+          ((window.CXoneDfo = n),
+            (window[n] =
+              window[n] ||
+              function () {
+                (window[n].q = window[n].q || []).push(arguments);
+              }),
+            (window[n].u = u),
+            (e = document.createElement("script")),
+            (e.type = "module"),
+            (e.src = u + "?" + Math.round(Date.now() / 1e3 / 3600)),
+            document.head.appendChild(e));
+        })(
+          "cxone",
+          "https://web-modules-de-na1.niceincontact.com/loader/1/loader.js",
+        );
+
+        cxone("init", "1022");
+        cxone("chat", "init", 1022, "chat_4bc8d701-a316-4b5f-bc12-9c45f766dbd0");
+
+        cxone("chat", "setAllowedExternalMessageTypes", [
+          "MESSAGE_SENT",
+          "MESSAGE_RECEIVED",
+        ]);
+
+        window.addEventListener("message", function (event) {
+          console.log(event, `event ${new Date().toISOString()}`);
+
+          // Ensure the data structure is as expected
+          if (event.data && event.data.actionType === "MESSAGE_RECEIVED") {
+            const messageContent = event.data.action?.message;
+
+            // Check if the message content is "#COBROWSE#"
+            if (messageContent === "#COBROWSE#") {
+              console.log("Cobrowse message received:", event.data);
+
+              // Check if Surfly is defined before calling session()
+              Surfly.session().startLeader(null, { name: `${event.data.action?.caseNumber}` });
+
+            }
+          }
+        });
+      }
+    } else {
+      console.log("Surfly was unable to initialize properly.");
+    }
+  });
+</script>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+
+    <div class="hero-left">
+      <div class="integration-badge">
+        <div class="badge-logos">
+          <div class="badge-logo" style="background:var(--sf-orange);">
+            <svg width="12" height="12" viewBox="0 0 18 18" fill="none">
+              <path d="M3 13c2-4 4-6 6-4s4-1 6-5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span class="badge-x">×</span>
+          <div class="badge-logo" style="background:var(--nice-blue);">N</div>
+        </div>
+        <span class="badge-text">Surfly × NICE CXone Integration</span>
+      </div>
+
+      <h1>
+        Co-Browse, <span class="hl-orange">natively</span><br/>
+        inside <span class="hl-blue">CXone</span>
+      </h1>
+
+      <p class="hero-sub">
+        Surfly's universal co-browsing engine, embedded directly into the NICE CXone agent console. No tab switching. No plugins. One click from an active call to a live co-browse session.
+      </p>
+
+      <div class="hero-actions">
+        <button class="btn-cobrowse" onclick="startSurflySession()">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          Start Co-Browse Session
+        </button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+  function startSurflySession() {
+    if (typeof Surfly !== 'undefined' && Surfly.session) {
+      Surfly.session().startLeader();
+    }
+  }
+</script>
+</body>
+</html>
