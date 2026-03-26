@@ -9,110 +9,45 @@
         href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap"
         rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
+    <script src="./nice-cxone-bridge.js"></script>
     <style>
         .be-template {
             z-index: 2147483549 !important;
         }
     </style>
     <script>
-        (function (s, u, r, f, l, y) {
-            s[f] = s[f] || {
-                init: function () {
-                    s[f].q = arguments;
-                },
-            };
-            l = u.createElement(r);
-            y = u.getElementsByTagName(r)[0];
-            l.async = 1;
-            l.src = "https://surfly.com/surfly.js";
-            y.parentNode.insertBefore(l, y);
-        })(window, document, "script", "Surfly");
-
-        var settings = {
-            // Surfly session options can be set here, or at the Company/Plan levels.
+        Surfly.init({
             widget_key: "134f5fd2ac8842c0a1cd6062818eee74",
-            block_until_agent_joins: true,
-        };
+            block_until_agent_joins: true
+        }, function (initResult) {
+            if (!initResult.success || Surfly.isInsideSession) return;
 
-        Surfly.init(settings, function (initResult) {
-            if (initResult.success) {
-                // API calls can now be made!
-                if (!Surfly.isInsideSession) {
-                    (function (n, u) {
-                        ((window.CXoneDfo = n),
-                            (window[n] =
-                                window[n] ||
-                                function () {
-                                    (window[n].q = window[n].q || []).push(arguments);
-                                }),
-                            (window[n].u = u),
-                            (e = document.createElement("script")),
-                            (e.type = "module"),
-                            (e.src = u + "?" + Math.round(Date.now() / 1e3 / 3600)),
-                            document.head.appendChild(e));
-                    })(
-                        "cxone",
-                        "https://web-modules-de-na1.niceincontact.com/loader/1/loader.js",
-                    );
+            // Load CXone
+            (function (n, u) {
+                ((window.CXoneDfo = n),
+                    (window[n] =
+                        window[n] ||
+                        function () {
+                            (window[n].q = window[n].q || []).push(arguments);
+                        }),
+                    (window[n].u = u),
+                    (e = document.createElement("script")),
+                    (e.type = "module"),
+                    (e.src = u + "?" + Math.round(Date.now() / 1e3 / 3600)),
+                    document.head.appendChild(e));
+            })(
+                "cxone",
+                "https://web-modules-de-na1.niceincontact.com/loader/1/loader.js",
+            );
 
-                    cxone("init", "1022");
-                    cxone("chat", "init", 1022, "chat_4bc8d701-a316-4b5f-bc12-9c45f766dbd0");
+            cxone("init", "1022");
+            cxone("chat", "init", 1022, "chat_4bc8d701-a316-4b5f-bc12-9c45f766dbd0");
+            cxone("chat", "setAllowedExternalMessageTypes", ["MESSAGE_SENT", "MESSAGE_RECEIVED"]);
 
-                    cxone("chat", "setAllowedExternalMessageTypes", [
-                        "MESSAGE_SENT",
-                        "MESSAGE_RECEIVED",
-                    ]);
-
-                    // Store the customer name from any earlier message in the session
-                    let customerName = null;
-                    let customerCaseNumber = null;
-
-                    window.addEventListener("message", function (event) {
-                        // Only process events re-dispatched from your own origin by the CXone widget
-                        if (event.origin !== window.location.origin) return;
-
-                        const data = event.data;
-                        if (!data || data.actionType !== "MESSAGE_RECEIVED") return;
-
-                        const action = data.action;
-                        if (!action) return;
-
-                        // Cache name and caseNumber whenever we see them populated
-                        // inbound = customer message (direction: "inbound"), author has no userId
-                        if (action.direction === "inbound" && action.author?.name) {
-                            customerName = action.author.name;
-                        }
-                        if (action.caseNumber) {
-                            customerCaseNumber = action.caseNumber;
-                        }
-
-                        const messageContent = action.message;
-
-                        console.log(event, `event ${new Date().toISOString()}`);
-
-                        // Ensure the data structure is as expected
-                        if (event.data && event.data.actionType === "MESSAGE_RECEIVED") {
-                            const messageContent = event.data.action?.message;
-
-                            // Check if the message content is "#COBROWSE#"
-                            if (messageContent === "#COBROWSE#") {
-                                console.log("Cobrowse trigger received", { customerName, customerCaseNumber });
-
-                                // Use cached values — the #COBROWSE# message itself will also have them
-                                // but guard against the rare race where it fires on the optimistic echo
-                                const name = customerName || action.author?.name || "Customer";
-                                const caseNum = customerCaseNumber || action.caseNumber || "unknown";
-
-                                Surfly.session().startLeader(null, {
-                                    name: `${name} — Case ${caseNum}`
-                                });
-                            }
-                        }
-                    });
-                }
-            } else {
-                console.log("Surfly was unable to initialize properly.");
-            }
+            // One line to activate the bridge
+            SurflyNICEBridge.init({
+                trigger: /cobrowse|co-browse|4-digit pin/i
+            });
         });
     </script>
 </head>
