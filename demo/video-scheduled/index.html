@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="shortcut icon"
+        href="https://www.navyfederal.org/etc.clientlibs/nfculibs/clientlibs/uife/clientlib-uife-nfculibs-site/resources/images/favicon.ico"
+        type="image/x-icon">
+    <title>Member Connect</title>
+    <script>
+        var showVideoChatButton = false;
+        var nicBusNumber = '4599130';
+        var nicChatPOC = '1605d414-489c-4df4-83b1-334dbeb0ab2c';
+        var clusterNiC = 'b32';
+        var surflyWidgetKey = '134f5fd2ac8842c0a1cd6062818eee74';
+        var videoSignalerURL = "https://home-b32.nice-incontact.com/inContact/Manage/Scripts/Spawn.aspx?scriptName=Surfly_Signaler&bus_no=4599130&scriptId=197588198&skill_no=4137191&p1=&p2=&p3=&p4=&p5=&Guid=602c459a-c935-4539-9fa0-0827ab102c74";
+        var randomIdNice = '';
+        let NicHomeURL = "https://home-" + clusterNiC + ".nice-incontact.com";
+
+        var chatSrc = document.createElement("script");
+        chatSrc.src = NicHomeURL + "/inContact/ChatClient/js/embed.min.js";
+
+        var head = document.getElementsByTagName("head")[0];
+        head.appendChild(chatSrc);
+
+        chatSrc.onload = function () {
+            (function (s, u, r, f, l, y) {
+                s[f] = s[f] || { init: function () { s[f].q = arguments; } };
+                l = u.createElement(r); y = u.getElementsByTagName(r)[0]; l.async = 1;
+                l.src = 'https://surfly.com/surfly.js'; y.parentNode.insertBefore(l, y);
+            })
+                (window, document, 'script', 'Surfly');
+            loadSurfly();
+        };
+
+        // Start a Work Item
+        function signalWorkItem(leaderLink) {
+            randomId();
+            console.log('signal Work Item');
+            var url = new URL(videoSignalerURL);
+            url.searchParams.set('p1', 'startWorkItem');
+            url.searchParams.set('p2', leaderLink);
+            url.searchParams.set('p3', randomIdNice);
+            fetch(url, { mode: "no-cors" });
+        }
+
+        // End a workItem
+        function endWorkItem(leaderLink) {
+            console.log('End Work Item', randomIdNice);
+            var url = new URL(videoSignalerURL);
+            url.searchParams.set('p1', 'endWorkItem');
+            url.searchParams.set('p2', leaderLink);
+            url.searchParams.set('p3', randomIdNice);
+            fetch(url, { mode: "no-cors" });
+        }
+
+         // Create Videochat Session
+        function createVideochatSession() {
+            if (!validateScheduleAccess().ok) {
+                applyUrlScheduleGate();
+                return;
+            }
+            var videochatSession = Surfly.session({
+                block_until_agent_joins: false,
+                hide_until_agent_joins: true,
+                videochat_autostart: true,
+                start_with_fullscreen_videochat: true,
+                videochat_prompt: true,
+                start_muted: false,
+                anyone_can_deactivate_space: true,
+            });
+
+            videochatSession.on("session_created", function (session, event) {
+                console.log('Waiting for confirmation');
+                session.startLeader(null, { name: "Agent" });
+            }).on("session_started", function (session, event) {
+                var surflySessionPin = session.pin;
+                var surflyLeaderLink = session.followerLink;
+                signalWorkItem(surflyLeaderLink);
+                console.log("Videochat session started");
+                console.log('Session Pin: ' + surflySessionPin);
+                // Display the Queue Spinner
+                var spinner = document.querySelector("#spinner-container");
+                spinner.classList.remove("hidden");
+
+                var cancelButton = document.querySelector("#btn-cancel-session");
+                // If the Cancel button is clicked, end the work item and end the session
+                cancelButton.addEventListener("click", function () {
+                    session.end();
+                });
+
+                // Remove the button
+                var button = document.querySelector("#start-button");
+                button.classList.add("hidden");
+            }).on("viewer_joined", function (session, event) {
+                window.nicVideochatContactId = event.userData.contactId;
+            }).on("session_ended", function (session, event) {
+                console.log("Videochat session ended", event, session);
+
+                endWorkItem(session.followerLink);
+
+                // Remove the Queue Spinner
+                var spinner = document.querySelector("#spinner-container");
+                spinner.classList.add("hidden");
+                // Add the button
+                var button = document.querySelector("#start-button");
+                button.classList.remove("hidden");
+            }).create();
+        };
+
+        function cancelSession() {
+            console.log("Canceling session...");
+            var currentSession = Surfly.session();
+            if (currentSession) {
+                currentSession.end();
+            }
+        }
+
+
+        function loadSurfly() {
+            // Setup settings from API
+            var settings = {
+                widget_key: surflyWidgetKey,
+                auto_restore: false,
+                session_start_confirmation: false,
+                hidden: false,
+                disable_end_redirect: true,
+                require_password: false,
+                agent_can_request_control: true,
+                automated_session_recording_enabled: true,
+                end_redirect_enabled: true,
+                new_urls_allowed: true,
+                non_hosts_can_open_tabs: true,
+            };
+
+            Surfly.init(settings, function (initResult) {
+                if (initResult.success) {
+                    if (!Surfly.isInsideSession) {
+
+                        if (localStorage.getItem(nicBusNumber + "-uniquePageId")) {
+                            console.log("random: " + localStorage.getItem(nicBusNumber + "-uniquePageId"));
+                        } else {
+                            let randomString = Math.random().toString(36).substring(7);
+                            let dateNow = Date.now();
+                            let uniquePageId = randomString + "-" + dateNow;
+
+                            console.log("random: " + uniquePageId);
+
+                            localStorage.setItem(nicBusNumber + "-uniquePageId", uniquePageId);
+                        }
+
+                    }
+                }
+            });
+        }
+
+        function randomId() {
+            console.log('it got here');
+            let randomString = Math.random().toString(36).substring(7);
+            let dateNow = Date.now();
+            let uniquePageId = randomString + "-" + dateNow;
+            console.log("random ID for Nice: " + uniquePageId);
+            randomIdNice = uniquePageId;
+        }
+
+        /** Scheduled slot is interpreted as wall time in fixed GMT+1 (UTC+01:00, no DST). */
+        var SCHEDULE_GMT1_OFFSET = '+01:00';
+
+        /** Join window: minutes before / after scheduled instant (GMT+1). */
+        var SCHEDULE_JOIN_EARLY_MIN = 2;
+        var SCHEDULE_JOIN_LATE_MIN = 5;
+
+        function getQueryParams() {
+            var params = new URLSearchParams(window.location.search);
+            return {
+                name: (params.get('name') || '').trim(),
+                email: (params.get('email') || '').trim(),
+                date: (params.get('date') || '').trim(),
+                time: (params.get('time') || '').trim()
+            };
+        }
+
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        /**
+         * Parses date (YYYY-MM-DD) and time (HH:mm or HH:mm:ss) as wall clock in GMT+1 (UTC+01:00).
+         * Returns Date (absolute instant) or null if invalid.
+         */
+        function parseScheduledGmtPlus1(dateStr, timeStr) {
+            if (!dateStr || !timeStr) return null;
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return null;
+            var tp = timeStr.split(':').map(function (x) { return x.trim(); });
+            if (tp.length < 2 || tp.length > 3) return null;
+            var h = parseInt(tp[0], 10), m = parseInt(tp[1], 10), s = tp[2] !== undefined ? parseInt(tp[2], 10) : 0;
+            if (isNaN(h) || isNaN(m) || isNaN(s) || h < 0 || h > 23 || m < 0 || m > 59 || s < 0 || s > 59) return null;
+            var pad = function (n) { return n < 10 ? '0' + n : String(n); };
+            var t = pad(h) + ':' + pad(m) + ':' + pad(s);
+            var iso = dateStr + 'T' + t + SCHEDULE_GMT1_OFFSET;
+            var d = new Date(iso);
+            if (isNaN(d.getTime())) return null;
+            return d;
+        }
+
+        function validateScheduleAccess() {
+            var q = getQueryParams();
+            if (!q.name || !q.email || !q.date || !q.time) {
+                return { ok: false, reason: 'missing', message: 'This link is incomplete. It should include your name, email, date, and time.' };
+            }
+            if (!isValidEmail(q.email)) {
+                return { ok: false, reason: 'email', message: 'The email in this link does not look valid.' };
+            }
+            var scheduled = parseScheduledGmtPlus1(q.date, q.time);
+            if (!scheduled) {
+                return { ok: false, reason: 'datetime', message: 'The date or time in this link is not valid. Use YYYY-MM-DD and HH:mm (24h), interpreted as GMT+1.' };
+            }
+            var now = Date.now();
+            var start = scheduled.getTime() - SCHEDULE_JOIN_EARLY_MIN * 60 * 1000;
+            var end = scheduled.getTime() + SCHEDULE_JOIN_LATE_MIN * 60 * 1000;
+            if (now < start) {
+                return { ok: false, reason: 'early', message: 'Video chat opens ' + SCHEDULE_JOIN_EARLY_MIN + ' minutes before your scheduled time (GMT+1).' };
+            }
+            if (now > end) {
+                return { ok: false, reason: 'late', message: 'This scheduled session window has ended (' + SCHEDULE_JOIN_LATE_MIN + ' minutes after your GMT+1 time). Please request a new link.' };
+            }
+            return { ok: true, scheduled: scheduled, query: q };
+        }
+
+        function applyUrlScheduleGate() {
+            var q = getQueryParams();
+            var btn = document.getElementById('startVideoBtn');
+            var statusEl = document.getElementById('schedule-status');
+            var guestEl = document.getElementById('guest-line');
+            var result = validateScheduleAccess();
+
+            if (guestEl) {
+                guestEl.textContent = q.name ? 'Welcome, ' + q.name + '.' : '';
+            }
+
+            if (!btn || !statusEl) return;
+
+            if (result.ok) {
+                btn.disabled = false;
+                btn.removeAttribute('aria-disabled');
+                statusEl.textContent = 'You are within your join window (' + SCHEDULE_JOIN_EARLY_MIN + ' min before–' + SCHEDULE_JOIN_LATE_MIN + ' min after your GMT+1 time). Tap below when you are ready.';
+                statusEl.className = 'schedule-status schedule-status--ok';
+            } else {
+                btn.disabled = true;
+                btn.setAttribute('aria-disabled', 'true');
+                statusEl.textContent = result.message;
+                statusEl.className = 'schedule-status schedule-status--bad';
+            }
+        }
+    </script>
+</head>
+
+<body class="pagecontainer">
+    <div class="container" id="start-button">
+        <header class="video-chat-hero" aria-label="Video chat">
+            <p class="video-chat-eyebrow">You have arrived at the</p>
+            <h1 class="video-chat-title">
+                <span class="video-chat-title__glow">Video Chat</span>
+                <span class="video-chat-title__page">Page</span>
+            </h1>
+            <p class="video-chat-tagline">Secure session — the date and time on your link are interpreted as <strong>GMT+1</strong> (UTC+01:00). When your short join window is open, start below.</p>
+        </header>
+        <p class="guest-line" id="guest-line" aria-live="polite"></p>
+        <p class="schedule-status schedule-status--bad" id="schedule-status" role="status">Checking your link…</p>
+        <div>
+            <button type="button" onclick="createVideochatSession()" class="start-button" id="startVideoBtn" disabled aria-disabled="true">
+                Start Video
+            </button>
+        </div>
+    </div>
+    <script>
+        applyUrlScheduleGate();
+    </script>
+    <div id="spinner-container" class="hidden">
+        <div id="spinner">
+            <div class="loader"></div>
+            <p class="text-queue">Please wait to be connected</p>
+            <button type="button" class="cancel-button" id="btn-cancel-session" onclick="cancelSession()">Cancel</button>
+        </div>
+    </div>
+</body>
+<style>
+    :root {
+        --dark-blue: #032955;
+        --blue: #144881;
+        --light-blue: #0667BA;
+        --background-off-white: #f9f9f9;
+        --text-grey: #444;
+        --amn-font: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif, BlinkMacSystemFont, Helvetica Neue, Arial, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+    }
+
+    body {
+        font-family: 'Outfit', var(--amn-font);
+    }
+
+    .pagecontainer {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        min-height: 100vh;
+        background: var(--background-off-white);
+        /* fallback for old browsers */
+        /* background: -webkit-linear-gradient(to top, #ffffff, #e54747); */
+        /* Chrome 10-25, Safari 5.1-6 */
+        /* background: linear-gradient(to top, #ffffff, #e54747); */
+        /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+    }
+
+    .video-chat-hero {
+        max-width: 36rem;
+        margin: 0 auto 2rem;
+        position: relative;
+    }
+
+    .video-chat-eyebrow {
+        font-family: 'Outfit', sans-serif;
+        font-size: 0.95rem;
+        font-weight: 600;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--light-blue);
+        margin: 0 0 0.75rem;
+        animation: fade-up 0.7s ease-out both;
+    }
+
+    .video-chat-title {
+        font-family: 'Syne', sans-serif;
+        font-size: clamp(2.75rem, 8vw, 4.25rem);
+        font-weight: 800;
+        line-height: 1.05;
+        margin: 0 0 1.25rem;
+        color: var(--dark-blue);
+        animation: fade-up 0.75s ease-out 0.08s both;
+    }
+
+    .video-chat-title__glow {
+        display: inline-block;
+        background: linear-gradient(120deg, var(--blue) 0%, var(--light-blue) 45%, #ED780F 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        text-shadow: 0 0 40px rgba(6, 103, 186, 0.25);
+    }
+
+    .video-chat-title__page {
+        display: block;
+        font-size: 0.55em;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        color: var(--blue);
+        margin-top: 0.15em;
+    }
+
+    .video-chat-tagline {
+        font-size: 1.125rem;
+        font-weight: 400;
+        color: var(--text-grey);
+        line-height: 1.55;
+        margin: 0;
+        animation: fade-up 0.8s ease-out 0.16s both;
+    }
+
+    @keyframes fade-up {
+        from {
+            opacity: 0;
+            transform: translateY(12px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .guest-line {
+        font-size: 1.35rem;
+        font-weight: 600;
+        color: var(--blue);
+        margin: 0 0 1rem;
+        min-height: 1.5em;
+    }
+
+    .schedule-status {
+        font-size: 1.05rem;
+        line-height: 1.5;
+        max-width: 28rem;
+        margin: 0 auto 1.5rem;
+        padding: 0.75rem 1rem;
+        border-radius: 12px;
+    }
+
+    .schedule-status--ok {
+        color: #0d4a2b;
+        background: rgba(13, 74, 43, 0.08);
+        border: 1px solid rgba(13, 74, 43, 0.2);
+    }
+
+    .schedule-status--bad {
+        color: #6b2c0a;
+        background: rgba(237, 120, 15, 0.12);
+        border: 1px solid rgba(154, 78, 10, 0.25);
+    }
+
+    .container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .button-logo {
+        margin: 0;
+        padding: 0;
+        width: 300px;
+        height: 300px;
+        border: none;
+        cursor: pointer;
+        border-radius: 10px;
+    }
+
+    .img-logo {
+        width: 300px;
+        height: 300px;
+        border-radius: 10px;
+    }
+
+    .loader {
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid var(--blue);
+        border-bottom: 16px solid #ED780F;
+        border-left: 16px solid #89ADD0;
+        border-right: 16px solid #9A4E0A;
+        width: 120px;
+        height: 120px;
+        -webkit-animation: spin 2s linear infinite;
+        animation: spin 2s linear infinite;
+    }
+
+    @-webkit-keyframes spin {
+        0% {
+            -webkit-transform: rotate(0deg);
+        }
+
+        100% {
+            -webkit-transform: rotate(360deg);
+        }
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .text-queue {
+        font-size: 1.5rem;
+        color: var(--blue);
+        margin: 0;
+        padding: 20px;
+        margin: 20px;
+    }
+
+    #spinner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .hidden {
+        display: none
+    }
+
+    .start-button {
+        background-color: var(--background-off-white);
+        color: var(--blue);
+        border-radius: 15px;
+        border: 3px solid var(--blue);
+        padding: 16px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 2rem;
+        margin: 4px 2px;
+        transition-duration: 0.4s;
+        cursor: pointer;
+    }
+
+    .start-button:hover {
+        background-color: #ED780F;
+        color: white;
+        border: 2px solid var(--blue);
+
+    }
+
+    .cancel-button {
+        background-color: white;
+        color: var(--blue);
+        ;
+        border-radius: 15px;
+        border: 3px solid var(--blue);
+        padding: 16px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 1.7rem;
+        margin: 4px 2px;
+        transition-duration: 0.4s;
+        cursor: pointer;
+    }
+
+    .cancel-button:hover {
+        background-color: var(--blue);
+        ;
+        color: white;
+        border: 2px solid var(--blue);
+    }
+
+    .start-button:disabled {
+        background-color: #cccccc;
+        border-color: #cccccc;
+        color: #666666;
+        cursor: not-allowed;
+    }
+
+    .start-button:disabled:hover {
+        background-color: #cccccc;
+        color: #666666;
+    }
+</style>
+
+</html>
