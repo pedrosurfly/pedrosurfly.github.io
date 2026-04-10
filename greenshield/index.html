@@ -1,0 +1,79 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Surfly Landing Page</title>
+  <style>
+    :root {
+      color-scheme: light;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+    }
+
+    .container {
+      text-align: center;
+    }
+
+    button {
+      padding: 0.9rem 1.4rem;
+      border: 0;
+      border-radius: 8px;
+      background: #2563eb;
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+  </style>
+  <script>
+    (function(s,u,r,f,l,y){s[f]=s[f]||{init:function(){s[f].q=arguments}};
+    l=u.createElement(r);y=u.getElementsByTagName(r)[0];l.async=1;
+    l.src='https://surfly.com/surfly.js';y.parentNode.insertBefore(l,y);})
+    (window,document,'script','Surfly');
+    
+    var settings = {
+        // Surfly session options can be set here, or at the Company/Plan levels.
+        widget_key: 'da31490e83d14a28aac6761f3760128b',
+    };
+    
+    Surfly.init(settings, function(initResult) {
+        if (initResult.success) {
+            // API calls can now be made!
+            if (!Surfly.isInsideSession) {
+                
+            }
+        }
+        else{
+            console.log("Surfly was unable to initialize properly.")
+        }
+    });
+    </script>
+</head>
+<body>
+  <main class="container">
+    <button id="startLeaderButton" type="button">Start Surfly Leader Session</button>
+  </main>
+
+  <script>
+    document.getElementById("startLeaderButton").addEventListener("click", function () {
+      if (typeof Surfly !== "undefined" && Surfly.session) {
+        Surfly.session().startLeader();
+      } else {
+        console.error("Surfly is not available on this page.");
+      }
+    });
+  </script>
+</body>
+</html>
