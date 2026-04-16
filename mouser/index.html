@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DFO / CXone Test Page</title>
+  <style>
+    .surfly-btn {
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .surfly-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    }
+
+    .surfly-btn:active {
+      transform: translateY(0);
+    }
+
+    /* Fix the z-index issue */
+    .be-template {
+      z-index: 2147483549 !important;
+    }
+  </style>
+  <script>
+    (function (s, u, r, f, l, y) {
+      s[f] = s[f] || {
+        init: function () {
+          s[f].q = arguments;
+        },
+      };
+      l = u.createElement(r);
+      y = u.getElementsByTagName(r)[0];
+      l.async = 1;
+      l.src = "https://surfly.com/surfly.js";
+      y.parentNode.insertBefore(l, y);
+    })(window, document, "script", "Surfly");
+
+    var settings = {
+      // Surfly session options can be set here, or at the Company/Plan levels.
+      widget_key: "9caa9fd4462a4d4db3c880509c5dc1c2",
+      block_until_agent_joins: true,
+    };
+
+    Surfly.init(settings, function (initResult) {
+      if (initResult.success) {
+        // API calls can now be made!
+        if (!Surfly.isInsideSession) {
+          (function (n, u) {
+        window.CXoneDfo = n,
+            window[n] = window[n] || function () { (window[n].q = window[n].q || []).push(arguments) }, window[n].u = u,
+            e = document.createElement("script"), e.type = "module", e.src = u + "?" + Math.round(Date.now() / 1e3 / 3600),
+            document.head.appendChild(e)
+    })('cxone', 'https://web-modules-de-na1.niceincontact.com/loader/1/loader.js');
+    cxone('init', '5840');
+    cxone('guide', 'init', { locale: 'en-us' });
+    cxone('analytics','setVisitorVariable', 'lang', '@Model');
+    cxone('guide','setCustomCss', [
+    '[data-selector="GUIDE_CHANNEL_BUTTON_LABEL"] { font-family: Arial !important; }',
+    '[data-selector="PRECONTACT_SURVEY_DESCRIPTION"] { font-family: Arial !important; }',
+    '[data-selector="GUIDE_CHANNEL_ICON"] { transform: scale(0.75); transform-origin: center center; }',
+    '[data-selector="GUIDE_SINGLE_MENU_CLOSE_BUTTON"]:focus, [data-selector="BEGIN_CHAT"]:focus, [data-selector="GUIDE_CHANNEL_BUTTON"]:focus  { outline: 2px #F9F9F9 solid !important; outline-offset: 0 !important; box-shadow: 0 0 0 4px #193146 !important; }',
+    ].join(' '));
+    cxone('chat', 'setCustomCss', [
+    '[data-selector="HEADER_ACTION_MENU_BUTTON"], [data-selector="HEADER_MINIMIZE_WINDOW"] { padding: 0.2em 0.6em !important; cursor: pointer !important; }'
+    ].join(' '));
+
+          cxone("chat", "setAllowedExternalMessageTypes", [
+            "MESSAGE_SENT",
+            "MESSAGE_RECEIVED",
+          ]);
+
+          window.addEventListener("message", function (event) {
+            console.log(event, `event ${new Date().toISOString()}`);
+
+            // Ensure the data structure is as expected
+            if (event.data && event.data.actionType === "MESSAGE_RECEIVED") {
+              const messageContent = event.data.action?.message;
+
+              // Check if the message content is "#COBROWSE#"
+              if (messageContent === "#COBROWSE#") {
+                console.log("Cobrowse message received:", event.data);
+
+                // Check if Surfly is defined before calling session()
+                Surfly.session().startLeader(null, { name: `${event.data.action?.caseNumber}` });
+
+              }
+            }
+          });
+        }
+      } else {
+        console.log("Surfly was unable to initialize properly.");
+      }
+    });
+  </script>
+
+</head>
+
+<body>
+  <h1>DFO / CXone Chat Tester</h1>
+  <h2>Sub-title goes here</h2>
+  <p>This is a test page for the DFO / CXone chat integration.</p>
+  <p>
+    It should display a chat window when the user clicks the button below.
+  </p>
+  <button type="button" class="surfly-btn" onclick="Surfly.session().startLeader()">
+    Launch Surfly Session
+  </button>
+</body>
+
+</html>
