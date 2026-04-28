@@ -1,113 +1,397 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Surfly × NICE CXone — Co-Browse Integration Demo</title>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap"
-        rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css" />
-    <script src="./nice-cxone-bridge.js"></script>
-    <style>
-        .be-template {
-            z-index: 2147483549 !important;
-        }
-    </style>
-    <script>
-        Surfly.init({
-            widget_key: "6f49d3e254784443b304e8f1c5fa3168",
-            block_until_agent_joins: true
-        }, function (initResult) {
-            if (!initResult.success || Surfly.isInsideSession) return;
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Meridian Wealth & Retirement — Clarity for the Years Ahead</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --navy-900:#0c2340; --navy-800:#14304f; --navy-700:#1e3d5e;
+    --terracotta:#d97757; --terracotta-dark:#b85a3d;
+    --cream:#f5f0e8; --cream-light:#fbf7f0; --paper:#fff;
+    --ink:#1a1a1a; --ink-soft:#525252; --ink-mute:#8a8a8a;
+    --rule:#e5dfd3; --gold:#c9a55c;
+    --shadow-md:0 8px 24px rgba(12,35,64,.08);
+    --shadow-lg:0 24px 60px rgba(12,35,64,.14);
+    --max:1240px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Manrope',-apple-system,sans-serif;font-size:16px;line-height:1.6;color:var(--ink);background:var(--cream-light);-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:'Fraunces',Georgia,serif;font-weight:400;color:var(--navy-900);letter-spacing:-.01em;line-height:1.15}
+h1{font-size:clamp(2.4rem,5vw,4.2rem)}
+h2{font-size:clamp(1.8rem,3.5vw,2.6rem)}
+h3{font-size:1.35rem}
+a{color:var(--navy-800);text-decoration:none;transition:color .2s}
+a:hover{color:var(--terracotta)}
+.container{max-width:var(--max);margin:0 auto;padding:0 28px}
+.utility{background:var(--navy-900);color:rgba(255,255,255,.75);font-size:13px;padding:8px 0}
+.utility .container{display:flex;justify-content:flex-end;gap:24px}
+.utility a{color:rgba(255,255,255,.85)}
+.utility a:hover{color:var(--terracotta)}
+.header{background:var(--paper);border-bottom:1px solid var(--rule);position:sticky;top:0;z-index:50}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:22px 28px;max-width:var(--max);margin:0 auto}
+.logo{font-family:'Fraunces',serif;font-size:26px;font-weight:500;color:var(--navy-900);letter-spacing:-.02em}
+.logo span{color:var(--terracotta);font-style:italic}
+.nav-links{display:flex;gap:32px;list-style:none}
+.nav-links a{font-size:15px;font-weight:500;color:var(--ink);position:relative;padding:6px 0}
+.nav-links a::after{content:'';position:absolute;left:0;bottom:0;width:0;height:2px;background:var(--terracotta);transition:width .3s}
+.nav-links a:hover::after,.nav-links a.active::after{width:100%}
+.nav-cta{display:flex;gap:12px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;font-size:15px;font-weight:600;border:none;border-radius:4px;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn-primary{background:var(--terracotta);color:#fff}
+.btn-primary:hover{background:var(--terracotta-dark);color:#fff;transform:translateY(-1px);box-shadow:var(--shadow-md)}
+.btn-secondary{background:transparent;color:var(--navy-900);border:1.5px solid var(--navy-900)}
+.btn-secondary:hover{background:var(--navy-900);color:#fff}
+.btn-ghost{background:transparent;color:var(--navy-900);padding:13px 0;font-weight:600}
+.btn-ghost::after{content:'→';margin-left:6px;transition:transform .2s}
+.btn-ghost:hover{color:var(--terracotta)}
+.btn-ghost:hover::after{transform:translateX(4px)}
+.hero{background:var(--cream);overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:60px;align-items:center;padding:80px 28px 100px;max-width:var(--max);margin:0 auto}
+.eyebrow{display:inline-block;font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--terracotta);margin-bottom:22px}
+.hero h1{margin-bottom:24px}
+.hero h1 em{font-style:italic;color:var(--terracotta);font-weight:300}
+.hero p{font-size:19px;line-height:1.6;color:var(--ink-soft);max-width:520px;margin-bottom:36px}
+.hero-actions{display:flex;gap:16px;flex-wrap:wrap}
+.hero-art{position:relative;aspect-ratio:4/5;border-radius:12px;overflow:hidden;background:linear-gradient(135deg,var(--navy-800),var(--navy-900));box-shadow:var(--shadow-lg)}
+.hero-art::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 30%,rgba(217,119,87,.4),transparent 50%),radial-gradient(circle at 80% 80%,rgba(201,165,92,.3),transparent 50%)}
+.hero-art-content{position:absolute;inset:0;padding:40px;display:flex;flex-direction:column;justify-content:space-between;color:#fff}
+.stat-card{background:rgba(255,255,255,.08);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:22px;align-self:flex-start;max-width:240px}
+.stat-num{font-family:'Fraunces',serif;font-size:42px;color:var(--gold);line-height:1;margin-bottom:6px}
+.stat-label{font-size:13px;color:rgba(255,255,255,.75);letter-spacing:.04em}
+.hero-quote{font-family:'Fraunces',serif;font-style:italic;font-size:22px;line-height:1.4;align-self:flex-end;max-width:320px}
+.hero-quote::before{content:'"';font-size:80px;line-height:.5;color:var(--terracotta);display:block;margin-bottom:16px}
+.trust{background:var(--paper);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:36px 0}
+.trust-inner{display:flex;justify-content:space-between;align-items:center;gap:40px;flex-wrap:wrap}
+.trust-label{font-size:13px;text-transform:uppercase;letter-spacing:.14em;color:var(--ink-mute);font-weight:600}
+.trust-stats{display:flex;gap:60px}
+.trust-stat strong{font-family:'Fraunces',serif;font-size:28px;color:var(--navy-900);display:block;line-height:1}
+.trust-stat span{font-size:13px;color:var(--ink-soft)}
+section.block{padding:100px 0}
+.section-head{max-width:720px;margin-bottom:60px}
+.section-head h2 em{font-style:italic;color:var(--terracotta);font-weight:300}
+.section-head p{font-size:18px;color:var(--ink-soft);margin-top:16px}
+.products{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.product-card{background:var(--paper);border:1px solid var(--rule);border-radius:8px;padding:36px 32px;transition:all .3s;position:relative;overflow:hidden}
+.product-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--terracotta);transform:scaleX(0);transform-origin:left;transition:transform .3s}
+.product-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-md)}
+.product-card:hover::before{transform:scaleX(1)}
+.product-icon{width:48px;height:48px;background:var(--cream);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:24px;color:var(--terracotta)}
+.product-card h3{margin-bottom:12px}
+.product-card p{color:var(--ink-soft);margin-bottom:24px;font-size:15px}
+.product-card .btn-ghost{padding:0;font-size:14px}
+.feature{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.feature-art{aspect-ratio:5/4;border-radius:12px;background:linear-gradient(135deg,var(--cream),var(--rule));position:relative;overflow:hidden;box-shadow:var(--shadow-md)}
+.feature-art-inner{position:absolute;inset:30px;border:1px solid rgba(12,35,64,.1);border-radius:8px;padding:36px;display:flex;flex-direction:column;justify-content:space-between;background:rgba(255,255,255,.5);backdrop-filter:blur(8px)}
+.feature-chart{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;align-items:end;height:160px}
+.bar{background:linear-gradient(to top,var(--terracotta),var(--gold));border-radius:3px 3px 0 0}
+.bar:nth-child(1){height:30%}.bar:nth-child(2){height:50%}.bar:nth-child(3){height:65%}.bar:nth-child(4){height:85%}.bar:nth-child(5){height:100%}
+.resources{display:grid;grid-template-columns:repeat(3,1fr);gap:32px}
+.resource-tag{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--terracotta)}
+.resource h3{margin:12px 0;font-size:1.2rem;line-height:1.3}
+.resource p{color:var(--ink-soft);font-size:15px;margin-bottom:16px}
+.resource-meta{font-size:13px;color:var(--ink-mute)}
+.resource-image{aspect-ratio:16/10;border-radius:6px;margin-bottom:20px;background:linear-gradient(135deg,var(--navy-800),var(--terracotta))}
+.resource:nth-child(2) .resource-image{background:linear-gradient(135deg,var(--terracotta),var(--gold))}
+.resource:nth-child(3) .resource-image{background:linear-gradient(135deg,var(--gold),var(--navy-700))}
+.cta-banner{background:var(--navy-900);color:#fff;padding:80px 0;position:relative;overflow:hidden}
+.cta-banner::before{content:'';position:absolute;top:-50%;right:-10%;width:500px;height:500px;background:radial-gradient(circle,rgba(217,119,87,.2),transparent 70%)}
+.cta-banner h2{color:#fff;margin-bottom:16px}
+.cta-banner h2 em{color:var(--terracotta);font-style:italic;font-weight:300}
+.cta-banner p{font-size:18px;color:rgba(255,255,255,.75);margin-bottom:32px;max-width:560px}
+.cta-banner .container{position:relative;z-index:1}
+.footer{background:var(--cream);padding:80px 0 40px;border-top:1px solid var(--rule)}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px;margin-bottom:60px}
+.footer-brand .logo{display:block;margin-bottom:16px}
+.footer-brand p{color:var(--ink-soft);font-size:14px;max-width:320px}
+.footer h4{font-family:'Manrope',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--navy-900);margin-bottom:20px}
+.footer ul{list-style:none}
+.footer li{margin-bottom:10px}
+.footer li a{font-size:14px;color:var(--ink-soft)}
+.footer-bottom{padding-top:30px;border-top:1px solid var(--rule);display:flex;justify-content:space-between;font-size:13px;color:var(--ink-mute);flex-wrap:wrap;gap:16px}
+.footer-disclaimer{font-size:12px;color:var(--ink-mute);line-height:1.6;margin-top:24px;padding-top:24px;border-top:1px dashed var(--rule)}
+@media(max-width:900px){.nav-links{display:none}.hero-grid{grid-template-columns:1fr;gap:40px;padding:50px 28px 70px}.products{grid-template-columns:1fr}.feature{grid-template-columns:1fr;gap:40px}.resources{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr 1fr;gap:40px}.trust-stats{gap:30px}section.block{padding:60px 0}}
+</style>
 
-            // Load CXone
-            (function (n, u) {
-                ((window.CXoneDfo = n),
-                    (window[n] =
-                        window[n] ||
-                        function () {
-                            (window[n].q = window[n].q || []).push(arguments);
-                        }),
-                    (window[n].u = u),
-                    (e = document.createElement("script")),
-                    (e.type = "module"),
-                    (e.src = u + "?" + Math.round(Date.now() / 1e3 / 3600)),
-                    document.head.appendChild(e));
-            })(
-                "cxone",
-                "https://web-modules-de-na1.niceincontact.com/loader/1/loader.js",
-            );
+<script>
+/* Surfly + NICE CXone bridge */
+(function (s, u, r, f, l, y) {
+    s[f] = s[f] || { init: function () { s[f].q = arguments; } };
+    l = u.createElement(r); y = u.getElementsByTagName(r)[0];
+    l.async = 1; l.src = "https://surfly.com/surfly.js";
+    y.parentNode.insertBefore(l, y);
+})(window, document, "script", "Surfly");
 
-            cxone("init", "1022");
-            cxone("guide", "init", "695c3a47-ffee-4f7d-9167-97fb31723506");
-            cxone("chat", "setAllowedExternalMessageTypes", ["MESSAGE_SENT", "MESSAGE_RECEIVED"]);
+(function (windowObj) {
+    windowObj.SurflyNICEBridge = {
+        init: function (options) {
+            options = options || {};
+            var trigger = options.trigger;
+            var matchesTrigger;
+            if (typeof trigger === "function") matchesTrigger = trigger;
+            else if (trigger instanceof RegExp) matchesTrigger = function (m) { return trigger.test(m); };
+            else if (typeof trigger === "string") matchesTrigger = function (m) { return m === trigger; };
+            else matchesTrigger = function (m) { return m === "#COBROWSE#"; };
 
-            // One line to activate the bridge
-            SurflyNICEBridge.init({
-                trigger: /cobrowse|co-browse|4-digit pin/i
+            var customerName = null, customerCaseNumber = null;
+            windowObj.addEventListener("message", function (event) {
+                if (event.origin !== windowObj.location.origin) return;
+                var data = event.data;
+                if (!data || data.actionType !== "MESSAGE_RECEIVED") return;
+                var action = data.action;
+                if (!action) return;
+                if (action.direction === "inbound" && action.author && action.author.name) customerName = action.author.name;
+                if (action.caseNumber) customerCaseNumber = action.caseNumber;
+                if (!action.message || !matchesTrigger(action.message)) return;
+                var name = customerName || (action.author && action.author.name) || "Customer";
+                var caseNum = customerCaseNumber || action.caseNumber || "unknown";
+                if (typeof options.onStart === "function") {
+                    options.onStart({ name: name, caseNum: caseNum });
+                } else {
+                    Surfly.session().startLeader(null, { name: name + " - Case " + caseNum });
+                }
             });
-        });
-    </script>
+        }
+    };
+})(window);
+
+Surfly.init(
+    { widget_key: "6f49d3e254784443b304e8f1c5fa3168", block_until_agent_joins: true },
+    function (initResult) {
+        if (!initResult.success || Surfly.isInsideSession) return;
+        (function (n, u) {
+            window.CXoneDfo = n;
+            window[n] = window[n] || function () { (window[n].q = window[n].q || []).push(arguments); };
+            window[n].u = u;
+            var e = document.createElement("script");
+            e.type = "module";
+            e.src = u + "?" + Math.round(Date.now() / 1e3 / 3600);
+            document.head.appendChild(e);
+        })("cxone", "https://web-modules-de-na1.niceincontact.com/loader/1/loader.js");
+        cxone("init", "1092");
+        cxone("guide", "init", "695c3a47-ffee-4f7d-9167-97fb31723506");
+        cxone("chat", "setAllowedExternalMessageTypes", ["MESSAGE_SENT", "MESSAGE_RECEIVED"]);
+        SurflyNICEBridge.init({ trigger: /cobrowse|co-browse|4-digit pin/i });
+    }
+);
+</script>
 </head>
-
 <body>
+<div class="utility">
+    <div class="container">
+        <a href="#contact">Contact an advisor</a>
+        <a href="#">Client Login</a>
+        <a href="#">Find a Professional</a>
+    </div>
+</div>
 
-    <section class="hero">
-        <div class="hero-glow"></div>
-        <div class="hero-grid"></div>
-        <div class="hero-inner">
+<header class="header">
+    <nav class="nav">
+        <a href="#" class="logo">meridian<span>.</span></a>
+        <ul class="nav-links">
+            <li><a href="#" class="active">Home</a></li>
+            <li><a href="#products">Annuities</a></li>
+            <li><a href="#planning">Retirement</a></li>
+            <li><a href="#insights">Insights</a></li>
+            <li><a href="#contact">About</a></li>
+        </ul>
+        <div class="nav-cta"><a href="#contact" class="btn btn-primary">Talk to us</a></div>
+    </nav>
+</header>
 
-            <div class="hero-left">
-                <div class="integration-badge">
-                    <div class="badge-logos">
-                        <div class="badge-logo" style="background:var(--sf-orange);">
-                            <svg width="12" height="12" viewBox="0 0 18 18" fill="none">
-                                <path d="M3 13c2-4 4-6 6-4s4-1 6-5" stroke="#fff" stroke-width="2.2"
-                                    stroke-linecap="round" />
-                            </svg>
-                        </div>
-                        <span class="badge-x">×</span>
-                        <div class="badge-logo" style="background:var(--nice-blue);">N</div>
-                    </div>
-                    <span class="badge-text">Surfly × NICE CXone Integration</span>
+<section class="hero">
+    <div class="hero-grid">
+        <div>
+            <span class="eyebrow">Retirement Income, Reimagined</span>
+            <h1>Plan for a future <em>worth waiting for.</em></h1>
+            <p>For more than three decades, we've helped families turn lifetimes of saving into lifetimes of income — with annuities, planning tools, and advice built for the years that matter most.</p>
+            <div class="hero-actions">
+                <a href="#products" class="btn btn-primary">Explore our products</a>
+                <a href="#planning" class="btn btn-secondary">Start planning</a>
+            </div>
+        </div>
+        <div class="hero-art">
+            <div class="hero-art-content">
+                <div class="stat-card">
+                    <div class="stat-num">$280B</div>
+                    <div class="stat-label">in assets under management</div>
                 </div>
+                <div class="hero-quote">Retirement isn't a finish line. It's the longest chapter you'll ever write.</div>
+            </div>
+        </div>
+    </div>
+</section>
 
-                <h1>
-                    Co-Browse, <span class="hl-orange">natively</span><br />
-                    inside <span class="hl-blue">CXone</span>
-                </h1>
+<section class="trust">
+    <div class="container">
+        <div class="trust-inner">
+            <div class="trust-label">Trusted by families since 1991</div>
+            <div class="trust-stats">
+                <div class="trust-stat"><strong>1.2M+</strong><span>Active clients</span></div>
+                <div class="trust-stat"><strong>34 yrs</strong><span>In business</span></div>
+                <div class="trust-stat"><strong>A+</strong><span>AM Best rating</span></div>
+                <div class="trust-stat"><strong>50</strong><span>States served</span></div>
+            </div>
+        </div>
+    </div>
+</section>
 
-                <p class="hero-sub">
-                    Surfly's universal co-browsing engine, embedded directly into the NICE CXone agent console. No tab
-                    switching. No plugins. One click from an active call to a live co-browse session.
-                </p>
+<section class="block" id="products">
+    <div class="container">
+        <div class="section-head">
+            <span class="eyebrow">Our Solutions</span>
+            <h2>Three ways we help you <em>retire on your terms.</em></h2>
+            <p>Whether you're saving for the future or already drawing income, our products are built around one idea: predictable outcomes, designed for people.</p>
+        </div>
+        <div class="products">
+            <div class="product-card">
+                <div class="product-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="9"/></svg></div>
+                <h3>Variable Annuities</h3>
+                <p>Tax-deferred growth potential with the flexibility to invest across more than 100 fund options.</p>
+                <a href="#contact" class="btn-ghost">Learn more</a>
+            </div>
+            <div class="product-card">
+                <div class="product-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12h18M3 6h18M3 18h12"/></svg></div>
+                <h3>Fixed Index Annuities</h3>
+                <p>Protect your principal while sharing in market gains — without the worry of market losses.</p>
+                <a href="#contact" class="btn-ghost">Learn more</a>
+            </div>
+            <div class="product-card">
+                <div class="product-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+                <h3>Income for Life</h3>
+                <p>Turn your savings into a paycheck you can count on, every month, for as long as you live.</p>
+                <a href="#contact" class="btn-ghost">Learn more</a>
+            </div>
+        </div>
+    </div>
+</section>
 
-                <div class="hero-actions">
-                    <button class="btn-cobrowse" onclick="startSurflySession()">
-                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                            <circle cx="9" cy="7" r="4" />
-                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                        </svg>
-                        Start Co-Browse Session
-                    </button>
+<section class="block" id="planning" style="background:var(--paper);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);">
+    <div class="container">
+        <div class="feature">
+            <div>
+                <span class="eyebrow">Why Meridian</span>
+                <h2>Built for the long view, not the next quarter.</h2>
+                <p style="color:var(--ink-soft);font-size:18px;margin:20px 0 28px;">We don't chase headlines or trends. We build retirement products that hold up across decades, market cycles, and the lives that depend on them.</p>
+                <ul style="list-style:none;margin-bottom:32px;">
+                    <li style="padding:14px 0;border-bottom:1px solid var(--rule);display:flex;gap:16px;align-items:flex-start;">
+                        <span style="color:var(--terracotta);font-family:'Fraunces',serif;font-size:22px;">01</span>
+                        <div><strong style="color:var(--navy-900);">Independent guidance.</strong> <span style="color:var(--ink-soft);">No proprietary funds, no quotas.</span></div>
+                    </li>
+                    <li style="padding:14px 0;border-bottom:1px solid var(--rule);display:flex;gap:16px;align-items:flex-start;">
+                        <span style="color:var(--terracotta);font-family:'Fraunces',serif;font-size:22px;">02</span>
+                        <div><strong style="color:var(--navy-900);">Transparent fees.</strong> <span style="color:var(--ink-soft);">Plain-English pricing, always.</span></div>
+                    </li>
+                    <li style="padding:14px 0;display:flex;gap:16px;align-items:flex-start;">
+                        <span style="color:var(--terracotta);font-family:'Fraunces',serif;font-size:22px;">03</span>
+                        <div><strong style="color:var(--navy-900);">Lifetime support.</strong> <span style="color:var(--ink-soft);">A real person, every time you call.</span></div>
+                    </li>
+                </ul>
+                <a href="#contact" class="btn btn-secondary">See our approach</a>
+            </div>
+            <div class="feature-art">
+                <div class="feature-art-inner">
+                    <div>
+                        <div style="font-size:13px;color:var(--ink-mute);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">Avg. retirement income growth</div>
+                        <div style="font-family:'Fraunces',serif;font-size:42px;color:var(--navy-900);">+6.4%</div>
+                    </div>
+                    <div class="feature-chart"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+                    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--ink-mute);margin-top:8px;">
+                        <span>2020</span><span>2021</span><span>2022</span><span>2023</span><span>2024</span>
+                    </div>
                 </div>
             </div>
-
         </div>
-    </section>
+    </div>
+</section>
 
-    <script>
-        function startSurflySession() {
-            if (typeof Surfly !== 'undefined' && Surfly.session) {
-                Surfly.session().startLeader();
-            }
-        }
-    </script>
+<section class="block" id="insights">
+    <div class="container">
+        <div class="section-head">
+            <span class="eyebrow">Insights</span>
+            <h2>Reading worth your <em>weekend.</em></h2>
+        </div>
+        <div class="resources">
+            <article class="resource">
+                <div class="resource-image"></div>
+                <span class="resource-tag">Retirement Income</span>
+                <h3>Five questions to ask yourself before you turn 65.</h3>
+                <p>The decisions you make in the years just before retirement often matter more than the ones that come after.</p>
+                <div class="resource-meta">8 min read · By Sarah Chen, CFP®</div>
+            </article>
+            <article class="resource">
+                <div class="resource-image"></div>
+                <span class="resource-tag">Tax Strategy</span>
+                <h3>The Roth conversion playbook for early retirees.</h3>
+                <p>How a few well-timed conversions in your 60s can shape decades of tax-free income.</p>
+                <div class="resource-meta">12 min read · By Marcus Avellán</div>
+            </article>
+            <article class="resource">
+                <div class="resource-image"></div>
+                <span class="resource-tag">Market Outlook</span>
+                <h3>Why volatility hurts retirees twice — and how to plan for it.</h3>
+                <p>Sequence-of-returns risk is the silent threat to a long retirement. Here's how to manage it.</p>
+                <div class="resource-meta">6 min read · By Priya Raman</div>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="cta-banner" id="contact">
+    <div class="container">
+        <h2>Ready to see what's <em>possible?</em></h2>
+        <p>Connect with a Meridian advisor for a no-obligation conversation about your goals, your timeline, and what comes next.</p>
+        <a href="#" class="btn btn-primary">Schedule a conversation</a>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="#" class="logo">meridian<span>.</span></a>
+                <p>Retirement planning, annuities, and lifetime income solutions for the families who built America.</p>
+            </div>
+            <div>
+                <h4>Products</h4>
+                <ul>
+                    <li><a href="#products">Variable Annuities</a></li>
+                    <li><a href="#products">Fixed Index Annuities</a></li>
+                    <li><a href="#products">Income Riders</a></li>
+                    <li><a href="#products">Life Insurance</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Leadership</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Newsroom</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Forms</a></li>
+                    <li><a href="#">File a Claim</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div>© 2026 Meridian Wealth & Retirement. All rights reserved.</div>
+            <div><a href="#">Privacy</a> · <a href="#">Terms</a> · <a href="#">Disclosures</a></div>
+        </div>
+        <div class="footer-disclaimer">
+            <strong>Demo notice:</strong> This is a fictional website created solely for demonstrating cobrowse and chat integration features. Meridian Wealth & Retirement is not a real company. All product names, statistics, and content are illustrative only.
+        </div>
+    </div>
+</footer>
 </body>
-
 </html>
