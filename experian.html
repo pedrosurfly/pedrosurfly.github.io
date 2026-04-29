@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Landing Page</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .link-button {
+      display: inline-block;
+      padding: 12px 22px;
+      text-decoration: none;
+      color: #ffffff;
+      background: #1f6feb;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: background 0.2s ease;
+    }
+
+    .link-button:hover {
+      background: #1558b0;
+    }
+  </style>
+</head>
+<body>
+  <div class="button-group">
+    <a class="link-button" href="https://www.aaa.com" target="_blank" rel="noopener noreferrer">Go to AAA</a>
+    <a class="link-button" href="https://www.experian.com" target="_blank" rel="noopener noreferrer">Go to Experian</a>
+  </div>
+</body>
+</html>
