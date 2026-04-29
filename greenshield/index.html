@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Surfly Design Test</title>
     <style>
-        
         /* General Reset */
         * {
             margin: 0;
@@ -55,17 +54,19 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(37, 99, 235, 0.18);
+            backdrop-filter: blur(2px);
             justify-content: center;
             align-items: center;
             z-index: 1000;
         }
 
         .popup-content {
-            background-color: white;
+            background-color: #ffffff;
             padding: 2rem;
-            border-radius: 5px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 14px;
+            border: 1px solid #dbe6ff;
+            box-shadow: 0 20px 50px rgba(29, 78, 216, 0.16);
             position: relative;
             max-width: 500px;
             width: 90%;
@@ -77,7 +78,87 @@
             right: 10px;
             cursor: pointer;
             font-size: 1.5rem;
-            color: #666;
+            color: #1d4ed8;
+            padding: 0 0.35rem;
+            border-radius: 6px;
+        }
+
+        .popup-close:hover {
+            background: #eff6ff;
+        }
+
+        .popup-content h2 {
+            color: #1e40af;
+            margin-bottom: 0.35rem;
+        }
+
+        .popup-content p {
+            color: #334155;
+        }
+
+        #language-select {
+            margin: 1rem 0;
+            padding: 0.5rem 0.7rem;
+            border-radius: 8px;
+            border: 1px solid #bfdbfe;
+            background: #f8fbff;
+            color: #1e3a8a;
+        }
+
+        #popup-details {
+            margin: 1rem 0;
+            font-size: 0.95rem;
+            color: #475569;
+            line-height: 1.5;
+        }
+
+        #terms-container {
+            margin: 1rem 0;
+        }
+
+        #terms-container label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #1e3a8a;
+        }
+
+        #btn-start-session,
+        #btn-cancel-session {
+            margin: 0.75rem 0.35rem 0 0;
+            padding: 0.65rem 1rem;
+            border-radius: 8px;
+            border: 0;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+
+        #btn-start-session {
+            background: #2563eb;
+            color: #fff;
+        }
+
+        #btn-start-session:hover {
+            background: #1d4ed8;
+        }
+
+        #btn-start-session:disabled {
+            background: #93c5fd;
+            cursor: not-allowed;
+        }
+
+        #btn-cancel-session {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+        }
+
+        #btn-cancel-session:hover {
+            background: #dbeafe;
+        }
+
+        #session-pin {
+            color: #1e40af;
         }
     </style>
 </head>
@@ -93,27 +174,26 @@
             <span class="popup-close" onclick="closePopup()">&times;</span>
             <h2 id="popup-title">Start Session</h2>
             <p id="popup-message">Would you like to start a new session?</p>
-            <select id="language-select" style="margin: 1rem 0; padding: 0.5rem; border-radius: 4px;"
-                onchange="updatePopupLanguage()">
+            <select id="language-select" onchange="updatePopupLanguage()">
                 <option value="en">🇬🇧 English</option>
                 <option value="fr">🇫🇷 Français</option>
             </select>
-            <p id="popup-details" style="margin: 1rem 0; font-size: 0.9rem; color: #666;"></p>
+            <p id="popup-details"></p>
             <div id="session-id" style="margin: 1rem 0; font-size: 1.2rem;"></div>
-            <div id="terms-container" style="margin: 1rem 0;">
-                <label style="display: flex; align-items: center; gap: 0.5rem;">
+            <div id="terms-container">
+                <label>
                     <input type="checkbox" id="terms-checkbox" onchange="toggleAcceptButton()">
                     <span id="terms-text">Accept the Terms & Conditions</span>
                 </label>
             </div>
-            <p id="session-pin-instruction" class="hidden" style="margin: 1rem 0 0.5rem 0; font-size: 1rem;">
+            <p id="session-pin-instruction" class="hidden" style="margin: 1rem 0 0.5rem 0;">
                 Please share with the Agent the 4-digit PIN below:
             </p>
             <p id="session-pin" class="hidden" style="margin: 1rem 0; font-size: 1.1rem; font-weight: bold;">
                 Session PIN: <span id="session-pin-value"></span>
             </p>
-            <button id="btn-start-session" style="margin: 1rem 0; padding: 0.5rem 1rem;" disabled>Agree</button>
-            <button id="btn-cancel-session" class="hidden" style="margin: 1rem 0; padding: 0.5rem 1rem;">Cancel</button>
+            <button id="btn-start-session" disabled>Agree</button>
+            <button id="btn-cancel-session" class="hidden">Cancel</button>
         </div>
     </div>
     <script>
