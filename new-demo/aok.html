@@ -4,17 +4,92 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Surfly × NICE CXone — Co-Browse Integration Demo</title>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap"
-        rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css" />
-    <script src="./nice-cxone-bridge.js"></script>
+    <title>NICE CXone Chat — Surfly Co-Browse</title>
     <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background: #ffffff;
+        }
         .be-template {
             z-index: 2147483549 !important;
         }
     </style>
+
+    <script>
+        // --- Surfly loader ---
+        (function (s, u, r, f, l, y) {
+            s[f] = s[f] || {
+                init: function () {
+                    s[f].q = arguments;
+                },
+            };
+            l = u.createElement(r);
+            y = u.getElementsByTagName(r)[0];
+            l.async = 1;
+            l.src = "https://surfly.com/surfly.js";
+            y.parentNode.insertBefore(l, y);
+        })(window, document, "script", "Surfly");
+
+        // --- Surfly × NICE CXone bridge ---
+        (function (window) {
+            window.SurflyNICEBridge = {
+                init: function (options) {
+                    options = options || {};
+
+                    var trigger = options.trigger;
+                    var matchesTrigger;
+
+                    if (typeof trigger === "function") {
+                        matchesTrigger = trigger;
+                    } else if (trigger instanceof RegExp) {
+                        matchesTrigger = function (msg) { return trigger.test(msg); };
+                    } else if (typeof trigger === "string") {
+                        matchesTrigger = function (msg) { return msg === trigger; };
+                    } else {
+                        matchesTrigger = function (msg) { return msg === "#COBROWSE#"; };
+                    }
+
+                    var customerName = null;
+                    var customerCaseNumber = null;
+
+                    window.addEventListener("message", function (event) {
+                        if (event.origin !== window.location.origin) return;
+
+                        var data = event.data;
+                        if (!data || data.actionType !== "MESSAGE_RECEIVED") return;
+
+                        var action = data.action;
+                        if (!action) return;
+
+                        if (action.direction === "inbound" && action.author && action.author.name) {
+                            customerName = action.author.name;
+                        }
+                        if (action.caseNumber) {
+                            customerCaseNumber = action.caseNumber;
+                        }
+
+                        if (!action.message || !matchesTrigger(action.message)) return;
+
+                        var name = customerName || (action.author && action.author.name) || "Customer";
+                        var caseNum = customerCaseNumber || action.caseNumber || "unknown";
+
+                        console.log("[SurflyNICEBridge] Launching co-browse", { name: name, caseNum: caseNum });
+
+                        if (typeof options.onStart === "function") {
+                            options.onStart({ name: name, caseNum: caseNum });
+                        } else {
+                            Surfly.session().startLeader(null, {
+                                name: name + " — Case " + caseNum
+                            });
+                        }
+                    });
+                }
+            };
+        })(window);
+    </script>
+
     <script>
         Surfly.init({
             widget_key: "dc666176aac94750a3c3d0c666fee484",
@@ -44,83 +119,15 @@
             cxone("chat", "init", 1022, "chat_76118f22-1610-4c39-9fbf-0c969eea3167");
             cxone("chat", "setAllowedExternalMessageTypes", ["MESSAGE_SENT", "MESSAGE_RECEIVED"]);
 
-            // One line to activate the bridge
+            // Activate the bridge
             SurflyNICEBridge.init({
                 trigger: /cobrowse|co-browse|4-digit pin/i
             });
         });
-
-        (function (s, u, r, f, l, y) {
-  s[f] = s[f] || {
-    init: function () {
-      s[f].q = arguments;
-    },
-  };
-  l = u.createElement(r);
-  y = u.getElementsByTagName(r)[0];
-  l.async = 1;
-  l.src = "https://surfly.com/surfly.js";
-  y.parentNode.insertBefore(l, y);
-})(window, document, "script", "Surfly");
     </script>
 </head>
 
 <body>
-
-    <section class="hero">
-        <div class="hero-glow"></div>
-        <div class="hero-grid"></div>
-        <div class="hero-inner">
-
-            <div class="hero-left">
-                <div class="integration-badge">
-                    <div class="badge-logos">
-                        <div class="badge-logo" style="background:var(--sf-orange);">
-                            <svg width="12" height="12" viewBox="0 0 18 18" fill="none">
-                                <path d="M3 13c2-4 4-6 6-4s4-1 6-5" stroke="#fff" stroke-width="2.2"
-                                    stroke-linecap="round" />
-                            </svg>
-                        </div>
-                        <span class="badge-x">×</span>
-                        <div class="badge-logo" style="background:var(--nice-blue);">N</div>
-                    </div>
-                    <span class="badge-text">Surfly × NICE CXone Integration</span>
-                </div>
-
-                <h1>
-                    Co-Browse, <span class="hl-orange">natively</span><br />
-                    inside <span class="hl-blue">CXone</span>
-                </h1>
-
-                <p class="hero-sub">
-                    Surfly's universal co-browsing engine, embedded directly into the NICE CXone agent console. No tab
-                    switching. No plugins. One click from an active call to a live co-browse session.
-                </p>
-
-                <div class="hero-actions">
-                    <button class="btn-cobrowse" onclick="startSurflySession()">
-                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                            <circle cx="9" cy="7" r="4" />
-                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                        </svg>
-                        Start Co-Browse Session
-                    </button>
-                </div>
-            </div>
-
-        </div>
-    </section>
-
-    <script>
-        function startSurflySession() {
-            if (typeof Surfly !== 'undefined' && Surfly.session) {
-                Surfly.session().startLeader();
-            }
-        }
-    </script>
 </body>
 
 </html>
