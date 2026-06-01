@@ -11,6 +11,14 @@
   y.parentNode.insertBefore(l, y);
 })(window, document, "script", "Surfly");
 
+// Keep the Surfly co-browse template above the CXone widget layer
+// Handling iFrame levels that conflict with Chat iFrame
+(function (u) {
+  var style = u.createElement("style");
+  style.textContent = ".be-template { z-index: 2147483549 !important; }";
+  u.head.appendChild(style);
+})(document);
+
 (function (window) {
     window.SurflyNICEBridge = {
       init: function (options) {
