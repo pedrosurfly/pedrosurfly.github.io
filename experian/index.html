@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="shortcut icon"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23632678'/%3E%3Ctext x='16' y='22' font-size='15' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'%3Ee%3C/text%3E%3C/svg%3E"
+        type="image/svg+xml">
+    <title>Experian — I-9 Video Verification</title>
+    <script>
+        var showVideoChatButton = false;
+        var nicBusNumber = '4599130';
+        var nicChatPOC = '1605d414-489c-4df4-83b1-334dbeb0ab2c';
+        var clusterNiC = 'b32';
+        var surflyWidgetKey = '134f5fd2ac8842c0a1cd6062818eee74';
+        var videoSignalerURL = "https://home-b32.nice-incontact.com/inContact/Manage/Scripts/Spawn.aspx?scriptName=Surfly_Signaler&bus_no=4599130&scriptId=197588198&skill_no=4137191&p1=&p2=&p3=&p4=&p5=&Guid=602c459a-c935-4539-9fa0-0827ab102c74";
+        var randomIdNice = '';
+        let NicHomeURL = "https://home-" + clusterNiC + ".nice-incontact.com";
+
+        /* ---------------------------------------------------------------
+         * Queue routing — each option maps to a NiC ACD skill (skill_no).
+         * Sent to the Surfly_Signaler as p4 and routed by IB_Video_WI's
+         * REQAGENT. DEFAULT_SKILL is the fallback when none is selected.
+         * --------------------------------------------------------------- */
+        var QUEUES = [
+            { label: 'Employer Representative', skill_no: '36262424' },
+            { label: 'I-9 Verification Team', skill_no: '36262425' }
+        ];
+        var DEFAULT_SKILL = '4137191';
+
+        /** Holds the skill chosen for the current session (read at session_started). */
+        var selectedSkill = DEFAULT_SKILL;
+
+        /** Page mode: 'scheduled' (join a link) or 'ondemand' (attend now). */
+        var pageMode = 'ondemand';
+
+        var chatSrc = document.createElement("script");
+        chatSrc.src = NicHomeURL + "/inContact/ChatClient/js/embed.min.js";
+
+        var head = document.getElementsByTagName("head")[0];
+        head.appendChild(chatSrc);
+
+        chatSrc.onload = function () {
+            (function (s, u, r, f, l, y) {
+                s[f] = s[f] || { init: function () { s[f].q = arguments; } };
+                l = u.createElement(r); y = u.getElementsByTagName(r)[0]; l.async = 1;
+                l.src = 'https://surfly.com/surfly.js'; y.parentNode.insertBefore(l, y);
+            })
+                (window, document, 'script', 'Surfly');
+            loadSurfly();
+        };
+
+        // Start a Work Item — skillId is passed through to NiC as p4
+        function signalWorkItem(leaderLink, skillId) {
+            randomId();
+            console.log('signal Work Item, skill:', skillId);
+            var url = new URL(videoSignalerURL);
+            url.searchParams.set('p1', 'startWorkItem');
+            url.searchParams.set('p2', leaderLink);
+            url.searchParams.set('p3', randomIdNice);
+            url.searchParams.set('p4', skillId || DEFAULT_SKILL);
+            fetch(url, { mode: "no-cors" });
+        }
+
+        // End a workItem
+        function endWorkItem(leaderLink) {
+            console.log('End Work Item', randomIdNice);
+            var url = new URL(videoSignalerURL);
+            url.searchParams.set('p1', 'endWorkItem');
+            url.searchParams.set('p2', leaderLink);
+            url.searchParams.set('p3', randomIdNice);
+            fetch(url, { mode: "no-cors" });
+        }
+
+         // Create Videochat Session
+        function createVideochatSession() {
+            var access = (pageMode === 'scheduled') ? validateScheduleAccess() : validateOnDemandAccess();
+            if (!access.ok) {
+                if (pageMode === 'scheduled') { applyJoinGate(); } else { applyOnDemandGate(); }
+                return;
+            }
+            // Lock in the chosen queue for this session
+            selectedSkill = getSelectedSkill();
+
+            var videochatSession = Surfly.session({
+                block_until_agent_joins: false,
+                hide_until_agent_joins: true,
+                videochat_autostart: true,
+                start_with_fullscreen_videochat: true,
+                videochat_prompt: true,
+                start_muted: false,
+                anyone_can_deactivate_space: true,
+            });
+
+            videochatSession.on("session_created", function (session, event) {
+                console.log('Waiting for confirmation');
+                session.startLeader(null, { name: "Agent" });
+            }).on("session_started", function (session, event) {
+                var surflySessionPin = session.pin;
+                var surflyLeaderLink = session.followerLink;
+                signalWorkItem(surflyLeaderLink, selectedSkill);
+                console.log("Videochat session started");
+                console.log('Session Pin: ' + surflySessionPin);
+                // Display the Queue Spinner
+                var spinner = document.querySelector("#spinner-container");
+                spinner.classList.remove("hidden");
+
+                var cancelButton = document.querySelector("#btn-cancel-session");
+                // If the Cancel button is clicked, end the work item and end the session
+                cancelButton.addEventListener("click", function () {
+                    session.end();
+                });
+
+                // Remove the card
+                var card = document.querySelector("#start-button");
+                card.classList.add("hidden");
+            }).on("viewer_joined", function (session, event) {
+                window.nicVideochatContactId = event.userData.contactId;
+            }).on("session_ended", function (session, event) {
+                console.log("Videochat session ended", event, session);
+
+                endWorkItem(session.followerLink);
+
+                // Remove the Queue Spinner
+                var spinner = document.querySelector("#spinner-container");
+                spinner.classList.add("hidden");
+                // Show the card again
+                var card = document.querySelector("#start-button");
+                card.classList.remove("hidden");
+            }).create();
+        };
+
+        function cancelSession() {
+            console.log("Canceling session...");
+            var currentSession = Surfly.session();
+            if (currentSession) {
+                currentSession.end();
+            }
+        }
+
+
+        function loadSurfly() {
+            // Setup settings from API
+            var settings = {
+                widget_key: surflyWidgetKey,
+                auto_restore: false,
+                session_start_confirmation: false,
+                hidden: false,
+                disable_end_redirect: true,
+                require_password: false,
+                agent_can_request_control: true,
+                automated_session_recording_enabled: true,
+                end_redirect_enabled: true,
+                new_urls_allowed: true,
+                non_hosts_can_open_tabs: true,
+            };
+
+            Surfly.init(settings, function (initResult) {
+                if (initResult.success) {
+                    if (!Surfly.isInsideSession) {
+
+                        if (localStorage.getItem(nicBusNumber + "-uniquePageId")) {
+                            console.log("random: " + localStorage.getItem(nicBusNumber + "-uniquePageId"));
+                        } else {
+                            let randomString = Math.random().toString(36).substring(7);
+                            let dateNow = Date.now();
+                            let uniquePageId = randomString + "-" + dateNow;
+
+                            console.log("random: " + uniquePageId);
+
+                            localStorage.setItem(nicBusNumber + "-uniquePageId", uniquePageId);
+                        }
+
+                    }
+                }
+            });
+        }
+
+        function randomId() {
+            console.log('it got here');
+            let randomString = Math.random().toString(36).substring(7);
+            let dateNow = Date.now();
+            let uniquePageId = randomString + "-" + dateNow;
+            console.log("random ID for Nice: " + uniquePageId);
+            randomIdNice = uniquePageId;
+        }
+
+        /* ===============================================================
+         * Mode + access logic
+         *  - scheduled : URL has date + time  -> join-window gate (GMT+1)
+         *  - ondemand  : no schedule params   -> chooser (now / schedule)
+         * =============================================================== */
+
+        /** Scheduled slot is interpreted as wall time in fixed GMT+1 (UTC+01:00, no DST). */
+        var SCHEDULE_GMT1_OFFSET = '+01:00';
+
+        /** Join window: minutes before / after scheduled instant (GMT+1). */
+        var SCHEDULE_JOIN_EARLY_MIN = 2;
+        var SCHEDULE_JOIN_LATE_MIN = 5;
+
+        /** On-demand working hours, as wall time in GMT+1. */
+        var WORK_DAYS = [1, 2, 3, 4, 5]; // Mon–Fri (0 = Sun)
+        var WORK_START_GMT1 = 9;         // 09:00 inclusive
+        var WORK_END_GMT1 = 17;          // 17:00 exclusive
+
+        function pad2(n) { return n < 10 ? '0' + n : String(n); }
+
+        function getQueryParams() {
+            var params = new URLSearchParams(window.location.search);
+            return {
+                name: (params.get('name') || '').trim(),
+                email: (params.get('email') || '').trim(),
+                date: (params.get('date') || '').trim(),
+                time: (params.get('time') || '').trim(),
+                queue: (params.get('queue') || '').trim()
+            };
+        }
+
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        /** Now expressed as wall-clock parts in fixed GMT+1 (no DST). */
+        function nowGmtPlus1() {
+            return new Date(Date.now() + 60 * 60 * 1000); // shift UTC by +1h; read with getUTC*
+        }
+
+        function isWithinWorkingHours() {
+            var d = nowGmtPlus1();
+            if (WORK_DAYS.indexOf(d.getUTCDay()) === -1) return false;
+            var h = d.getUTCHours();
+            return h >= WORK_START_GMT1 && h < WORK_END_GMT1;
+        }
+
+        /**
+         * Parses date (YYYY-MM-DD) and time (HH:mm or HH:mm:ss) as wall clock in GMT+1 (UTC+01:00).
+         * Returns Date (absolute instant) or null if invalid.
+         */
+        function parseScheduledGmtPlus1(dateStr, timeStr) {
+            if (!dateStr || !timeStr) return null;
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return null;
+            var tp = timeStr.split(':').map(function (x) { return x.trim(); });
+            if (tp.length < 2 || tp.length > 3) return null;
+            var h = parseInt(tp[0], 10), m = parseInt(tp[1], 10), s = tp[2] !== undefined ? parseInt(tp[2], 10) : 0;
+            if (isNaN(h) || isNaN(m) || isNaN(s) || h < 0 || h > 23 || m < 0 || m > 59 || s < 0 || s > 59) return null;
+            var t = pad2(h) + ':' + pad2(m) + ':' + pad2(s);
+            var iso = dateStr + 'T' + t + SCHEDULE_GMT1_OFFSET;
+            var d = new Date(iso);
+            if (isNaN(d.getTime())) return null;
+            return d;
+        }
+
+        function validateScheduleAccess() {
+            var q = getQueryParams();
+            if (!q.name || !q.email || !q.date || !q.time) {
+                return { ok: false, reason: 'missing', message: 'This link is incomplete. It should include your name, email, date, and time.' };
+            }
+            if (!isValidEmail(q.email)) {
+                return { ok: false, reason: 'email', message: 'The email in this link does not look valid.' };
+            }
+            var scheduled = parseScheduledGmtPlus1(q.date, q.time);
+            if (!scheduled) {
+                return { ok: false, reason: 'datetime', message: 'The date or time in this link is not valid. Use YYYY-MM-DD and HH:mm (24h), interpreted as GMT+1.' };
+            }
+            var now = Date.now();
+            var start = scheduled.getTime() - SCHEDULE_JOIN_EARLY_MIN * 60 * 1000;
+            var end = scheduled.getTime() + SCHEDULE_JOIN_LATE_MIN * 60 * 1000;
+            if (now < start) {
+                return { ok: false, reason: 'early', message: 'This session is not open yet. Video chat opens ' + SCHEDULE_JOIN_EARLY_MIN + ' minutes before your scheduled time (GMT+1).' };
+            }
+            if (now > end) {
+                return { ok: false, reason: 'late', message: 'This scheduled session window has ended (' + SCHEDULE_JOIN_LATE_MIN + ' minutes after your GMT+1 time). Please request a new link.' };
+            }
+            return { ok: true, scheduled: scheduled, query: q };
+        }
+
+        function validateOnDemandAccess() {
+            if (!isWithinWorkingHours()) {
+                return { ok: false, reason: 'hours', message: 'Live verification is available Monday–Friday, 9:00–17:00 (GMT+1). Outside these hours, please schedule a time instead.' };
+            }
+            var name = (document.getElementById('od-name') || {}).value || '';
+            var email = (document.getElementById('od-email') || {}).value || '';
+            name = name.trim(); email = email.trim();
+            if (!name) {
+                return { ok: false, reason: 'name', message: 'Please enter your full name to continue.' };
+            }
+            if (!isValidEmail(email)) {
+                return { ok: false, reason: 'email', message: 'Please enter a valid email address to continue.' };
+            }
+            return { ok: true, query: { name: name, email: email } };
+        }
+
+        function getSelectedSkill() {
+            var id = (pageMode === 'scheduled') ? 'join-queue' : 'od-queue';
+            var sel = document.getElementById(id);
+            return (sel && sel.value) ? sel.value : DEFAULT_SKILL;
+        }
+
+        function populateQueues(selectId, preselect) {
+            var sel = document.getElementById(selectId);
+            if (!sel) return;
+            sel.innerHTML = '';
+            QUEUES.forEach(function (q) {
+                var o = document.createElement('option');
+                o.value = q.skill_no;
+                o.textContent = q.label;
+                if (preselect && preselect === q.skill_no) o.selected = true;
+                sel.appendChild(o);
+            });
+        }
+
+        /* ---------------- Gates ---------------- */
+
+        function applyJoinGate() {
+            var q = getQueryParams();
+            var btn = document.getElementById('joinStartBtn');
+            var statusEl = document.getElementById('join-status');
+            var guestEl = document.getElementById('join-guest');
+            var result = validateScheduleAccess();
+
+            if (guestEl) guestEl.textContent = q.name ? 'Welcome, ' + q.name + '.' : '';
+            if (!btn || !statusEl) return;
+
+            if (result.ok) {
+                btn.disabled = false;
+                btn.removeAttribute('aria-disabled');
+                statusEl.textContent = 'You are within your join window (' + SCHEDULE_JOIN_EARLY_MIN + ' min before–' + SCHEDULE_JOIN_LATE_MIN + ' min after your GMT+1 time). Start when you are ready.';
+                statusEl.className = 'schedule-status schedule-status--ok';
+            } else {
+                btn.disabled = true;
+                btn.setAttribute('aria-disabled', 'true');
+                statusEl.textContent = result.message;
+                statusEl.className = 'schedule-status schedule-status--bad';
+            }
+        }
+
+        function applyOnDemandGate() {
+            var btn = document.getElementById('odStartBtn');
+            var statusEl = document.getElementById('ondemand-status');
+            var result = validateOnDemandAccess();
+            if (!btn || !statusEl) return;
+
+            if (result.ok) {
+                btn.disabled = false;
+                btn.removeAttribute('aria-disabled');
+                statusEl.textContent = 'You are ready to connect. Choose who to meet with, then start your verification.';
+                statusEl.className = 'schedule-status schedule-status--ok';
+            } else {
+                btn.disabled = true;
+                btn.setAttribute('aria-disabled', 'true');
+                statusEl.textContent = result.message;
+                statusEl.className = 'schedule-status schedule-status--bad';
+            }
+        }
+
+        /* ---------------- Chooser ---------------- */
+
+        function chooseMode(mode) {
+            var pNow = document.getElementById('panel-ondemand');
+            var pSch = document.getElementById('panel-schedule');
+            var cNow = document.getElementById('choice-now');
+            var cSch = document.getElementById('choice-schedule');
+
+            if (mode === 'now') {
+                pageMode = 'ondemand';
+                pNow.classList.remove('hidden');
+                pSch.classList.add('hidden');
+                cNow.classList.add('choice-card--active');
+                cSch.classList.remove('choice-card--active');
+                applyOnDemandGate();
+            } else {
+                pSch.classList.remove('hidden');
+                pNow.classList.add('hidden');
+                cSch.classList.add('choice-card--active');
+                cNow.classList.remove('choice-card--active');
+            }
+        }
+
+        /* ---------------- Schedule link generator ---------------- */
+
+        function prefillScheduleDefaults() {
+            var d = nowGmtPlus1();
+            var dateEl = document.getElementById('sc-date');
+            var timeEl = document.getElementById('sc-time');
+            if (dateEl) dateEl.value = d.getUTCFullYear() + '-' + pad2(d.getUTCMonth() + 1) + '-' + pad2(d.getUTCDate());
+            if (timeEl) timeEl.value = pad2(d.getUTCHours()) + ':' + pad2(d.getUTCMinutes());
+        }
+
+        function baseUrl() {
+            return window.location.href.split('#')[0].split('?')[0];
+        }
+
+        function generateScheduleLink() {
+            var name = (document.getElementById('sc-name').value || '').trim();
+            var email = (document.getElementById('sc-email').value || '').trim();
+            var date = (document.getElementById('sc-date').value || '').trim();
+            var time = (document.getElementById('sc-time').value || '').trim();
+            var queue = document.getElementById('sc-queue').value;
+            var err = document.getElementById('sc-error');
+            var resultBox = document.getElementById('sc-result');
+
+            function fail(msg) {
+                err.textContent = msg;
+                resultBox.classList.add('hidden');
+            }
+
+            if (!name) return fail('Please enter the full name.');
+            if (!isValidEmail(email)) return fail('Please enter a valid email address.');
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return fail('Please pick a date.');
+            if (!parseScheduledGmtPlus1(date, time)) return fail('Please pick a valid time.');
+
+            err.textContent = '';
+
+            var p = new URLSearchParams();
+            p.set('name', name);
+            p.set('email', email);
+            p.set('date', date);
+            p.set('time', time);
+            p.set('queue', queue);
+            var url = baseUrl() + '?' + p.toString();
+
+            document.getElementById('sc-url').value = url;
+            resultBox.classList.remove('hidden');
+        }
+
+        function copyScheduleLink() {
+            var input = document.getElementById('sc-url');
+            var feedback = document.getElementById('sc-copied');
+            input.select();
+            input.setSelectionRange(0, 99999);
+            var done = function () { feedback.textContent = 'Copied!'; setTimeout(function () { feedback.textContent = ''; }, 2000); };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(input.value).then(done, function () { try { document.execCommand('copy'); done(); } catch (e) {} });
+            } else {
+                try { document.execCommand('copy'); done(); } catch (e) {}
+            }
+        }
+
+        function openScheduleLink() {
+            var url = document.getElementById('sc-url').value;
+            if (url) window.open(url, '_blank');
+        }
+
+        /* ---------------- Init ---------------- */
+
+        function initPage() {
+            var q = getQueryParams();
+            var tagline = document.getElementById('hero-tagline');
+
+            if (q.date && q.time) {
+                // JOIN mode — a generated/scheduled link was opened
+                pageMode = 'scheduled';
+                document.getElementById('screen-join').classList.remove('hidden');
+                populateQueues('join-queue', q.queue);
+                tagline.innerHTML = 'Your scheduled appointment time is interpreted as <strong>GMT+1</strong> (UTC+01:00). When your join window opens, start the verification below.';
+                applyJoinGate();
+            } else {
+                // CHOOSER mode — attend now or schedule a link
+                pageMode = 'ondemand';
+                document.getElementById('screen-choice').classList.remove('hidden');
+                populateQueues('od-queue', '');
+                populateQueues('sc-queue', '');
+                prefillScheduleDefaults();
+                tagline.innerHTML = 'Complete <strong>Section 2</strong> of your Form I-9 with a representative. Connect now, or schedule a time and share the link.';
+
+                document.getElementById('od-name').addEventListener('input', applyOnDemandGate);
+                document.getElementById('od-email').addEventListener('input', applyOnDemandGate);
+                document.getElementById('od-queue').addEventListener('change', applyOnDemandGate);
+            }
+        }
+    </script>
+</head>
+
+<body class="pagecontainer">
+    <main class="card" id="start-button">
+        <div class="brandbar">
+            <span class="exp-wordmark">experian<span class="exp-dot">.</span></span>
+            <span class="exp-divider" aria-hidden="true"></span>
+            <span class="exp-product">Form I-9 Verification</span>
+        </div>
+
+        <header class="hero" aria-label="I-9 video verification">
+            <p class="eyebrow">Section 2 · Employment Eligibility</p>
+            <h1 class="title">
+                <span class="title__glow">Video Verification</span>
+                <span class="title__sub">Complete your Form I-9 with a representative</span>
+            </h1>
+            <p class="tagline" id="hero-tagline"></p>
+        </header>
+
+        <!-- ============ JOIN screen (opened via a scheduled link) ============ -->
+        <section id="screen-join" class="screen hidden">
+            <p class="guest-line" id="join-guest" aria-live="polite"></p>
+            <label class="field">
+                <span class="field-label">Connecting you with</span>
+                <div class="select-wrap"><select id="join-queue" class="select-input"></select></div>
+            </label>
+            <p class="schedule-status schedule-status--bad" id="join-status" role="status">Checking your link…</p>
+            <button type="button" onclick="createVideochatSession()" class="start-button" id="joinStartBtn" disabled aria-disabled="true">
+                Start Video Verification
+            </button>
+        </section>
+
+        <!-- ============ CHOOSER screen (no params) ============ -->
+        <section id="screen-choice" class="screen hidden">
+            <div class="choice-grid">
+                <button type="button" class="choice-card" id="choice-now" onclick="chooseMode('now')">
+                    <span class="choice-icon" aria-hidden="true">▶</span>
+                    <span class="choice-title">Attend now</span>
+                    <span class="choice-sub">Connect with a representative right away</span>
+                </button>
+                <button type="button" class="choice-card" id="choice-schedule" onclick="chooseMode('schedule')">
+                    <span class="choice-icon" aria-hidden="true">🗓</span>
+                    <span class="choice-title">Schedule for later</span>
+                    <span class="choice-sub">Generate a link for a future time</span>
+                </button>
+            </div>
+
+            <!-- On-demand panel -->
+            <div id="panel-ondemand" class="panel hidden">
+                <div class="field-group">
+                    <label class="field">
+                        <span class="field-label">Full Name</span>
+                        <input type="text" id="od-name" class="text-input" placeholder="e.g. Jordan Smith" autocomplete="name">
+                    </label>
+                    <label class="field">
+                        <span class="field-label">Email</span>
+                        <input type="email" id="od-email" class="text-input" placeholder="you@example.com" autocomplete="email">
+                    </label>
+                </div>
+                <label class="field">
+                    <span class="field-label">Who would you like to meet with?</span>
+                    <div class="select-wrap"><select id="od-queue" class="select-input"></select></div>
+                </label>
+                <p class="schedule-status schedule-status--bad" id="ondemand-status" role="status"></p>
+                <button type="button" onclick="createVideochatSession()" class="start-button" id="odStartBtn" disabled aria-disabled="true">
+                    Start Video Verification
+                </button>
+            </div>
+
+            <!-- Schedule (link generator) panel -->
+            <div id="panel-schedule" class="panel hidden">
+                <div class="field-group">
+                    <label class="field">
+                        <span class="field-label">Full Name</span>
+                        <input type="text" id="sc-name" class="text-input" placeholder="e.g. Jordan Smith" autocomplete="name">
+                    </label>
+                    <label class="field">
+                        <span class="field-label">Email</span>
+                        <input type="email" id="sc-email" class="text-input" placeholder="customer@example.com" autocomplete="email">
+                    </label>
+                </div>
+                <div class="field-row">
+                    <label class="field">
+                        <span class="field-label">Date (GMT+1)</span>
+                        <input type="date" id="sc-date" class="text-input">
+                    </label>
+                    <label class="field">
+                        <span class="field-label">Time (GMT+1)</span>
+                        <input type="time" id="sc-time" class="text-input">
+                    </label>
+                </div>
+                <label class="field">
+                    <span class="field-label">Route to</span>
+                    <div class="select-wrap"><select id="sc-queue" class="select-input"></select></div>
+                </label>
+                <p class="hint">Time is interpreted as <strong>GMT+1</strong>. The join window opens 2 min before and closes 5 min after.</p>
+                <p class="form-error" id="sc-error" role="alert"></p>
+                <button type="button" onclick="generateScheduleLink()" class="start-button" id="genBtn">
+                    Schedule Session
+                </button>
+
+                <div id="sc-result" class="result-box hidden">
+                    <span class="field-label">Shareable link</span>
+                    <input type="text" id="sc-url" class="text-input" readonly onclick="this.select()">
+                    <div class="result-actions">
+                        <button type="button" class="mini-btn" onclick="copyScheduleLink()">Copy</button>
+                        <button type="button" class="mini-btn mini-btn--ghost" onclick="openScheduleLink()">Open in new tab</button>
+                        <span class="copied" id="sc-copied" aria-live="polite"></span>
+                    </div>
+                    <p class="hint">Share this with the customer. Open it in another tab to preview their experience.</p>
+                </div>
+            </div>
+        </section>
+
+        <p class="legal-note">Secure, recorded session for I-9 document verification. All times are shown in GMT+1 (UTC+01:00).</p>
+    </main>
+
+    <div id="spinner-container" class="hidden">
+        <div id="spinner">
+            <div class="loader"></div>
+            <p class="text-queue">Please wait to be connected</p>
+            <button type="button" class="cancel-button" id="btn-cancel-session" onclick="cancelSession()">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        initPage();
+    </script>
+</body>
+<style>
+    :root {
+        --exp-purple: #632678;
+        --exp-purple-deep: #41184e;
+        --exp-violet: #7d2e8e;
+        --exp-magenta: #e6328c;
+        --exp-blue: #2e5bbf;
+        --ink: #2b2433;
+        --text-grey: #5a5368;
+        --line: #e7e1ee;
+        --surface: #ffffff;
+        --amn-font: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif, BlinkMacSystemFont, Helvetica Neue, Arial, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        font-family: 'Outfit', var(--amn-font);
+        color: var(--ink);
+    }
+
+    .pagecontainer {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 2rem 1.25rem;
+        background:
+            radial-gradient(1200px 600px at 50% -10%, rgba(99, 38, 120, 0.10), transparent 60%),
+            radial-gradient(900px 500px at 90% 110%, rgba(46, 91, 191, 0.08), transparent 55%),
+            #f6f3fa;
+    }
+
+    .card {
+        width: 100%;
+        max-width: 34rem;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        padding: 2.25rem 2rem 1.75rem;
+        box-shadow: 0 24px 60px -28px rgba(65, 24, 78, 0.45);
+        animation: fade-up 0.6s ease-out both;
+    }
+
+    .brandbar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.85rem;
+        margin-bottom: 1.75rem;
+    }
+
+    .exp-wordmark {
+        font-family: 'Syne', sans-serif;
+        font-weight: 800;
+        font-size: 1.5rem;
+        letter-spacing: -0.02em;
+        color: var(--exp-purple);
+    }
+
+    .exp-dot { color: var(--exp-magenta); }
+
+    .exp-divider {
+        width: 1px;
+        height: 1.25rem;
+        background: var(--line);
+    }
+
+    .exp-product {
+        font-size: 0.82rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-grey);
+    }
+
+    .hero { margin: 0 auto 1.5rem; }
+
+    .eyebrow {
+        font-size: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--exp-violet);
+        margin: 0 0 0.65rem;
+    }
+
+    .title {
+        font-family: 'Syne', sans-serif;
+        font-size: clamp(2.1rem, 6vw, 2.9rem);
+        font-weight: 800;
+        line-height: 1.08;
+        margin: 0 0 1rem;
+    }
+
+    .title__glow {
+        display: inline-block;
+        background: linear-gradient(120deg, var(--exp-purple) 0%, var(--exp-violet) 45%, var(--exp-magenta) 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .title__sub {
+        display: block;
+        font-family: 'Outfit', sans-serif;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: var(--text-grey);
+        margin-top: 0.5rem;
+    }
+
+    .tagline {
+        font-size: 1.02rem;
+        color: var(--text-grey);
+        line-height: 1.55;
+        margin: 0;
+    }
+
+    @keyframes fade-up {
+        from { opacity: 0; transform: translateY(12px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Chooser */
+    .choice-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.9rem;
+        margin: 1.5rem 0 0.5rem;
+    }
+
+    .choice-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.4rem;
+        text-align: center;
+        background: #fbf9fd;
+        border: 1.5px solid var(--line);
+        border-radius: 16px;
+        padding: 1.25rem 1rem;
+        cursor: pointer;
+        font-family: inherit;
+        transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s, background 0.2s;
+    }
+
+    .choice-card:hover {
+        transform: translateY(-2px);
+        border-color: var(--exp-violet);
+    }
+
+    .choice-card--active {
+        border-color: var(--exp-purple);
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(99, 38, 120, 0.15);
+    }
+
+    .choice-icon {
+        font-size: 1.4rem;
+        color: var(--exp-purple);
+    }
+
+    .choice-title {
+        font-weight: 700;
+        font-size: 1.05rem;
+        color: var(--ink);
+    }
+
+    .choice-sub {
+        font-size: 0.82rem;
+        color: var(--text-grey);
+        line-height: 1.4;
+    }
+
+    .panel {
+        margin-top: 1.25rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid var(--line);
+        animation: fade-up 0.4s ease-out both;
+    }
+
+    /* Fields */
+    .field-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .field-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.9rem;
+    }
+
+    .field {
+        display: block;
+        text-align: left;
+        margin: 0.9rem 0 0;
+    }
+
+    .field-label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--ink);
+        margin-bottom: 0.4rem;
+    }
+
+    .text-input,
+    .select-input {
+        width: 100%;
+        font-family: inherit;
+        font-size: 1rem;
+        color: var(--ink);
+        background: #fbf9fd;
+        border: 1.5px solid var(--line);
+        border-radius: 12px;
+        padding: 0.8rem 0.95rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .text-input::placeholder { color: #a79fb3; }
+
+    .text-input:focus,
+    .select-input:focus {
+        outline: none;
+        border-color: var(--exp-violet);
+        box-shadow: 0 0 0 3px rgba(125, 46, 142, 0.15);
+        background: #fff;
+    }
+
+    .select-wrap { position: relative; }
+
+    .select-wrap::after {
+        content: "";
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        width: 0.55rem;
+        height: 0.55rem;
+        border-right: 2px solid var(--exp-violet);
+        border-bottom: 2px solid var(--exp-violet);
+        transform: translateY(-65%) rotate(45deg);
+        pointer-events: none;
+    }
+
+    .select-input {
+        appearance: none;
+        -webkit-appearance: none;
+        cursor: pointer;
+        padding-right: 2.5rem;
+    }
+
+    .hint {
+        font-size: 0.8rem;
+        color: var(--text-grey);
+        line-height: 1.5;
+        text-align: left;
+        margin: 0.9rem 0 0;
+    }
+
+    .form-error {
+        font-size: 0.9rem;
+        color: #b3245f;
+        text-align: left;
+        margin: 0.6rem 0 0;
+        min-height: 1.1em;
+    }
+
+    .guest-line {
+        font-size: 1.15rem;
+        font-weight: 600;
+        color: var(--exp-purple);
+        margin: 0 0 0.75rem;
+        min-height: 1.2em;
+    }
+
+    .schedule-status {
+        font-size: 0.98rem;
+        line-height: 1.5;
+        margin: 1.25rem 0;
+        padding: 0.75rem 1rem;
+        border-radius: 12px;
+        text-align: center;
+    }
+
+    .schedule-status--ok {
+        color: #155e3a;
+        background: rgba(21, 94, 58, 0.08);
+        border: 1px solid rgba(21, 94, 58, 0.2);
+    }
+
+    .schedule-status--bad {
+        color: #7a2150;
+        background: rgba(230, 50, 140, 0.10);
+        border: 1px solid rgba(230, 50, 140, 0.25);
+    }
+
+    .start-button {
+        width: 100%;
+        margin-top: 1.25rem;
+        background: linear-gradient(120deg, var(--exp-purple) 0%, var(--exp-violet) 100%);
+        color: #fff;
+        border-radius: 14px;
+        border: none;
+        padding: 1rem 2rem;
+        font-family: inherit;
+        font-size: 1.2rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.15s, box-shadow 0.2s;
+        box-shadow: 0 14px 30px -12px rgba(99, 38, 120, 0.6);
+    }
+
+    .start-button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 18px 36px -12px rgba(99, 38, 120, 0.7);
+    }
+
+    .start-button:disabled {
+        background: #d9d2e2;
+        color: #8c8499;
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+    }
+
+    /* Generated-link result */
+    .result-box {
+        margin-top: 1.25rem;
+        padding: 1rem;
+        border: 1px dashed var(--exp-violet);
+        border-radius: 14px;
+        background: #faf6fc;
+        text-align: left;
+    }
+
+    .result-box .text-input {
+        margin-top: 0.4rem;
+        font-size: 0.85rem;
+        background: #fff;
+    }
+
+    .result-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin-top: 0.7rem;
+        flex-wrap: wrap;
+    }
+
+    .mini-btn {
+        font-family: inherit;
+        font-size: 0.9rem;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        background: var(--exp-purple);
+        color: #fff;
+        transition: background 0.2s;
+    }
+
+    .mini-btn:hover { background: var(--exp-purple-deep); }
+
+    .mini-btn--ghost {
+        background: #fff;
+        color: var(--exp-purple);
+        border: 1.5px solid var(--exp-purple);
+    }
+
+    .mini-btn--ghost:hover { background: #f1e8f5; }
+
+    .copied {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #155e3a;
+    }
+
+    .legal-note {
+        font-size: 0.78rem;
+        color: #9a92a8;
+        line-height: 1.5;
+        margin: 1.5rem 0 0;
+    }
+
+    /* Spinner / queue */
+    #spinner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .loader {
+        border: 14px solid #efe9f4;
+        border-radius: 50%;
+        border-top: 14px solid var(--exp-purple);
+        border-bottom: 14px solid var(--exp-magenta);
+        border-left: 14px solid var(--exp-violet);
+        border-right: 14px solid var(--exp-blue);
+        width: 110px;
+        height: 110px;
+        -webkit-animation: spin 1.6s linear infinite;
+        animation: spin 1.6s linear infinite;
+    }
+
+    @-webkit-keyframes spin {
+        0% { -webkit-transform: rotate(0deg); }
+        100% { -webkit-transform: rotate(360deg); }
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .text-queue {
+        font-size: 1.35rem;
+        color: var(--exp-purple);
+        font-weight: 600;
+        margin: 1.5rem 0;
+    }
+
+    .cancel-button {
+        background: #fff;
+        color: var(--exp-purple);
+        border-radius: 14px;
+        border: 2px solid var(--exp-purple);
+        padding: 0.8rem 2rem;
+        font-family: inherit;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.25s, color 0.25s;
+    }
+
+    .cancel-button:hover {
+        background: var(--exp-purple);
+        color: #fff;
+    }
+
+    .hidden { display: none; }
+
+    @media (max-width: 30rem) {
+        .choice-grid { grid-template-columns: 1fr; }
+    }
+</style>
+
+</html>
