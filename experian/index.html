@@ -79,8 +79,9 @@
                 if (pageMode === 'scheduled') { applyJoinGate(); } else { applyOnDemandGate(); }
                 return;
             }
-            // Lock in the chosen queue for this session
+            // Lock in the chosen queue + participant name for this session
             selectedSkill = getSelectedSkill();
+            var participantName = (access.query && access.query.name) ? access.query.name : 'Customer';
 
             var videochatSession = Surfly.session({
                 block_until_agent_joins: false,
@@ -94,7 +95,7 @@
 
             videochatSession.on("session_created", function (session, event) {
                 console.log('Waiting for confirmation');
-                session.startLeader(null, { name: "Agent" });
+                session.startLeader(null, { name: participantName });
             }).on("session_started", function (session, event) {
                 var surflySessionPin = session.pin;
                 var surflyLeaderLink = session.followerLink;
