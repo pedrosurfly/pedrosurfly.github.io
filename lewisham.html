@@ -5,17 +5,48 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Surfly × NICE CXone — Co-Browse Integration Demo</title>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap"
-        rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css" />
-    <script src="./nice-cxone-bridge.js"></script>
     <style>
-        .be-template {
-            z-index: 2147483549 !important;
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0d1117;
+            font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+        }
+        .btn-cobrowse {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 17px;
+            font-weight: 600;
+            color: #fff;
+            background: linear-gradient(135deg, #ff5a1f, #ff7a3c);
+            border: none;
+            border-radius: 10px;
+            padding: 16px 30px;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(255, 90, 31, 0.4);
+            transition: transform 0.08s ease, box-shadow 0.15s ease;
+        }
+        .btn-cobrowse:hover {
+            box-shadow: 0 10px 30px rgba(255, 90, 31, 0.55);
+        }
+        .btn-cobrowse:active {
+            transform: translateY(1px);
         }
     </style>
     <script>
+        // Load the Surfly snippet
+        (function (s, u, r, f, l, y) {
+            s[f] = s[f] || { init: function () { s[f].q = arguments } };
+            l = u.createElement(r); y = u.getElementsByTagName(r)[0]; l.async = 1;
+            l.src = 'https://surfly.com/surfly.js'; y.parentNode.insertBefore(l, y);
+        })(window, document, 'script', 'Surfly');
+
         Surfly.init({
             widget_key: "2df9c6184f68404e99ac2691d3535f1e",
             block_until_agent_joins: true
@@ -27,52 +58,16 @@
 
 <body>
 
-    <section class="hero">
-        <div class="hero-glow"></div>
-        <div class="hero-grid"></div>
-        <div class="hero-inner">
-
-            <div class="hero-left">
-                <div class="integration-badge">
-                    <div class="badge-logos">
-                        <div class="badge-logo" style="background:var(--sf-orange);">
-                            <svg width="12" height="12" viewBox="0 0 18 18" fill="none">
-                                <path d="M3 13c2-4 4-6 6-4s4-1 6-5" stroke="#fff" stroke-width="2.2"
-                                    stroke-linecap="round" />
-                            </svg>
-                        </div>
-                        <span class="badge-x">×</span>
-                        <div class="badge-logo" style="background:var(--nice-blue);">N</div>
-                    </div>
-                    <span class="badge-text">Surfly × NICE CXone Integration</span>
-                </div>
-
-                <h1>
-                    Co-Browse, <span class="hl-orange">natively</span><br />
-                    inside <span class="hl-blue">CXone</span>
-                </h1>
-
-                <p class="hero-sub">
-                    Surfly's universal co-browsing engine, embedded directly into the NICE CXone agent console. No tab
-                    switching. No plugins. One click from an active call to a live co-browse session.
-                </p>
-
-                <div class="hero-actions">
-                    <button class="btn-cobrowse" onclick="startSurflySession()">
-                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                            <circle cx="9" cy="7" r="4" />
-                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                        </svg>
-                        Start Co-Browse Session
-                    </button>
-                </div>
-            </div>
-
-        </div>
-    </section>
+    <button class="btn-cobrowse" onclick="startSurflySession()">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+        Start Co-Browse Session
+    </button>
 
     <script>
         function startSurflySession() {
