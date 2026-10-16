@@ -161,17 +161,24 @@ const CH = 'wf-cmd-landing';
 // =====================================================================
 // NAMESPACE SHIM: classic `Surfly` vs current `webfuse` global
 // =====================================================================
-function haveGlobal(){
-  return (window.webfuse && window.webfuse.initSpace) ||
-         (window.Surfly && (window.Surfly.listSessions || window.Surfly.isInsideSession !== undefined));
+function realGlobal(){
+  const w = window.webfuse, s = window.Surfly;
+  if (w && (w.currentSession || w.isInsideSession !== undefined || w.initSpace || w.listSessions)) return w;
+  if (s && (s.listSessions || s.isInsideSession !== undefined)) return s;
+  return null;
+}
+function haveGlobal(){ return !!realGlobal(); }
+function insideSession(){
+  const g = realGlobal();
+  if (g && (g.isInsideSession === true || g.currentSession)) return true;
+  return /\/session\//.test(location.pathname);   // proxy URL heuristic
 }
 function loadWidget(){
-  // Inside a session (and on the platform landing page) the API global is
-  // already present; outside, we inject the snippet ourselves.
+  // Inside a session the platform already provides the API; injecting the
+  // snippet from another host would only add noise (and can be blocked).
   return new Promise((resolve, reject) => {
     if (haveGlobal()) return resolve();
-    // Official stub: queues init() calls made before the script finishes.
-    window.Surfly = window.Surfly || { init: function(){ window.__surfly_q = arguments; } };
+    if (insideSession()) return reject(new Error('no-api-inside'));
     const s = document.createElement('script');
     s.src = SURFLY_DOMAIN + '/surfly.js';
     s.onerror = () => reject(new Error('Could not load ' + SURFLY_DOMAIN + '/surfly.js — set SURFLY_DOMAIN to your Space domain.'));
@@ -184,7 +191,7 @@ function loadWidget(){
     })();
   });
 }
-const API = () => window.Surfly || window.webfuse;
+const API = () => realGlobal() || window.webfuse || {};
 
 function initSpace(){
   const A = API();
@@ -234,9 +241,12 @@ let space = null, session = null;
 let deckConnected = false, lastDeckClient = null;
 
 (async function boot(){
-  await loadWidget();
-  const A = API();
-  if (A.isInsideSession) return bootDeck();
+  try { await loadWidget(); }
+  catch(e){
+    if (e && e.message === 'no-api-inside') return bootDeckDegraded();
+    throw e;
+  }
+  if (insideSession()) return bootDeck();
   return bootController();
 })().catch(e => { log('BOOT ERROR: ' + (e.message || e)); setBanner(String(e.message || e)); });
 
@@ -251,8 +261,18 @@ async function bootDeck(){
   $('mode-sub').textContent = 'Running inside a live Surfly session. Tab controls act on the co-browsed tab for everyone. Privileged controls relay to the agent console.';
   $('view-deck').style.display = 'block';
 
-  const cs = API().currentSession || (API().listSessions() || [])[0];
-  if (!cs) throw new Error('currentSession not found.');
+  const A = API();
+  const grab = () => A.currentSession ||
+    (typeof A.listSessions === 'function' ? (A.listSessions() || [])[0] : null) ||
+    window.webfuseSession || window.SurflySession || null;
+  let cs = grab();
+  if (!cs) {
+    // Classic builds require init() before currentSession is populated, and the
+    // injected API can lag page load. Init (harmless if already done), then poll.
+    try { await initSpace(); } catch(e){ log('init inside session skipped: ' + (e && e.message || e)); }
+    for (let i = 0; i < 40 && !(cs = grab()); i++) await new Promise(r => setTimeout(r, 100));
+  }
+  if (!cs) return bootDeckDegraded();
   session = cs;
 
   // Host state: no public getter; settle it from events.
@@ -288,9 +308,33 @@ async function bootDeck(){
     }
   });
 
-  function audit(entry){ try { session.log(entry); } catch(e){} }
+  bindDeckTabs();
+  $('d-end').addEventListener('click', () => guard(() => {
+    audit('deck: end session');
+    session.end();                   // public method, permission-checked by the platform
+  }));
 
-  // ---- tab controls (no API needed; the session proxy handles them) ----
+  // ---- privileged controls (relayed to the console tab) ----
+  function ask(op, extra){
+    if (!deckConnected){
+      setBanner('Agent console not connected. Open this same page in a normal browser tab (outside the session) and keep it open — it executes these commands.');
+      return;
+    }
+    session.sendMessage(Object.assign({ ch: CH, t: 'request', op }, extra || {}), '*');
+    log('requested from console: ' + op);
+  }
+  $('d-host').addEventListener('click', () => ask('makehost-self'));
+  $('d-agentcam').addEventListener('click', () => ask('agent-camera-fullscreen'));
+  $('d-invite').addEventListener('click', () => ask('invite-link'));
+}
+
+// =====================================================================
+// DECK tab controls: pure browser calls; the session proxy turns them into
+// session-wide actions. These work with or without the JS API session
+// object, so they are shared by the full and degraded boot paths.
+// =====================================================================
+function audit(entry){ if (session) try { session.log(entry); } catch(e){} }
+function bindDeckTabs(){
   $('d-reload').addEventListener('click', () => guard(() => {
     audit('deck: reload tab');
     location.reload();               // reloads the co-browsed tab for everyone
@@ -314,23 +358,19 @@ async function bootDeck(){
     audit('deck: navigate to ' + u);
     location.href = u;               // proxified: session-wide navigation
   }));
-  $('d-end').addEventListener('click', () => guard(() => {
-    audit('deck: end session');
-    session.end();                   // public method, permission-checked by the platform
-  }));
+}
 
-  // ---- privileged controls (relayed to the console tab) ----
-  function ask(op, extra){
-    if (!deckConnected){
-      setBanner('Agent console not connected. Open this same page in a normal browser tab (outside the session) and keep it open — it executes these commands.');
-      return;
-    }
-    session.sendMessage(Object.assign({ ch: CH, t: 'request', op }, extra || {}), '*');
-    log('requested from console: ' + op);
-  }
-  $('d-host').addEventListener('click', () => ask('makehost-self'));
-  $('d-agentcam').addEventListener('click', () => ask('agent-camera-fullscreen'));
-  $('d-invite').addEventListener('click', () => ask('invite-link'));
+// =====================================================================
+// MODE 1b — DECK (degraded): inside a session but the JS API did not
+// expose the session object to this page. Tab controls still work; API
+// calls (end, audit, relay) are disabled with an explanation.
+// =====================================================================
+async function bootDeckDegraded(){
+  $('mode-sub').textContent = 'Inside a session, but the JS API session object was not exposed to this page. Reload / navigate / open-tab still act on the co-browsed tab. End, audit and the privileged relay need the API.';
+  setBanner('Session API not exposed here — degraded mode. Tab controls work. If this page was served inside the session, check that the widget key / space id were substituted (upload as the Landing Page, or set MAN_KEY / MAN_SID).');
+  $('d-conn').textContent = 'no API';
+  ['d-end','d-host','d-agentcam','d-invite'].forEach(id => { $(id).disabled = true; });
+  bindDeckTabs();
 }
 
 // =====================================================================
@@ -342,8 +382,12 @@ async function bootController(){
   $('mode-sub').textContent = 'Start the session here and share the join link. This tab holds the full Session API and executes privileged requests from the in-session page.';
   $('view-controller').style.display = 'block';
 
+  if (!WIDGET_KEY || !SPACE_ID){
+    throw new Error('No widget key / space id. Serve this file as the Space Landing Page (tokens get substituted), or set MAN_KEY / MAN_SID at the top of the file.');
+  }
   space = await initSpace();
-  const ex = API().listSessions();
+  const A = API();
+  const ex = (typeof A.listSessions === 'function') ? A.listSessions() : [];
   if (ex && ex.length) attach(ex[0]);
 
   $('btn-start').addEventListener('click', () => guard(async () => {
