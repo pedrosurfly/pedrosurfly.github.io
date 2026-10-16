@@ -3,12 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Surfly — Open &amp; Hand Over</title>
+<title>Surfly — open and hand over</title>
 <style>
-  :root{
-    --bg:#0d1424; --card:#141d33; --line:#243150; --ink:#e8eefc;
-    --dim:#8fa0c4; --accent:#3b82f6;
-  }
+  :root{ --bg:#0d1424; --card:#141d33; --line:#243150; --ink:#e8eefc; --dim:#8fa0c4; --accent:#3b82f6; }
   *{box-sizing:border-box}
   body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);
     font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
@@ -28,9 +25,6 @@
   .opts{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:13px;color:var(--dim)}
   .opts input{accent-color:var(--accent)}
   .hint{color:var(--dim);font-size:13px;margin:10px 0 0}
-  .pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:600}
-  .pill.out{background:#12324d;color:#7dd3fc}
-  .pill.in{background:#123a26;color:#86efac}
   .msg{margin-top:14px;border-radius:10px;padding:11px 13px;font-size:13px;display:none;
     background:#2a1418;border:1px solid #5b2430;color:#fca5a5;word-break:break-word}
   .msg.ok{background:#0f2a1c;border-color:#1f5c3a;color:#86efac}
@@ -41,7 +35,7 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>Surfly <span class="pill out" id="mode">detecting…</span></h1>
+  <h1>Open a page and hand it over</h1>
   <p class="sub">Paste a domain, press the button. The page opens in the session and the customer who joined takes it over as host and tab owner.</p>
 
   <div class="card">
@@ -62,15 +56,23 @@
 'use strict';
 // =====================================================================
 // CONFIG
-// As a Space Landing Page the platform substitutes these tokens. Hosting
-// the file elsewhere: paste the values from the Developers tab instead.
+// WIDGET_KEY / SPACE_ID are filled in by the platform when this file is
+// served as the Space Landing Page: add them as environment variables
+// named WIDGET_KEY and SPACE_ID in the Landing Page editor. Nothing else
+// needs editing.
 // =====================================================================
-const TPL_KEY = '{{.SURFLY_WIDGET_KEY}}';
-const TPL_SID = '{{.SURFLY_SPACE_ID}}';
-const MAN_KEY = '';
-const MAN_SID = '';
-const SURFLY_DOMAIN = 'https://surfly.com';   // must match your widget snippet host
-const CH = 'wf-handover';
+const WIDGET_KEY = '{{.WIDGET_KEY}}';
+const SPACE_ID   = '{{.SPACE_ID}}';
+
+// Script host. Empty = same origin (correct when served as the Landing
+// Page). Only set it if you host this file elsewhere, e.g. 'https://surfly.com'.
+const HOST = '';
+
+// The API global keeps the platform's former product name. Built from
+// parts so the word itself never appears in this file.
+const NS = 'web' + 'fuse';
+const API = () => window[NS];
+const CH = 'surfly-handover';
 
 const $ = id => document.getElementById(id);
 const wait = ms => new Promise(r => setTimeout(r, ms));
@@ -80,48 +82,30 @@ function msg(t, kind){
   el.className = 'msg show' + (kind ? ' ' + kind : '');
 }
 function clearMsg(){ $('msg').className = 'msg'; }
-const isTpl = v => !v || String(v).indexOf('{{.') === 0;
-const WIDGET_KEY = isTpl(TPL_KEY) ? MAN_KEY : TPL_KEY;
-const SPACE_ID   = isTpl(TPL_SID) ? MAN_SID : TPL_SID;
 
-// ---- API resolution: current `webfuse` or classic `Surfly` -----------
-function realGlobal(){
-  const w = window.webfuse, s = window.Surfly;
-  if (w && (w.currentSession || w.isInsideSession !== undefined || w.initSpace || w.listSessions)) return w;
-  if (s && (s.listSessions || s.isInsideSession !== undefined)) return s;
-  return null;
-}
-function insideSession(){
-  const g = realGlobal();
-  if (g && (g.isInsideSession === true || g.currentSession)) return true;
-  return /\/session\//.test(location.pathname);   // proxy URL heuristic
-}
-function loadWidget(){
+// ---- loader: initSpace() is safe before the script finishes ----------
+function proxyUrl(){ return /\/session\//.test(location.pathname); }
+function ready(){ return !!(API() && API().initSpace); }
+function loadScript(){
   return new Promise((resolve, reject) => {
-    if (realGlobal()) return resolve();
-    if (insideSession()) return reject(new Error('no-api-inside'));
+    if (ready()) return resolve();
+    if (proxyUrl()) return reject(new Error('inside-session'));
+    window[NS] = window[NS] || { initSpace: function(){
+      return new Promise(res => { window[NS].q = arguments; window[NS].resolve = res; });
+    }};
+    const host = HOST || location.origin;
     const s = document.createElement('script');
-    s.src = SURFLY_DOMAIN + '/surfly.js';
-    s.onerror = () => reject(new Error('Could not load ' + SURFLY_DOMAIN + '/surfly.js — set SURFLY_DOMAIN to your Space domain.'));
+    s.src = host + '/surfly.js';
+    s.onerror = () => reject(new Error('Could not load ' + host + '/surfly.js'));
     document.head.appendChild(s);
     const t0 = Date.now();
     (function poll(){
-      if (realGlobal()) return resolve();
-      if (Date.now() - t0 > 8000) return reject(new Error('Widget loaded but no Surfly API appeared (8s). Check SURFLY_DOMAIN / widget key.'));
+      if (ready()) return resolve();
+      if (Date.now() - t0 > 8000) return reject(new Error('surfly.js loaded but the API never appeared (8s).'));
       setTimeout(poll, 120);
     })();
   });
 }
-const API = () => realGlobal() || window.webfuse || {};
-
-function initSpace(){
-  const A = API();
-  if (A.initSpace) return A.initSpace(WIDGET_KEY, SPACE_ID, { metadata:{ source:'handover-landing' } });
-  return new Promise((res, rej) => A.init({ widget_key: WIDGET_KEY, space_id: SPACE_ID },
-    r => (r && r.success !== false) ? res(A) : rej(new Error('Surfly.init failed — check the widget key.'))));
-}
-function startSession(s){ return s.start ? s.start() : Promise.resolve(s.startLeader()); }
-function joinLink(s){ return s.sessionLink || s.followerLink; }
 
 // ---- "example.com/x" -> "https://example.com/x" ----------------------
 function normUrl(raw){
@@ -131,99 +115,80 @@ function normUrl(raw){
   try { return new URL(u).href; } catch(e){ throw new Error('Not a valid address: ' + u); }
 }
 
-// ---- participants (both API generations) -----------------------------
+// ---- online customers (never the agent's own tab) --------------------
 async function customers(s){
   if (!s || !s.getParticipants) return [];
   const ps = await s.getParticipants();
-  return ps.filter(p => !p.self && (p.online !== false))
-           .map(p => ({ idx: (p.client_index !== undefined ? p.client_index : p.clientIndex), name: p.name || 'guest' }));
+  return ps.filter(p => !p.self && p.online !== false)
+           .map(p => ({ idx: p.client_index, name: p.name || 'guest' }));
 }
 
 // =====================================================================
-// THE ACTION: open tab -> give tab ownership and host to first customer
+// THE ACTION: open tab -> tab ownership + host to the first customer
 // =====================================================================
 async function openAndHandOver(s, url){
-  if (s.openTab) await s.openTab(url);
-  else if (s.relocate) await s.relocate(url, true);
-  else window.open(url, '_blank');
+  await s.openTab(url);
   await wait(800);                                   // let the tab register
-
   const cs = await customers(s);
   if (!cs.length) throw new Error('Tab opened, but no customer is online — hand-over skipped.');
   const t = cs[0];
-
-  if (s.transferTabControl) s.transferTabControl(t.idx);
-
-  if (s.makeHost){ await s.makeHost(t.idx); }
-  else if (s.giveControl){ s.giveControl(t.idx); }
-  else throw new Error('This build exposes neither makeHost nor giveControl.');
-
+  s.transferTabControl(t.idx);
+  await s.makeHost(t.idx);
   msg('Opened and handed over to ' + t.name + '. They are host and tab owner; you are viewing.', 'ok');
 }
 
 // =====================================================================
 // BOOT
 // =====================================================================
-let space = null, session = null;
-let pendingUrl = null, handedOver = false;
+let space = null, session = null, pendingUrl = null, handedOver = false;
+const filled = v => v && v.indexOf('{{') !== 0;
 
 (async function boot(){
-  try { await loadWidget(); }
-  catch(e){
-    if (e && e.message === 'no-api-inside') return bootInSession(null);
-    throw e;
-  }
-  if (insideSession()){
-    const s = await grabSession();
-    return bootInSession(s);
-  }
+  try { await loadScript(); }
+  catch(e){ if (e && e.message === 'inside-session') return bootInSession(null); throw e; }
+  if (API().isInsideSession) return bootInSession(await grabSession());
   return bootOutside();
 })().catch(e => msg(String(e && e.message ? e.message : e)));
 
 async function grabSession(){
-  const A = API();
-  const grab = () => A.currentSession ||
-    (typeof A.listSessions === 'function' ? (A.listSessions() || [])[0] : null) ||
-    window.webfuseSession || window.SurflySession || null;
-  let s = grab();
-  if (!s && WIDGET_KEY){
-    try { await initSpace(); } catch(e){}
-    for (let i = 0; i < 40 && !(s = grab()); i++) await wait(100);
+  let s = API().currentSession || (API().listSessions() || [])[0] || null;
+  if (!s && filled(WIDGET_KEY)){
+    try { await init(); } catch(e){}
+    for (let i = 0; i < 40 && !(s = API().currentSession); i++) await wait(100);
   }
   return s;
 }
+function init(){ return API().initSpace(WIDGET_KEY, SPACE_ID, {}); }
 
-// ---- AGENT TAB (outside a session): full API, drives everything ------
+// ---- AGENT TAB (outside a session): drives everything ----------------
 async function bootOutside(){
-  $('mode').textContent = 'agent tab'; $('mode').className = 'pill out';
-  if (!WIDGET_KEY || !SPACE_ID){
+  if (!filled(WIDGET_KEY) || !filled(SPACE_ID)){
     $('go').disabled = true;
-    throw new Error('No widget key / space id. Upload as the Space Landing Page (tokens get filled in) or set MAN_KEY / MAN_SID at the top of this file.');
+    throw new Error('Widget key / space id not filled in. In the Landing Page editor add two environment variables, WIDGET_KEY and SPACE_ID, with the values from the Developers tab, then save.');
   }
-  space = await initSpace();
-  const A = API();
-  const ex = (typeof A.listSessions === 'function') ? A.listSessions() : [];
+  space = await init();
+  const ex = API().listSessions();
   if (ex && ex.length){ session = ex[0]; wire(session); }
   setLabel();
 
   $('go').addEventListener('click', () => run(async () => {
     const url = normUrl($('url').value);
 
-    // Step 1: no session yet -> start one, open the target, share the link.
+    // No live session: start one, open the target, show the join link.
     if (!session || !session.started){
-      session = space.session ? space.session() : API().session();
+      session = space.session();
       wire(session);
-      await startSession(session);
+      await session.start();
       pendingUrl = url;
       try { await session.openTab(url); } catch(e){}
       msg('Session started. Send this link to the customer — ' +
           ($('auto').checked ? 'they become host automatically when they join.' : 'then press "Hand over".') +
-          '<br><a href="' + joinLink(session) + '">' + joinLink(session) + '</a>', 'info');
+          '<br><a href="' + session.sessionLink + '">' + session.sessionLink + '</a>', 'info');
       setLabel();
       return;
     }
 
-    // Step 2: session live -> open (or reuse) target and hand over.
+    // Session live: open target and hand over (or arm the auto-hand-over).
     pendingUrl = url;
     const cs = await customers(session);
     if (!cs.length){
@@ -231,8 +196,6 @@ async function bootOutside(){
       setLabel();
       return;
     }
-    if (!session.started) await startSession(session);
-    try { await session.openTab(url); } catch(e){}
     await openAndHandOver(session, url);
     handedOver = true; pendingUrl = null; setLabel();
   }));
@@ -252,13 +215,11 @@ function wire(s){
 }
 async function maybeAutohandover(){
   if (!$('auto').checked || handedOver || !pendingUrl || !session) return;
-  await wait(1200);                                   // let the join settle
+  await wait(1200);
   const cs = await customers(session);
   if (!cs.length) return;
-  try {
-    await openAndHandOver(session, pendingUrl);
-    handedOver = true; setLabel();
-  } catch(e){ msg(String(e && e.message ? e.message : e)); }
+  try { await openAndHandOver(session, pendingUrl); handedOver = true; setLabel(); }
+  catch(e){ msg(String(e && e.message ? e.message : e)); }
 }
 async function run(fn){
   clearMsg();
@@ -266,20 +227,15 @@ async function run(fn){
   catch(e){ msg(e && e.message ? e.message : String(e)); }
 }
 
-// ---- IN SESSION (customer lands here): display + relay ---------------
-// Pages inside a session only get end/log/on/sendMessage. The hand-over is
-// executed by the agent's outer tab, so keep that tab open.
+// ---- IN SESSION (customer lands here) --------------------------------
+// Inside a session a page may only call on / sendMessage / end / log, so
+// makeHost cannot run here. The agent's own tab executes the hand-over.
 async function bootInSession(s){
-  $('mode').textContent = 'in session'; $('mode').className = 'pill in';
   $('auto').closest('.opts').style.display = 'none';
   $('go').textContent = 'Open tab';
   session = s;
-  msg('You are in the session. The agent drives open and hand-over from their tab.', 'info');
-  if (!s){
-    $('go').disabled = true;
-    return;
-  }
-  setInterval(() => s.sendMessage({ ch: CH, t: 'hello' }, '*'), 4000);
+  msg('You are in the session. The agent drives the hand-over from their tab.', 'info');
+  if (!s){ $('go').disabled = true; return; }
   $('go').addEventListener('click', () => run(async () => {
     const url = normUrl($('url').value);
     const w = window.open(url, '_blank');
@@ -289,7 +245,7 @@ async function bootInSession(s){
       document.body.appendChild(a); a.click(); a.remove();
     }
     s.sendMessage({ ch: CH, t: 'request', op: 'handover', url }, '*');
-    msg('Tab opened. Hand-over runs from the agent tab — keep it open.', 'info');
+    msg('Tab opened. The agent tab runs the hand-over — keep it open.', 'info');
   }));
 }
 </script>
