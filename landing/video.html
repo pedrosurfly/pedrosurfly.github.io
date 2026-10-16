@@ -7,281 +7,477 @@
 <style>
   :root{
     --bg:#0f1729; --card:#1a2340; --line:#2b3a63; --text:#e8ecf7;
-    --muted:#93a1c4; --accent:#4f7cff; --accent-2:#22c55e; --danger:#ef4444;
+    --muted:#93a1c4; --accent:#4f7cff; --green:#22c55e; --danger:#ef4444;
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-  .wrap{max-width:1040px;margin:0 auto;padding:32px 20px 56px}
-  header h1{font-size:26px;margin:0 0 6px}
-  header p{color:var(--muted);margin:0 0 26px;font-size:15px}
-  .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}
-  @media (max-width:780px){.grid{grid-template-columns:1fr}}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 18px 20px}
-  .card h2{font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 14px}
-  .row{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap}
-  input[type=url]{flex:1;min-width:220px;background:#0d1428;border:1px solid var(--line);color:var(--text);border-radius:9px;padding:10px 12px;font-size:14px}
-  button{border:0;border-radius:9px;padding:10px 14px;font-size:14px;font-weight:600;cursor:pointer;background:var(--accent);color:#fff}
+  .wrap{max-width:980px;margin:0 auto;padding:28px 20px 56px}
+  header{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+  header h1{font-size:24px;margin:0}
+  .badge{font-size:12px;font-weight:700;letter-spacing:.05em;padding:4px 10px;border-radius:99px;background:#243356;color:var(--muted)}
+  .badge.in{background:#123d24;color:#7ef0a5}
+  .badge.out{background:#1c2f6b;color:#9db9ff}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 22px}
+  .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}
+  @media (max-width:760px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 16px 18px;margin-bottom:16px}
+  .card h2{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 12px}
+  .row{display:flex;gap:9px;margin-bottom:9px;flex-wrap:wrap}
+  input[type=url]{flex:1;min-width:200px;background:#0d1428;border:1px solid var(--line);color:var(--text);border-radius:9px;padding:9px 11px;font-size:14px}
+  button{border:0;border-radius:9px;padding:10px 14px;font-size:13.5px;font-weight:600;cursor:pointer;background:var(--accent);color:#fff}
   button.secondary{background:#243356;color:var(--text)}
-  button.green{background:var(--accent-2);color:#06220f}
+  button.green{background:var(--green);color:#06220f}
   button.red{background:var(--danger)}
-  button:disabled{opacity:.45;cursor:not-allowed}
-  .status{display:flex;flex-direction:column;gap:8px;font-size:14px}
-  .status .kv{display:flex;justify-content:space-between;gap:12px;border-bottom:1px dashed var(--line);padding-bottom:7px}
-  .status .kv b{color:var(--muted);font-weight:600;text-align:left}
-  .status .kv span{word-break:break-all;text-align:right}
+  button:disabled{opacity:.4;cursor:not-allowed}
+  .kv{display:flex;justify-content:space-between;gap:10px;font-size:13.5px;border-bottom:1px dashed var(--line);padding:5px 0}
+  .kv b{color:var(--muted);font-weight:600}
+  .kv span{word-break:break-all;text-align:right}
+  #participants{margin:0;padding:0;list-style:none;font-size:13.5px;color:var(--muted)}
+  #participants li{padding:2px 0}
+  .logbox{background:#0d1428;border:1px solid var(--line);border-radius:9px;padding:9px 11px;height:190px;overflow-y:auto;font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#b7c3e0;white-space:pre-wrap}
+  .hint{font-size:12.5px;color:var(--muted);margin:2px 0 10px}
+  .banner{display:none;background:#3b1d27;border:1px solid #7f2c3c;color:#ffd9df;border-radius:9px;padding:9px 11px;font-size:13px;margin-bottom:14px}
   .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#64748b;margin-right:6px}
-  .dot.on{background:var(--accent-2)}
-  #participants{margin:0;padding:0;list-style:none;font-size:14px;color:var(--muted)}
-  #participants li{padding:3px 0}
-  #log{background:#0d1428;border:1px solid var(--line);border-radius:9px;padding:10px 12px;height:170px;overflow-y:auto;font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:#b7c3e0;white-space:pre-wrap}
-  .hint{font-size:12.5px;color:var(--muted);margin:2px 0 14px}
-  .banner{display:none;background:#3b1d27;border:1px solid #7f2c3c;color:#ffd9df;border-radius:9px;padding:10px 12px;font-size:13.5px;margin-bottom:16px}
+  .dot.on{background:var(--green)}
+  label.tog{font-size:13px;color:var(--muted);display:flex;gap:7px;align-items:center;margin:4px 0}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <h1>Session Command Deck</h1>
-    <p>Start a Surfly session, then drive it programmatically: open tabs, reload, video, and hand hosting to the customer.</p>
+    <h1>Surfly Command Landing</h1>
+    <span class="badge" id="mode-badge">detecting…</span>
   </header>
+  <p class="sub" id="mode-sub"></p>
   <div class="banner" id="banner"></div>
 
-  <div class="grid">
-    <div class="card">
-      <h2>Session</h2>
-      <div class="row">
-        <button id="btn-start">Start session</button>
-        <button id="btn-copy" class="secondary" disabled>Copy join link</button>
-        <button id="btn-end" class="red" disabled>End session</button>
+  <!-- ============ DECK: this page loaded INSIDE the session (primary) ============ -->
+  <div id="view-deck" style="display:none">
+    <div class="grid">
+      <div>
+        <div class="card">
+          <h2>Tab controls</h2>
+          <div class="row">
+            <input type="url" id="d-url" placeholder="https://app.example.com/page">
+            <button id="d-newtab">Open tab</button>
+          </div>
+          <div class="row">
+            <button id="d-reload">Reload page</button>
+            <button id="d-nav" class="secondary">Navigate this tab</button>
+            <button id="d-end" class="red">End session</button>
+          </div>
+          <p class="hint">These work with no setup: inside a session, opening a tab and reloading <i>are</i> session actions, visible to every participant.</p>
+        </div>
+        <div class="card">
+          <h2>Session controls</h2>
+          <div class="row">
+            <button id="d-host" class="green">Become host</button>
+            <button id="d-agentcam" class="secondary">Agent camera full screen</button>
+            <button id="d-invite" class="secondary">Get invite link</button>
+          </div>
+          <p class="hint">makeHost / videochat / invite are privileged: the platform only exposes end/log/on/sendMessage to pages inside a session. These buttons relay the request to the agent console tab, which executes it (host hand-over asks the agent to confirm).</p>
+        </div>
       </div>
-      <p class="hint">If the page URL carries <code>?url=https://…</code>, that page opens automatically in a new session tab after start.</p>
-
-      <h2 style="margin-top:18px">Commands</h2>
-      <div class="row">
-        <input type="url" id="tab-url" placeholder="https://customer-app.example.com/page">
-        <button id="btn-open" class="secondary" disabled>Open in new tab</button>
+      <div>
+        <div class="card">
+          <h2>Status</h2>
+          <div class="kv"><b>In session</b><span><i class="dot on"></i>yes</span></div>
+          <div class="kv"><b>Agent console</b><span id="d-conn">connecting…</span></div>
+          <div class="kv"><b>You are host</b><span id="d-ishost">–</span></div>
+          <h2 style="margin-top:14px">Log</h2>
+          <div class="logbox" id="log"></div>
+        </div>
       </div>
-      <div class="row">
-        <button id="btn-reload" class="secondary" disabled>Reload active tab</button>
-        <button id="btn-video" class="secondary" disabled>Join video chat</button>
-        <button id="btn-cam" class="secondary" disabled>Camera full screen</button>
-      </div>
-      <div class="row">
-        <button id="btn-host" class="green" disabled>Hand host to customer</button>
-      </div>
-      <p class="hint">"Hand host" makes the first online remote participant the host. Requires <b>host switching allowed</b> and <b>host rights: everyone</b> in Space settings.</p>
     </div>
+  </div>
 
-    <div class="card">
-      <h2>Status</h2>
-      <div class="status">
-        <div class="kv"><b>Session</b><span><i class="dot" id="dot"></i><span id="st-state">idle</span></span></div>
-        <div class="kv"><b>PIN</b><span id="st-pin">–</span></div>
-        <div class="kv"><b>Join link</b><span id="st-link">–</span></div>
+  <!-- ============ CONSOLE: same page OUTSIDE the session (agent side) ============ -->
+  <div id="view-controller" style="display:none">
+    <div class="grid">
+      <div>
+        <div class="card">
+          <h2>Start &amp; invite</h2>
+          <div class="row">
+            <button id="btn-start">Start session</button>
+            <button id="btn-copy" class="secondary" disabled>Copy join link</button>
+            <button id="btn-end" class="red" disabled>End session</button>
+          </div>
+          <p class="hint">Send the join link to the customer. A <code>?url=https://…</code> appended to the landing page URL opens that page automatically after start.</p>
+          <label class="tog"><input type="checkbox" id="autohost"> Auto-hand host to the first customer who joins</label>
+        </div>
+        <div class="card">
+          <h2>Privileged commands</h2>
+          <div class="row">
+            <button id="btn-host" class="green" disabled>Hand host to customer</button>
+            <button id="btn-cam" class="secondary" disabled>My camera full screen</button>
+            <button id="btn-invite" class="secondary" disabled>Open invite dialog</button>
+          </div>
+          <div class="row">
+            <input type="url" id="tab-url" placeholder="https://customer-app.example.com/page">
+            <button id="btn-open" class="secondary" disabled>Open in new tab</button>
+            <button id="btn-reload" class="secondary" disabled>Reload active tab</button>
+          </div>
+          <p class="hint">Full Session API (openTab / reloadTab / makeHost / videochat) runs here. Requests from the in-session page arrive on the message channel and execute in this tab.</p>
+        </div>
       </div>
-      <h2 style="margin-top:16px">Participants</h2>
-      <ul id="participants"><li>none yet</li></ul>
-      <h2 style="margin-top:16px">Log</h2>
-      <div id="log"></div>
+      <div>
+        <div class="card">
+          <h2>Status</h2>
+          <div class="kv"><b>Session</b><span><i class="dot" id="dot"></i><span id="st-state">idle</span></span></div>
+          <div class="kv"><b>PIN</b><span id="st-pin">–</span></div>
+          <div class="kv"><b>In-session page</b><span id="st-deck">not connected</span></div>
+          <h2 style="margin-top:14px">Participants</h2>
+          <ul id="participants"><li>none yet</li></ul>
+          <h2 style="margin-top:14px">Log</h2>
+          <div class="logbox" id="log2"></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
 <script>
-// ---- Configuration -------------------------------------------------------
-// Paste your widget key and space id from the Space's Developers tab.
-// If you serve this as a Custom Landing Page, you can instead keep the
-// template tokens and the platform fills them in automatically.
-const TPL_KEY  = '{{.SURFLY_WIDGET_KEY}}';
-const TPL_SID  = '{{.SURFLY_SPACE_ID}}';
-const MAN_KEY  = '';  // fallback: paste widget key here
-const MAN_SID  = '';  // fallback: paste space id here
-const WIDGET_KEY = isTemplate(TPL_KEY) ? MAN_KEY : TPL_KEY;
-const SPACE_ID   = isTemplate(TPL_SID) ? MAN_SID : TPL_SID;
-function isTemplate(v){ return !v || v.indexOf('{{.') === 0; }
+'use strict';
+// =====================================================================
+// CONFIG
+// =====================================================================
+// Custom Landing Page tokens (filled by the platform when served as the
+// Space landing page). Manual fallback if you host this elsewhere.
+const TPL_KEY = '{{.SURFLY_WIDGET_KEY}}';
+const TPL_SID = '{{.SURFLY_SPACE_ID}}';
+const MAN_KEY = '';   // paste widget key to host outside the platform
+const MAN_SID = '';   // paste space id
+function isTpl(v){ return !v || v.indexOf('{{.') === 0; }
+const WIDGET_KEY = isTpl(TPL_KEY) ? MAN_KEY : TPL_KEY;
+const SPACE_ID   = isTpl(TPL_SID) ? MAN_SID : TPL_SID;
 
-// Your Surfly domain: the host from your widget snippet (Developers tab).
-// Classic hosted Surfly uses https://surfly.com; a Space domain or on-prem
-// install answers on its own host.
+// Host from your widget snippet (Developers tab). Classic hosted Surfly:
+// https://surfly.com. Space domain / on-prem: that host.
 const SURFLY_DOMAIN = 'https://surfly.com';
 
-// ---- Namespace shim ------------------------------------------------------
-// The platform API lives on `window.Surfly` (classic) or `window.webfuse`
-// (current builds). Same methods, different global. We detect at runtime.
+// Tag for our postMessage channel (sendMessage bridges in-session and console).
+const CH = 'wf-cmd-landing';
+
+// =====================================================================
+// NAMESPACE SHIM: classic `Surfly` vs current `webfuse` global
+// =====================================================================
+function haveGlobal(){
+  return (window.webfuse && window.webfuse.initSpace) ||
+         (window.Surfly && (window.Surfly.listSessions || window.Surfly.isInsideSession !== undefined));
+}
 function loadWidget(){
+  // Inside a session (and on the platform landing page) the API global is
+  // already present; outside, we inject the snippet ourselves.
   return new Promise((resolve, reject) => {
-    if (window.Surfly || window.webfuse) return resolve();
+    if (haveGlobal()) return resolve();
+    // Official stub: queues init() calls made before the script finishes.
+    window.Surfly = window.Surfly || { init: function(){ window.__surfly_q = arguments; } };
     const s = document.createElement('script');
     s.src = SURFLY_DOMAIN + '/surfly.js';
-    s.onload = () => (window.Surfly || window.webfuse)
-      ? resolve() : reject(new Error('Script loaded but no Surfly/webfuse global appeared.'));
     s.onerror = () => reject(new Error('Could not load ' + SURFLY_DOMAIN + '/surfly.js — set SURFLY_DOMAIN to your Space domain.'));
     document.head.appendChild(s);
+    const t0 = Date.now();
+    (function poll(){
+      if (haveGlobal()) return resolve();
+      if (Date.now() - t0 > 8000) return reject(new Error('Widget script loaded but the Surfly API global never appeared (8s). Check SURFLY_DOMAIN.'));
+      setTimeout(poll, 120);
+    })();
   });
 }
 const API = () => window.Surfly || window.webfuse;
 
-// initSpace (modern) vs init(settings, callback) (classic)
-function initSpace(opts){
+function initSpace(){
   const A = API();
-  if (A.initSpace) return A.initSpace(WIDGET_KEY, SPACE_ID, opts);
+  if (A.initSpace) return A.initSpace(WIDGET_KEY, SPACE_ID, {
+    session_autorestore_enabled: true,
+    metadata: { source: 'command-landing' }
+  });
   return new Promise((resolve, reject) => {
-    A.init({ widget_key: WIDGET_KEY, space_id: SPACE_ID }, function(res){
-      (res && res.success !== false) ? resolve(A) : reject(new Error('Surfly.init failed (check widget key / browser support).'));
+    A.init({ widget_key: WIDGET_KEY, space_id: SPACE_ID, session_autorestore_enabled: true }, res => {
+      (res && res.success !== false) ? resolve(A) : reject(new Error('Surfly.init failed (check widget key).'));
     });
   });
 }
-// start (modern) vs startLeader (classic)
-function startSession(session){
-  if (session.start) return session.start();
-  return Promise.resolve(session.startLeader());
+function startSession(s){ return s.start ? s.start() : Promise.resolve(s.startLeader()); }
+function joinLink(s){ return s.sessionLink || s.followerLink; }
+function openTabUrl(s, url){
+  if (s.openTab) return s.openTab(url);
+  if (s.relocate) return s.relocate(url, true);
+  return Promise.reject(new Error('No openTab/relocate on this build.'));
 }
-// sessionLink (modern) vs followerLink (classic)
-function joinLink(session){ return session.sessionLink || session.followerLink; }
-// makeHost (modern) vs giveControl (classic)
-function handHost(session, clientIndex){
-  if (session.makeHost) return session.makeHost(clientIndex);
-  session.giveControl(clientIndex);
-  return Promise.resolve(clientIndex);
-}
-
-let space = null, session = null;
-
-async function getSession(){
-  if (session && session.started) return session;
-  await loadWidget();
-  if (!space) {
-    space = await initSpace({
-      session_autorestore_enabled: true, // survive landing-page reloads
-      metadata: { source: 'command-landing' }
-    });
-  }
-  const existing = API().listSessions();
-  session = (existing && existing[0]) || (space.session ? space.session() : API().session());
-  bindEvents(session);
-  return session;
+function handHost(s, idx){
+  if (s.makeHost) return s.makeHost(idx);
+  s.giveControl(idx);
+  return Promise.resolve(idx);
 }
 
-function bindEvents(s){
-  const on = (ev, cb) => { try { s.on(ev, cb); } catch(e){} };
-  on('session_started', () => { log('session started'); refresh(); });
-  on('session_ended',   () => { log('session ended'); refresh(); });
-  // modern + classic event names
-  on('participant_joined', (sess, ev) => { log('participant joined: index ' + (ev && ev.clientIndex)); refresh(); });
-  on('participant_left',   (sess, ev) => { log('participant left: index ' + (ev && ev.clientIndex)); refresh(); });
-  on('viewer_joined',      (sess, ev) => { log('participant joined: index ' + (ev && ev.clientIndex)); refresh(); });
-  on('viewer_left',        (sess, ev) => { log('participant left: index ' + (ev && ev.clientIndex)); refresh(); });
-  on('host_changed',       (sess, ev) => { log('host changed -> ' + (ev && ev.to === 0 ? 'leader' : 'viewer ' + (ev && ev.to))); refresh(); });
-}
-
-// ---- UI helpers ----------------------------------------------------------
+// =====================================================================
+// SHARED UI HELPERS
+// =====================================================================
 const $ = id => document.getElementById(id);
 function log(msg){
-  const el = $('log');
-  el.textContent += new Date().toLocaleTimeString() + '  ' + msg + '\n';
-  el.scrollTop = el.scrollHeight;
+  const t = new Date().toLocaleTimeString() + '  ' + msg + '\n';
+  const a = $('log'), b = $('log2');
+  if (a){ a.textContent += t; a.scrollTop = 1e9; }
+  if (b){ b.textContent += t; b.scrollTop = 1e9; }
 }
-function setBanner(msg){ const b = $('banner'); b.textContent = msg; b.style.display = msg ? 'block' : 'none'; }
-
-async function refresh(){
-  const started = !!(session && session.started);
-  $('dot').classList.toggle('on', started);
-  $('st-state').textContent = started ? 'live' : 'idle';
-  $('st-pin').textContent  = started && session.pin ? session.pin : '–';
-  $('st-link').textContent = started && joinLink(session) ? 'available' : '–';
-  ['btn-copy','btn-end','btn-open','btn-reload','btn-video','btn-cam','btn-host']
-    .forEach(id => $(id).disabled = !started);
-  $('btn-start').disabled = started;
-  if (started){
-    try {
-      const ps = await session.getParticipants();
-      const ul = $('participants');
-      ul.innerHTML = '';
-      ps.forEach(p => {
-        const li = document.createElement('li');
-        li.textContent = (p.self ? 'you' : (p.name || 'guest')) +
-                         ' · index ' + p.client_index +
-                         (p.online ? ' · online' : ' · offline');
-        ul.appendChild(li);
-      });
-      if (!ps.length) ul.innerHTML = '<li>none yet</li>';
-    } catch(e){ /* participant list not critical */ }
-  }
-}
-
+function setBanner(m){ $('banner').textContent = m; $('banner').style.display = m ? 'block' : 'none'; }
 async function guard(fn){
   try { await fn(); }
   catch(e){ log('ERROR: ' + (e && e.message ? e.message : e)); setBanner(String(e && e.message ? e.message : e)); }
-  finally { refresh(); }
 }
 
-// ---- Commands ------------------------------------------------------------
-$('btn-start').addEventListener('click', () => guard(async () => {
-  const s = await getSession();
-  if (!s.started) await startSession(s);
-  const target = new URLSearchParams(location.search).get('url');
-  if (target){ await openUrl(s, target); log('opened ?url target: ' + target); }
-  log('join link: ' + joinLink(s));
-}));
+// =====================================================================
+// BOOT: detect context. Inside a session -> deck. Outside -> console.
+// =====================================================================
+let space = null, session = null;
+let deckConnected = false, lastDeckClient = null;
 
-// openTab (modern) vs relocate(url, true) (older builds)
-function openUrl(s, url){
-  if (s.openTab) return s.openTab(url);
-  if (s.relocate) return s.relocate(url, true);
-  return Promise.reject(new Error('No openTab/relocate available on this platform build.'));
+(async function boot(){
+  await loadWidget();
+  const A = API();
+  if (A.isInsideSession) return bootDeck();
+  return bootController();
+})().catch(e => { log('BOOT ERROR: ' + (e.message || e)); setBanner(String(e.message || e)); });
+
+// =====================================================================
+// MODE 1 — DECK: running INSIDE the session (this is your main case).
+// Native public API only: on / sendMessage / end / log.
+// Reload, navigate and open-tab work through normal browser calls that
+// the session proxy turns into session-wide actions.
+// =====================================================================
+async function bootDeck(){
+  $('mode-badge').textContent = 'in session'; $('mode-badge').className = 'badge in';
+  $('mode-sub').textContent = 'Running inside a live Surfly session. Tab controls act on the co-browsed tab for everyone. Privileged controls relay to the agent console.';
+  $('view-deck').style.display = 'block';
+
+  const cs = API().currentSession || (API().listSessions() || [])[0];
+  if (!cs) throw new Error('currentSession not found.');
+  session = cs;
+
+  // Host state: no public getter; settle it from events.
+  session.on('host_changed', (s, ev) => {
+    const to = ev && ev.to;
+    const me = (session.clientIndex !== undefined) ? session.clientIndex : 0;
+    $('d-ishost').textContent = (to === me) ? 'yes' : 'no';
+    log('host changed (to index ' + to + ')');
+  });
+  session.on('session_ended', () => log('session ended'));
+
+  // Heartbeat so both sides know the other is present.
+  const hello = () => session.sendMessage({ ch: CH, t: 'hello' }, '*');
+  hello();
+  setInterval(() => { if (!deckConnected) hello(); }, 4000);
+
+  session.on('message', (s, ev) => {
+    const d = ev && ev.data;
+    if (!d || d.ch !== CH) return;
+    if (d.t === 'hi'){
+      if (!deckConnected){ deckConnected = true; $('d-conn').textContent = 'connected'; log('agent console connected'); }
+      if (typeof d.isHost === 'boolean') $('d-ishost').textContent = d.isHost ? 'yes' : 'no';
+      if (d.replyTo === 'invite' && d.link){
+        log('invite link: ' + d.link);
+        navigator.clipboard.writeText(d.link).then(() => log('(copied to clipboard)')).catch(() => {});
+      }
+      if (d.replyTo === 'ack-exec') log('console executed: ' + d.op + (d.ok ? ' ok' : ' FAILED'));
+      return;
+    }
+    if (d.t === 'cmd'){ // console-initiated action on this tab
+      if (d.op === 'reload'){ log('console asked reload'); location.reload(); }
+      if (d.op === 'navigate' && d.url){ log('console navigating to ' + d.url); location.href = d.url; }
+    }
+  });
+
+  function audit(entry){ try { session.log(entry); } catch(e){} }
+
+  // ---- tab controls (no API needed; the session proxy handles them) ----
+  $('d-reload').addEventListener('click', () => guard(() => {
+    audit('deck: reload tab');
+    location.reload();               // reloads the co-browsed tab for everyone
+  }));
+  $('d-newtab').addEventListener('click', () => guard(() => {
+    const u = $('d-url').value.trim();
+    if (!u) throw new Error('Enter a URL first.');
+    audit('deck: open tab ' + u);
+    // window.open inside a click handler is intercepted into a new session tab.
+    const w = window.open(u, '_blank');
+    if (!w){                          // popup-blocked fallback: synthetic link
+      const a = document.createElement('a');
+      a.href = u; a.target = '_blank'; a.rel = 'noopener';
+      document.body.appendChild(a); a.click(); a.remove();
+    }
+    log('opened session tab: ' + u);
+  }));
+  $('d-nav').addEventListener('click', () => guard(() => {
+    const u = $('d-url').value.trim();
+    if (!u) throw new Error('Enter a URL first.');
+    audit('deck: navigate to ' + u);
+    location.href = u;               // proxified: session-wide navigation
+  }));
+  $('d-end').addEventListener('click', () => guard(() => {
+    audit('deck: end session');
+    session.end();                   // public method, permission-checked by the platform
+  }));
+
+  // ---- privileged controls (relayed to the console tab) ----
+  function ask(op, extra){
+    if (!deckConnected){
+      setBanner('Agent console not connected. Open this same page in a normal browser tab (outside the session) and keep it open — it executes these commands.');
+      return;
+    }
+    session.sendMessage(Object.assign({ ch: CH, t: 'request', op }, extra || {}), '*');
+    log('requested from console: ' + op);
+  }
+  $('d-host').addEventListener('click', () => ask('makehost-self'));
+  $('d-agentcam').addEventListener('click', () => ask('agent-camera-fullscreen'));
+  $('d-invite').addEventListener('click', () => ask('invite-link'));
 }
 
-$('btn-copy').addEventListener('click', () => guard(async () => {
-  await navigator.clipboard.writeText(joinLink(session));
-  log('join link copied to clipboard');
-}));
+// =====================================================================
+// MODE 2 — CONSOLE: outside the session, full API. Starts sessions and
+// executes privileged requests from the deck.
+// =====================================================================
+async function bootController(){
+  $('mode-badge').textContent = 'agent console'; $('mode-badge').className = 'badge out';
+  $('mode-sub').textContent = 'Start the session here and share the join link. This tab holds the full Session API and executes privileged requests from the in-session page.';
+  $('view-controller').style.display = 'block';
 
-$('btn-end').addEventListener('click', () => guard(async () => {
-  session.end();
-  session = null;
-}));
+  space = await initSpace();
+  const ex = API().listSessions();
+  if (ex && ex.length) attach(ex[0]);
 
-$('btn-open').addEventListener('click', () => guard(async () => {
-  const url = $('tab-url').value.trim();
-  if (!url) throw new Error('Enter a URL first.');
-  await openUrl(session, url);
-  log('opened tab: ' + url);
-}));
+  $('btn-start').addEventListener('click', () => guard(async () => {
+    const s = space.session ? space.session() : API().session();
+    attach(s);
+    await startSession(s);
+    const target = new URLSearchParams(location.search).get('url');
+    if (target) await openTabUrl(s, target);
+    log('session started · link: ' + joinLink(s));
+  }));
+  $('btn-copy').addEventListener('click', () => guard(async () => {
+    await navigator.clipboard.writeText(joinLink(session));
+    log('join link copied');
+  }));
+  $('btn-end').addEventListener('click', () => guard(async () => { session.end(); detach(); }));
+  $('btn-host').addEventListener('click', () => guard(() => handToFirstCustomer()));
+  $('btn-cam').addEventListener('click', () => guard(() => agentCameraFullscreen()));
+  $('btn-invite').addEventListener('click', () => guard(() => {
+    if (session.ui && session.ui.openInviteDialog) session.ui.openInviteDialog();
+    else log('Invite dialog unavailable on this build; copy the join link instead.');
+  }));
+  $('btn-open').addEventListener('click', () => guard(async () => {
+    const u = $('tab-url').value.trim();
+    if (!u) throw new Error('Enter a URL first.');
+    await openTabUrl(session, u);
+    log('opened tab: ' + u);
+  }));
+  $('btn-reload').addEventListener('click', () => guard(async () => {
+    if (session.reloadTab) { await session.reloadTab(); log('reloaded active tab (API)'); }
+    else { session.sendMessage({ ch: CH, t: 'cmd', op: 'reload' }, '*'); log('asked in-session page to reload'); }
+  }));
 
-$('btn-reload').addEventListener('click', () => guard(async () => {
-  if (!session.reloadTab) throw new Error('reloadTab requires the current platform API.');
-  const r = await session.reloadTab(); // no ssid = active tab
-  log('reloaded: ' + (r && r.url ? r.url : 'active tab'));
-}));
+  const pre = new URLSearchParams(location.search).get('url');
+  if (pre) $('tab-url').value = pre;
+}
 
-$('btn-video').addEventListener('click', () => guard(async () => {
-  if (!session.joinVideochat) throw new Error('Video chat API requires the current platform build.');
-  // Opens the device-settings dialog; the chat joins once the user confirms.
-  await session.joinVideochat();
-  log('video chat: confirm devices in the dialog');
-}));
+function attach(s){
+  session = s;
+  s.on('session_started', () => { log('session started'); refreshCtrl(); });
+  s.on('session_ended',   () => { log('session ended'); detach(); });
+  s.on('participant_joined', (ss, ev) => { log('participant joined: index ' + ev.clientIndex); refreshCtrl(); maybeAutohost(ev.clientIndex); });
+  s.on('participant_left',   (ss, ev) => { log('participant left: index ' + ev.clientIndex); refreshCtrl(); });
+  s.on('viewer_joined',      (ss, ev) => { log('participant joined: index ' + ev.clientIndex); refreshCtrl(); maybeAutohost(ev.clientIndex); });
+  s.on('viewer_left',        (ss, ev) => { log('participant left: index ' + ev.clientIndex); refreshCtrl(); });
+  s.on('host_changed', (ss, ev) => { log('host changed -> index ' + ev.to); refreshCtrl(); });
+  s.on('message', (ss, ev) => onDeckMessage(ev));
+  refreshCtrl();
+}
+function detach(){
+  session = null; deckConnected = false;
+  ['btn-copy','btn-end','btn-host','btn-cam','btn-invite','btn-open','btn-reload'].forEach(id => $(id).disabled = true);
+  $('st-state').textContent = 'idle'; $('dot').classList.remove('on');
+  $('st-deck').textContent = 'not connected';
+}
 
-$('btn-cam').addEventListener('click', () => guard(async () => {
-  if (!session.toggleVideochatCamera) throw new Error('Video chat API requires the current platform build.');
-  // toggle returns the post-toggle state; double-toggle guarantees "on".
-  let on = await session.toggleVideochatCamera();
-  if (!on) on = await session.toggleVideochatCamera();
-  if (on) await session.toggleVideochatFullscreen();
-  log('camera ' + (on ? 'on, fullscreen toggled' : 'could not enable'));
-}));
+async function refreshCtrl(){
+  if (!session) return;
+  const live = !!session.started;
+  $('dot').classList.toggle('on', live);
+  $('st-state').textContent = live ? 'live' : 'starting…';
+  $('st-pin').textContent = session.pin || '–';
+  ['btn-copy','btn-end','btn-host','btn-cam','btn-invite','btn-open','btn-reload'].forEach(id => $(id).disabled = !live);
+  try {
+    const ps = await session.getParticipants();
+    const ul = $('participants'); ul.innerHTML = '';
+    ps.forEach(p => {
+      const li = document.createElement('li');
+      li.textContent = (p.self ? 'you (agent)' : (p.name || 'guest')) + ' · index ' + p.client_index + (p.online ? ' · online' : ' · offline');
+      ul.appendChild(li);
+    });
+    if (!ps.length) ul.innerHTML = '<li>none yet</li>';
+  } catch(e){}
+}
 
-$('btn-host').addEventListener('click', () => guard(async () => {
+async function firstCustomer(){
   const ps = await session.getParticipants();
-  const other = ps.find(p => !p.self && p.online);
-  if (!other) throw new Error('No remote participant online to hand hosting to.');
+  return ps.find(p => !p.self && p.online);
+}
+async function handToFirstCustomer(){
+  const other = await firstCustomer();
+  if (!other) throw new Error('No customer online in the session.');
   const idx = await handHost(session, other.client_index);
   log('host handed to client index ' + idx);
-}));
+}
+async function maybeAutohost(clientIndex){
+  if (!$('autohost').checked || clientIndex === 0) return;
+  try { await handHost(session, clientIndex); log('auto-host handed to index ' + clientIndex); }
+  catch(e){ log('auto-host failed: ' + e.message); }
+}
+async function agentCameraFullscreen(){
+  if (!session.joinVideochat) throw new Error('Videochat API requires the current platform build.');
+  await session.joinVideochat();                 // device dialog; joins on confirm
+  let on = await session.toggleVideochatCamera();
+  if (!on) on = await session.toggleVideochatCamera(); // double-toggle guarantees ON
+  if (on) await session.toggleVideochatFullscreen();
+  log('agent camera: ' + (on ? 'on, fullscreen' : 'could not enable'));
+}
 
-// init URL prefill: ?url=... also pre-fills the open-tab box
-const pre = new URLSearchParams(location.search).get('url');
-if (pre) $('tab-url').value = pre;
-refresh();
+// ---- relay: privileged requests from the in-session deck ----
+async function onDeckMessage(ev){
+  const d = ev && ev.data;
+  if (!d || d.ch !== CH) return;
+  if (d.t === 'hello'){
+    if (!deckConnected){ deckConnected = true; $('st-deck').textContent = 'connected'; log('in-session page connected'); }
+    lastDeckClient = ev.clientIndex !== undefined ? ev.clientIndex : lastDeckClient;
+    session.sendMessage({ ch: CH, t: 'hi' }, '*');
+    return;
+  }
+  if (d.t === 'request'){
+    log('deck request: ' + d.op + (d.op === 'makehost-self' ? ' (needs your OK)' : ''));
+    try {
+      if (d.op === 'makehost-self'){
+        const ok = confirm('Customer in the session asks to become HOST. Allow?');
+        if (!ok) throw new Error('declined by agent');
+        let idx = lastDeckClient;
+        if (idx == null){ const c = await firstCustomer(); if (!c) throw new Error('no customer found'); idx = c.client_index; }
+        const newIdx = await handHost(session, idx);
+        log('host handed to deck (index ' + newIdx + ')');
+      } else if (d.op === 'agent-camera-fullscreen'){
+        await agentCameraFullscreen();
+      } else if (d.op === 'invite-link'){
+        const link = joinLink(session);
+        session.sendMessage({ ch: CH, t: 'hi', replyTo: 'invite', link }, '*');
+        log('invite link sent back to deck');
+      } else {
+        throw new Error('unknown op ' + d.op);
+      }
+      session.sendMessage({ ch: CH, t: 'hi', replyTo: 'ack-exec', op: d.op, ok: true }, '*');
+    } catch(e){
+      log('deck request failed: ' + (e.message || e));
+      session.sendMessage({ ch: CH, t: 'hi', replyTo: 'ack-exec', op: d.op, ok: false }, '*');
+    }
+  }
+}
 </script>
 </body>
 </html>
