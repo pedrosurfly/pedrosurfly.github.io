@@ -40,7 +40,7 @@
   <div class="card">
     <div class="row">
       <input id="url" type="text" placeholder="app.example.com/page" autocomplete="off" spellcheck="false">
-      <button id="go">Open and hand over</button>
+      <button id="go" disabled>Open and hand over</button>
     </div>
     <div class="opts">
       <input type="checkbox" id="auto" checked>
@@ -54,15 +54,14 @@
 <script>
 'use strict';
 // =====================================================================
-// This page runs INSIDE a session only. The platform injects its API into
-// augmented pages, so there is no widget key, no space id and nothing to
-// configure here.
+// Runs inside a session. No widget key and no space id are needed: the
+// script below only ATTACHES to the session this tab is already in.
+// (A key is required only to START a session from outside.)
 //
-// The injected global keeps the platform's former product name; it is
-// assembled from parts so the word never appears in this file.
+// The API global keeps the platform's former product name; assembled from
+// parts so the word never appears in this file.
 // =====================================================================
 const NS = 'web' + 'fuse';
-const CH = 'surfly-handover';
 const $ = id => document.getElementById(id);
 const wait = ms => new Promise(r => setTimeout(r, ms));
 
@@ -73,10 +72,20 @@ function msg(t, kind){
 }
 function clearMsg(){ $('msg').className = 'msg'; }
 
-// ---- the session object the platform injects -------------------------
+// ---- load the platform script, then find the session ------------------
+function loadScript(){
+  return new Promise((resolve, reject) => {
+    if (window[NS]) return resolve();
+    const s = document.createElement('script');
+    s.src = location.origin + '/surfly.js';
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error('Could not load ' + location.origin + '/surfly.js'));
+    document.head.appendChild(s);
+  });
+}
 function sessionNow(){
   const a = window[NS];
-  if (!a) return window[NS + 'Session'] || null;
+  if (!a) return null;
   if (a.currentSession) return a.currentSession;
   try { const l = a.listSessions && a.listSessions(); if (l && l.length) return l[0]; } catch(e){}
   return null;
@@ -100,7 +109,7 @@ function normUrl(raw){
 // STATE
 // =====================================================================
 let session = null;
-let joined = [];                 // client indexes seen joining (fallback list)
+let joined = [];
 let pendingUrl = null;
 let handedOver = false;
 
@@ -148,14 +157,18 @@ function syntheticClick(url){
 // BOOT
 // =====================================================================
 (async function boot(){
+  try { await loadScript(); }
+  catch(e){ msg(String(e && e.message ? e.message : e)); return; }
+
   session = await waitForSession(8000);
   if (!session){
-    $('go').disabled = true;
-    msg('No session detected on this tab. This page has to be opened as a page inside a session.', 'info');
+    msg('Loaded the API but found no session on this tab. Open this page as a tab inside the session.', 'info');
     return;
   }
+  $('go').disabled = false;
   wire();
   setLabel();
+  msg('Session attached. Ready.', 'ok');
 
   $('go').addEventListener('click', () => run(async () => {
     const url = normUrl($('url').value);
@@ -164,7 +177,6 @@ function syntheticClick(url){
       pendingUrl = url;
       msg('No customer online yet. ' + ($('auto').checked ? 'Hand-over is armed and will fire the moment one joins.' : 'Press again once they join.'), 'info');
       setLabel();
-      // Open the tab anyway so the session already shows the target page.
       if (session.openTab) { try { await session.openTab(url); } catch(e){} }
       return;
     }
@@ -188,7 +200,7 @@ function wire(){
 }
 async function maybeAutohandover(){
   if (!$('auto').checked || handedOver || !pendingUrl) return;
-  await wait(1200);                                   // let the join settle
+  await wait(1200);
   const cs = await customers();
   if (!cs.length) return;
   try { await openAndHandOver(pendingUrl); setLabel(); }
@@ -200,7 +212,7 @@ async function run(fn){
   catch(e){
     const m = e && e.message ? e.message : String(e);
     msg(/permission|denied|forbidden|not allowed/i.test(m)
-      ? m + ' — the platform only lets the tab that started the session transfer hosting. Allow host switching in the Space settings and give the customer host rights.'
+      ? m + ' — the platform only exposes hosting calls to the session-owning context. Allow host switching in Space settings and give the customer host rights.'
       : m);
   }
 }
