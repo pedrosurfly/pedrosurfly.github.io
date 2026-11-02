@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Video chat recovery</title>
+  <style>
+    html, body { height: 100%; margin: 0; }
+    body {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f5f5f5;
+      color: #222;
+    }
+    .btn {
+      display: none;
+      padding: 16px 28px;
+      font-size: 18px;
+      font-weight: 600;
+      border-radius: 8px;
+      border: 2px solid #1a73e8;
+      background: #1a73e8;
+      color: #fff;
+      text-decoration: none;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .btn.secondary { background: #fff; color: #222; border-color: #222; }
+    .btn.visible { display: inline-block; }
+    #status { font-size: 16px; text-align: center; max-width: 480px; }
+    #log {
+      width: 100%;
+      max-width: 640px;
+      max-height: 40vh;
+      overflow: auto;
+      margin: 0;
+      padding: 12px;
+      box-sizing: border-box;
+      font: 12px/1.4 ui-monospace, Menlo, monospace;
+      background: #1e1e1e;
+      color: #d4d4d4;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+  </style>
+
+  <!-- Surfly loader snippet -->
+  <script>
+    (function (s, u, r, f, l, y) {
+      s[f] = s[f] || { init: function () { s[f].q = arguments; } };
+      l = u.createElement(r);
+      y = u.getElementsByTagName(r)[0];
+      l.async = 1;
+      l.src = 'https://surfly.com/surfly.js';
+      l.onload = function () { window.__surflyLoaded = true; };
+      l.onerror = function () { window.__surflyLoadError = true; };
+      y.parentNode.insertBefore(l, y);
+    })(window, document, 'script', 'Surfly');
+  </script>
+</head>
+<body>
+  <p id="status">Checking browser…</p>
+
+  <a id="open-in-chrome" class="btn" href="#">Open in Chrome</a>
+  <button id="reload-top" class="btn secondary" type="button">Reload whole browser</button>
+  <button id="rejoin" class="btn secondary" type="button">Rejoin session (retry video)</button>
+  <button id="reload-page" class="btn secondary" type="button">Reload this page only</button>
+
+  <pre id="log"></pre>
+
+  <script>
+    (function () {
+      // ---------- config ----------
+      var qs = new URLSearchParams(location.search);
+      var WIDGET_KEY = qs.get('widget_key') || '61c30ab2090a46d488cc5f41cc624fb4';
+      // Fallback follower link if the API does not expose it inside the session:
+      // open this page inside the session as  .../index.html?follower=<encoded follower link>
+      var followerFromQuery = qs.get('follower');
+
+      // ---------- on-page log ----------
+      var logEl = document.getElementById('log');
+      function log() {
+        var parts = Array.prototype.slice.call(arguments).map(function (a) {
+          if (typeof a === 'string') return a;
+          try { return JSON.stringify(a); } catch (e) { return String(a); }
+        });
+        logEl.textContent += parts.join(' ') + '\n';
+        logEl.scrollTop = logEl.scrollHeight;
+        console.log.apply(console, arguments);
+      }
+
+      // ---------- browser detection ----------
+      var ua = navigator.userAgent;
+      var isSamsung = /SamsungBrowser/.test(ua);
+      var isAndroid = /Android/.test(ua);
+      var isIOS = /iPhone|iPad|iPod/.test(ua) ||
+                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+      function isChrome() {
+        if (navigator.userAgentData && navigator.userAgentData.brands) {
+          return navigator.userAgentData.brands.some(function (b) { return b.brand === 'Google Chrome'; });
+        }
+        if (/CriOS/.test(ua)) return true;
+        return /Chrome\//.test(ua) &&
+               !/Edg\/|OPR\/|SamsungBrowser|Brave|Vivaldi|YaBrowser|UCBrowser/.test(ua) &&
+               !navigator.brave;
+      }
+
+      // ---------- link building ----------
+      var followerLink = null;
+
+      function targetUrl() {
+        // Inside a session location.href is the proxy URL; we need the real follower link.
+        return followerLink || followerFromQuery || location.href;
+      }
+
+      function chromeLink(url) {
+        if (isIOS) {
+          var scheme = /^https:/.test(url) ? 'googlechromes://' : 'googlechrome://';
+          return scheme + url.replace(/^https?:\/\//, '');
+        }
+        if (isAndroid) {
+          var bare = url.replace(/^https?:\/\//, '');
+          var proto = /^https:/.test(url) ? 'https' : 'http';
+          return 'intent://' + bare + '#Intent;scheme=' + proto +
+                 ';package=com.android.chrome;S.browser_fallback_url=' +
+                 encodeURIComponent(url) + ';end';
+        }
+        return 'https://www.google.com/chrome/';
+      }
+
+      function navigateTop(url) {
+        // Cross-origin iframe may not reload the parent, but it may navigate it on a user gesture.
+        try { window.top.location.href = url; }
+        catch (e) { log('top navigation blocked:', e.message); location.href = url; }
+      }
+
+      // ---------- UI ----------
+      var statusEl = document.getElementById('status');
+      var chromeBtn = document.getElementById('open-in-chrome');
+      var rejoinBtn = document.getElementById('rejoin');
+      var reloadTopBtn = document.getElementById('reload-top');
+      var reloadBtn = document.getElementById('reload-page');
+
+      function renderButtons() {
+        var url = targetUrl();
+        if (isChrome()) {
+          statusEl.textContent = 'You are using Chrome.';
+        } else {
+          statusEl.textContent = isSamsung
+            ? 'Samsung Internet detected. Camera may not work here. Open in Chrome:'
+            : 'Not Chrome. Open in Chrome:';
+          chromeBtn.href = chromeLink(url);
+          chromeBtn.classList.add('visible');
+        }
+        reloadTopBtn.classList.add('visible');
+        rejoinBtn.classList.add('visible');
+        reloadBtn.classList.add('visible');
+      }
+
+      chromeBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        log('open in chrome ->', chromeBtn.href);
+        navigateTop(chromeBtn.href);
+      });
+
+      reloadTopBtn.addEventListener('click', function () {
+        // Cross-origin top.reload() throws; only works if page and session shell share origin.
+        try {
+          window.top.location.reload();
+          log('top.reload() accepted');
+        } catch (e) {
+          log('top.reload() blocked:', e.name, '-> navigating top to', targetUrl());
+          navigateTop(targetUrl());
+        }
+      });
+
+      rejoinBtn.addEventListener('click', function () {
+        var url = targetUrl();
+        log('rejoin ->', url);
+        navigateTop(url);
+      });
+
+      reloadBtn.addEventListener('click', function () {
+        log('reload iframe only');
+        location.reload();
+      });
+
+      log('UA:', ua);
+      log('isChrome:', isChrome(), 'samsung:', isSamsung, 'android:', isAndroid, 'ios:', isIOS);
+      log('follower from query:', followerFromQuery);
+      renderButtons();
+
+      // ---------- Surfly ----------
+      log('widget_key:', WIDGET_KEY);
+      log('surfly.js loaded:', !!window.__surflyLoaded, 'error:', !!window.__surflyLoadError);
+      var initFired = false;
+      setTimeout(function () {
+        if (initFired) return;
+        log('WARN: Surfly.init callback not called after 5s');
+        log('surfly.js loaded:', !!window.__surflyLoaded, 'error:', !!window.__surflyLoadError);
+        log('Surfly is stub (queue only):', !!(window.Surfly && window.Surfly.q && !window.Surfly.session));
+        log('Surfly keys:', window.Surfly ? Object.keys(window.Surfly) : 'none');
+        log('isInsideSession:', window.Surfly && window.Surfly.isInsideSession);
+        log('currentSession:', !!(window.Surfly && window.Surfly.currentSession));
+      }, 5000);
+
+      Surfly.init({ widget_key: WIDGET_KEY }, function (init) {
+        initFired = true;
+        log('Surfly.init:', init);
+        log('isInsideSession:', Surfly.isInsideSession);
+
+        var s = Surfly.currentSession;
+        if (!s) { log('no currentSession'); return; }
+
+        // Test what is actually exposed inside the session
+        log('currentSession keys:', Object.keys(s));
+        log('followerLink:', s.followerLink);
+        log('leaderLink:', s.leaderLink);
+        log('pin:', s.pin);
+        log('started:', s.started);
+
+        // Probe undocumented candidates for the session link
+        log('sessionLink:', s.sessionLink);
+        log('_sessionId:', s._sessionId, '_formattedId:', s._formattedId);
+        log('_cobroServerName:', s._cobroServerName, '_isLeader:', s._isLeader);
+        log('_sessionSettings:', s._sessionSettings);
+        log('_api keys:', s._api ? Object.keys(s._api) : null);
+        log('listSessions:', Surfly.listSessions().length);
+        log('location.href:', location.href);
+        log('document.referrer:', document.referrer);
+        log('window.name:', window.name);
+        try {
+          var info = s.getSessionInfo && s.getSessionInfo();
+          if (info && info.then) info.then(function (r) { log('getSessionInfo:', r); },
+                                           function (e) { log('getSessionInfo rejected:', e && e.message); });
+          else log('getSessionInfo:', info);
+        } catch (e) { log('getSessionInfo threw:', e.message); }
+
+        // Build the follower link from the session id (documented props are null inside a session).
+        // Override base with ?base=https://your.surfly.host if sessions run on another domain.
+        var base = qs.get('base') ||
+                   (s._cobroServerName ? 'https://' + s._cobroServerName : 'https://surfly.com');
+        var built = s._sessionId ? base.replace(/\/$/, '') + '/' + s._sessionId : null;
+        followerLink = s.followerLink || s.sessionLink || built || null;
+        log('built link:', built);
+        log('using followerLink:', followerLink);
+        renderButtons();
+
+        ['session_started', 'session_loaded', 'participant_joined', 'participant_left',
+         'host_changed', 'tab_control', 'tab_activated',
+         'videochat_started', 'videochat_camera_toggled', 'videochat_microphone_toggled',
+         'message'
+        ].forEach(function (name) {
+          s.on(name, function (session, ev) { log('event', name, ev || ''); });
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
